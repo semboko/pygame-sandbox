@@ -3,6 +3,7 @@ from typing import Optional, Type
 import pygame
 
 from scenes.abstract import AbstractScene
+from scenes.gravity import GravityScene
 
 
 class Game:
@@ -16,12 +17,10 @@ class Game:
     def __enter__(self):
         pygame.init()
         self.sc = pygame.display.set_mode(self.res)
+        return self
 
     def __exit__(self, exc_class, exc_message, traceback_obj):
         pygame.quit()
-
-    def render(self):
-        self.sc.fill((255, 255, 255))
 
     def load_scene(self, scene: Type[AbstractScene]):
         self.scene = scene(self.sc)
@@ -32,12 +31,12 @@ class Game:
                 if event.type == pygame.QUIT:
                     return
             self.scene.handle_events(tuple(pygame.event.get()))
-            self.scene.update()
+            self.scene.update(self.fps)
             self.scene.render()
             pygame.display.update()
             self.clock.tick(self.fps)
 
 
 with Game() as g:
-    g.load_scene(...)
+    g.load_scene(GravityScene)
     g.run()
