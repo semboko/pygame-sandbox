@@ -10,6 +10,8 @@ class Game:
         self.sc = None
         self.res = (500, 500)
         self.scene: Optional[AbstractScene] = None
+        self.clock = pygame.time.Clock()
+        self.fps = 60
 
     def __enter__(self):
         pygame.init()
@@ -33,6 +35,7 @@ class Game:
             self.scene.update()
             self.scene.render()
             pygame.display.update()
+            self.clock.tick(self.fps)
 
 
 with Game() as g:
