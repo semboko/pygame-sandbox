@@ -1,0 +1,15 @@
+Gravity manipulation: Allow players to control the direction and strength of gravity, creating unique challenges and opportunities for building structures.
+
+Fluid dynamics: Implement fluid mechanics to create a sandbox where players can experiment with water, oil, and other liquids.
+
+Soft body physics: Introduce soft body physics to simulate deformable objects such as rubber or fabric.
+
+Weather and environmental effects: Add weather effects such as rain, snow, wind, and lightning to the game and let players experiment with how these elements interact with objects and structures.
+
+Particles and explosions: Add particle effects for things like fire, smoke, and explosions, and allow players to experiment with their properties and behaviors.
+
+Multiple materials: Include different materials with different properties, such as wood, metal, stone, and glass, to provide more variety and realism.
+
+Tools and machinery: Implement tools and machinery, such as cranes, bulldozers, and jackhammers, to give players more creative ways to manipulate their environment.
+
+Joints and constraints: Allow players to create objects with joints and constraints, such as rope bridges, pendulums, and chains, to explore the interactions between objects and mechanics.
