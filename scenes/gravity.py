@@ -10,7 +10,8 @@ from scenes.abstract import AbstractScene
 class GravityScene(AbstractScene):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
+        
+        self.space: pymunk.Space() = pymunk.Space()
         self.circle = pymunk.Body()
         self.circle.position = (self.size_sc[0]//2, self.size_sc[1]//2)
         self.circle_shape = pymunk.Circle(self.circle, 10)
@@ -19,7 +20,7 @@ class GravityScene(AbstractScene):
         pass
 
     def update(self, step):
-        super(GravityScene, self).update(step)
+        self.space.step(step)
     def render(self):
         self.display.fill((255, 255, 255))
         for i in range(len(self.space.bodies)):
