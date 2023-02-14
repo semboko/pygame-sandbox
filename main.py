@@ -23,7 +23,7 @@ class Game:
         pygame.quit()
 
     def load_scene(self, scene: Type[AbstractScene]):
-        self.scene = scene(self.sc)
+        self.scene = scene(self.sc, self.fps)
 
     def run(self):
         while True:
@@ -31,7 +31,7 @@ class Game:
                 if event.type == pygame.QUIT:
                     return
             self.scene.handle_events(tuple(pygame.event.get()))
-            self.scene.update(self.fps)
+            self.scene.update()
             self.scene.render()
             pygame.display.update()
             self.clock.tick(self.fps)
