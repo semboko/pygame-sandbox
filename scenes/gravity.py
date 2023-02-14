@@ -1,22 +1,42 @@
 from typing import Tuple
-
+from .utils import convert
 import pymunk
 from pygame.event import Event
 from pygame.surface import Surface
 import pygame.draw
 from scenes.abstract import AbstractScene
 
+class Ball:
+    def __init__(self, x:int, y:int, r:int, space: pymunk.Space, btype: int = pymunk.Body.DYNAMIC):
+        self.body = pymunk.Body(btype)
+        self.body.position = x, y
+        self.shape = pymunk.Circle(self.body, r)
+        self.shape.density = 1
+        self.r = r
+        space.add(self.body, self.shape)
+    def render(self, display: Surface) -> None:
+        h = display.get_height()
+        pygame.draw.circle(display, (244, 0, 0), convert(self.body.position, h), self.r)
+
+class Segment:
+    def __init__(self, a: Tuple[int, int], b: Tuple[int, int], r: int, space: pymunk.Space, btype: int = pymunk.Body.DYNAMIC):
+        self.body = pymunk.Body(btype)
+        self.shape = pymunk.Segment(self.body, a, b, r)
+        self.r = r
+        space.add(self.body, self.shape)
+    def render(self, display: Surface) -> None:
+        h = display.get_height()
+        pygame.draw.line(display, (0, 0, 0), convert(self.shape.a, h), convert(self.shape.b, h), self.r)
 
 class GravityScene(AbstractScene):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         
         self.space: pymunk.Space() = pymunk.Space()
-        self.circle = pymunk.Body()
-        self.circle.position = self.size_sc[0]//2, self.size_sc[1]//2
-        self.circle_shape = pymunk.Circle(self.circle, 10)
-        self.circle_shape.density = 1
-        self.space.add(self.circle, self.circle_shape)
+        self.space.gravity = 0, -1000
+        self.circle = Ball(250, 400, 10, self.space)
+
+        self.segment = Segment((0, 100),(500, 50),5,self.space,btype = pymunk.Body.KINEMATIC)
 
     def handle_events(self, events: Tuple[Event]) -> None:
         pass
@@ -26,5 +46,5 @@ class GravityScene(AbstractScene):
 
     def render(self):
         self.display.fill((255, 255, 255))
-        x, y = self.circle.position
-        pygame.draw.circle(self.display, (255, 0, 0), (int(x), int(y)), 10)
+        self.circle.render(self.display)
+        self.segment.render(self.display)
