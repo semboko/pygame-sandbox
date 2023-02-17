@@ -27,10 +27,10 @@ class Game:
 
     def run(self):
         while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+            for event in pygame.event.get() :
+                if event.type==pygame.QUIT :
                     return
-            self.scene.handle_events(tuple(pygame.event.get()))
+                self.scene.handle_events((event,))
             self.scene.update()
             self.scene.render()
             pygame.display.update()

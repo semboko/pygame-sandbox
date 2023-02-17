@@ -1,5 +1,6 @@
 from abc import ABC
 from typing import Tuple
+
 from pygame.event import Event
 from pygame.surface import Surface
 
