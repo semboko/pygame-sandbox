@@ -30,7 +30,7 @@ class Game:
             for event in pygame.event.get() :
                 if event.type==pygame.QUIT :
                     return
-                self.scene.handle_events((event,))
+                self.scene.handle_events((event,), pygame.mouse.get_pos())
             self.scene.update()
             self.scene.render()
             pygame.display.update()

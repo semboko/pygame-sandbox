@@ -10,7 +10,7 @@ class AbstractScene(ABC):
         self.size_sc: tuple = display.get_size()
         self.fps: int = fps
 
-    def handle_events(self, events: Tuple[Event]) -> None:
+    def handle_events(self, events: Tuple[Event], mouse: Tuple[int, int]) -> None:
         raise NotImplementedError()
 
     def update(self):
