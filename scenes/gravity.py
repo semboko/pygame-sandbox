@@ -23,7 +23,6 @@ class Ball:
         self.r = r
         space.add(self.body, self.shape)
 
-
     def render(self, display: Surface) -> None:
         h = display.get_height()
         pygame.draw.circle(display, (244, 0, 0), convert(self.body.position, h), self.r)
