@@ -1,3 +1,4 @@
+from logging import getLogger
 from typing import Tuple
 
 import pygame.draw
@@ -8,9 +9,9 @@ from pygame.surface import Surface
 from scenes.abstract import AbstractScene
 
 from .utils import convert
-from logging import getLogger
 
 log = getLogger()
+
 
 class Ball:
     def __init__(self, x: int, y: int, r: int, space: pymunk.Space, btype: int = pymunk.Body.DYNAMIC):
@@ -28,13 +29,21 @@ class Ball:
         pygame.draw.circle(display, (244, 0, 0), convert(self.body.position, h), self.r)
         log.info(f"circle by id {id(self)}: angle = {self.body.angle}, pos = {tuple(self.body.position)}")
         # Create a new pygame.Rect object for the ball
-        self.rect = pygame.Rect(*tuple(convert((self.body.position.x - self.r, (self.body.position.y - self.r)+2 * self.r), display.get_height())), 2 * self.r, 2 * self.r)
-        #pygame.draw.rect(display, (50, 50, 50), self.rect)
+        self.rect = pygame.Rect(
+            *tuple(
+                convert(
+                    (self.body.position.x - self.r, (self.body.position.y - self.r) + 2 * self.r), display.get_height()
+                )
+            ),
+            2 * self.r,
+            2 * self.r,
+        )
+        # pygame.draw.rect(display, (50, 50, 50), self.rect)
 
 
 class Segment:
     def __init__(
-            self, a: Tuple[int, int], b: Tuple[int, int], r: int, space: pymunk.Space, btype: int = pymunk.Body.DYNAMIC
+        self, a: Tuple[int, int], b: Tuple[int, int], r: int, space: pymunk.Space, btype: int = pymunk.Body.DYNAMIC
     ):
         self.body = pymunk.Body(body_type=btype)
         self.shape = pymunk.Segment(self.body, a, b, r)
@@ -83,10 +92,10 @@ class GravityScene(AbstractScene):
                 elif event.dict["button"] == 3:
                     for obj in self.renders_objs:
                         if isinstance(obj, Ball):
-                            print(obj.rect.colliderect(pygame.Rect(mouse[0]-20, mouse[1]-20, 40, 40)))
-                            if obj.rect.colliderect(pygame.Rect(mouse[0] - obj.r, mouse[1] - obj.r, obj.r*2, obj.r*2)):
-
-
+                            print(obj.rect.colliderect(pygame.Rect(mouse[0] - 20, mouse[1] - 20, 40, 40)))
+                            if obj.rect.colliderect(
+                                pygame.Rect(mouse[0] - obj.r, mouse[1] - obj.r, obj.r * 2, obj.r * 2)
+                            ):
                                 self.movement = True
                                 self.moving_obj = obj
             if event.type == pygame.MOUSEBUTTONUP:
@@ -124,7 +133,6 @@ class GravityScene(AbstractScene):
             self.space.step(1 / self.fps)
         self.clean_up()
 
-
     def clean_up(self):
         for i in self.renders_objs:
             if not isinstance(i, Segment):
@@ -135,4 +143,4 @@ class GravityScene(AbstractScene):
         self.display.fill((255, 255, 255))
         for obj in self.renders_objs:
             obj.render(self.display)
-        #pygame.draw.rect(self.display, (25, 25, 25), pygame.Rect(self.move_old[0]-20, self.move_old[1]-20, 40, 40))
+        # pygame.draw.rect(self.display, (25, 25, 25), pygame.Rect(self.move_old[0]-20, self.move_old[1]-20, 40, 40))
