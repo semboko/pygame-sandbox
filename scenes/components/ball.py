@@ -10,9 +10,9 @@ class Ball:
         self.body = pymunk.Body(body_type=btype)
         self.body.position = x, y
         self.shape = pymunk.Circle(self.body, r)
-        self.shape.density = 1
+        self.shape.density = .1
         self.shape.elasticity = 0.9
-        self.shape.friction = 0.8
+        self.shape.friction = 0.1
         self.r = r
         space.add(self.body, self.shape)
 
