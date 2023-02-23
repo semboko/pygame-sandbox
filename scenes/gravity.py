@@ -4,63 +4,13 @@ from typing import Tuple
 import pygame.draw
 import pymunk
 from pygame.event import Event
-from pygame.surface import Surface
+from scenes.components import Ball, Segment
 
 from scenes.abstract import AbstractScene
 
 from .utils import convert
 
 log = getLogger()
-
-
-class Ball:
-    def __init__(self, x: int, y: int, r: int, space: pymunk.Space, btype: int = pymunk.Body.DYNAMIC):
-        self.body = pymunk.Body(body_type=btype)
-        self.body.position = x, y
-        self.pos = x, y
-        self.shape = pymunk.Circle(self.body, r)
-        self.shape.density = 1
-        self.shape.elasticity = 0.9
-        self.r = r
-        space.add(self.body, self.shape)
-
-    def render(self, display: Surface) -> None:
-        h = display.get_height()
-        pygame.draw.circle(display, (244, 0, 0), convert(self.body.position, h), self.r)
-        log.info(f"circle by id {id(self)}: angle = {self.body.angle}, pos = {tuple(self.body.position)}")
-        # Create a new pygame.Rect object for the ball
-        self.rect = pygame.Rect(
-            *tuple(
-                convert(
-                    (self.body.position.x - self.r, (self.body.position.y - self.r) + 2 * self.r), display.get_height()
-                )
-            ),
-            2 * self.r,
-            2 * self.r,
-        )
-        # pygame.draw.rect(display, (50, 50, 50), self.rect)
-
-
-class Segment:
-    def __init__(
-        self, a: Tuple[int, int], b: Tuple[int, int], r: int, space: pymunk.Space, btype: int = pymunk.Body.DYNAMIC
-    ):
-        self.body = pymunk.Body(body_type=btype)
-        self.shape = pymunk.Segment(self.body, a, b, r)
-        self.shape.elasticity = 0.9
-        self.r = r
-        space.add(self.body, self.shape)
-
-        # Create a new pygame.Rect object for the segment
-        min_x = min(a[0], b[0]) - r
-        max_x = max(a[0], b[0]) + r
-        min_y = min(a[1], b[1]) - r
-        max_y = max(a[1], b[1]) + r
-        self.rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
-
-    def render(self, display: Surface) -> None:
-        h = display.get_height()
-        pygame.draw.line(display, (0, 0, 0), convert(self.shape.a, h), convert(self.shape.b, h), self.r)
 
 
 class GravityScene(AbstractScene):
@@ -78,14 +28,17 @@ class GravityScene(AbstractScene):
 
     def handle_events(self, events: Tuple[Event], mouse: Tuple[int, int]) -> None:
         for event in events:
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.pause = True
                 elif event.key == pygame.K_r:
                     self.reset_scene()
+
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_ESCAPE:
                     self.pause = False
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.dict["button"] == 1:
                     self.renders_objs.append(Ball(*convert(event.pos, self.size_sc[1]), 15, self.space))
@@ -98,6 +51,7 @@ class GravityScene(AbstractScene):
                             ):
                                 self.movement = True
                                 self.moving_obj = obj
+                                obj.body.position = convert(mouse, self.display.get_height())
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.dict["button"] == 3:
                     self.movement = False
@@ -143,4 +97,3 @@ class GravityScene(AbstractScene):
         self.display.fill((255, 255, 255))
         for obj in self.renders_objs:
             obj.render(self.display)
-        # pygame.draw.rect(self.display, (25, 25, 25), pygame.Rect(self.move_old[0]-20, self.move_old[1]-20, 40, 40))

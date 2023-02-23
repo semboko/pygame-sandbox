@@ -4,6 +4,7 @@ import pygame
 
 from scenes.abstract import AbstractScene
 from scenes.gravity import GravityScene
+from scenes.constraints import ConstraintScene
 
 
 class Game:
@@ -27,10 +28,10 @@ class Game:
 
     def run(self):
         while True:
-            for event in pygame.event.get() :
-                if event.type==pygame.QUIT :
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     return
-                self.scene.handle_events((event,), pygame.mouse.get_pos())
+                self.scene.handle_event(event)
             self.scene.update()
             self.scene.render()
             pygame.display.update()
@@ -38,5 +39,5 @@ class Game:
 
 
 with Game() as g:
-    g.load_scene(GravityScene)
+    g.load_scene(ConstraintScene)
     g.run()
