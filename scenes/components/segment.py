@@ -15,6 +15,7 @@ class Segment:
         self.shape.elasticity = 0.9
         self.shape.density = 1
         self.shape.mass = 2
+        self.shape.friction = .7
         self.r = r
         space.add(self.body, self.shape)
 
