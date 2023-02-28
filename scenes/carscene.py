@@ -1,10 +1,10 @@
 import pygame
+import pymunk
+from pygame.event import Event
 
 from scenes.abstract import AbstractPymunkScene
-from pygame.event import Event
-from scenes.components.car import Car
+from scenes.components.car import CarBody as Car
 from scenes.components.segment import Segment
-import pymunk
 
 
 class CarScene(AbstractPymunkScene):

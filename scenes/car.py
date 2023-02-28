@@ -1,10 +1,12 @@
-import pygame
-from scenes.abstract import AbstractPymunkScene
-from pygame.event import Event
 from typing import Sequence
+
+import pygame
+from pygame.event import Event
+
+from scenes.abstract import AbstractPymunkScene
+from scenes.components.ball import Ball
 from scenes.components.car import CarBody
 from scenes.components.random_floor import RandomFloor
-from scenes.components.ball import Ball
 from scenes.utils import convert
 
 
@@ -26,7 +28,7 @@ class CarScene(AbstractPymunkScene):
             self.cb.body.center_of_gravity = (gx - 5, gy)
             return
 
-        self.cb.body.center_of_gravity = (round(gx*.9, 1), gy)
+        self.cb.body.center_of_gravity = (round(gx * 0.9, 1), gy)
 
     def update_motor_rate(self, pressed_keys: Sequence[bool]):
         if pressed_keys[pygame.K_a]:
@@ -36,7 +38,7 @@ class CarScene(AbstractPymunkScene):
             self.cb.motor.rate -= 1
             return
 
-        self.cb.motor.rate *= .8
+        self.cb.motor.rate *= 0.8
 
     def update(self):
         super().update()

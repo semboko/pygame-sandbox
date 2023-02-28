@@ -1,8 +1,10 @@
+from math import cos, sin
+
 import pygame
-from scenes.utils import convert
-from pygame.surface import Surface
 import pymunk
-from math import sin, cos
+from pygame.surface import Surface
+
+from scenes.utils import convert
 
 
 class Ball:
@@ -10,7 +12,7 @@ class Ball:
         self.body = pymunk.Body(body_type=btype)
         self.body.position = x, y
         self.shape = pymunk.Circle(self.body, r)
-        self.shape.density = .1
+        self.shape.density = 0.1
         self.shape.elasticity = 0.9
         self.shape.friction = 0.7
         self.r = r
@@ -22,9 +24,5 @@ class Ball:
         alpha = self.body.angle
         line_end = cos(alpha) * self.r, sin(alpha) * self.r
         pygame.draw.line(
-            display,
-            (0, 0, 0),
-            convert(self.body.position, h),
-            convert(self.body.local_to_world(line_end), h),
-            1
+            display, (0, 0, 0), convert(self.body.position, h), convert(self.body.local_to_world(line_end), h), 1
         )

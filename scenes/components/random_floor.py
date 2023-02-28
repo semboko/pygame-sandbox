@@ -1,16 +1,17 @@
-import pymunk
 from itertools import pairwise
+from random import randint
+from typing import List, Tuple
+
+import pymunk
+from pygame import draw
+from pygame.surface import Surface
+
 from scenes.components.segment import Segment
 from scenes.utils import convert
-from pygame.surface import Surface
-from pygame import draw
-from typing import List, Tuple
-from random import randint
 
 
 class RandomFloor:
     def __init__(self, start_x: float, end_x: float, min_y: float, max_y: float, segments: int, space: pymunk.Space):
-
         self.points: List[Tuple[int, int]] = []
         total_width = end_x - start_x
         seg_width = total_width / segments

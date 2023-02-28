@@ -1,10 +1,11 @@
 import pygame
-from scenes.components.pj import PJ
-from scenes.abstract import AbstractPymunkScene
-from pygame.event import Event
-from scenes.components import Ball, Segment
 import pymunk
-from pymunk.constraints import PinJoint, PivotJoint, DampedSpring, DampedRotarySpring, SimpleMotor, GearJoint
+from pygame.event import Event
+from pymunk.constraints import DampedRotarySpring, DampedSpring, GearJoint, PinJoint, PivotJoint, SimpleMotor
+
+from scenes.abstract import AbstractPymunkScene
+from scenes.components import Ball, Segment
+from scenes.components.pj import PJ
 from scenes.utils import convert
 
 
@@ -19,7 +20,7 @@ class ConstraintScene(AbstractPymunkScene):
         # self.space.add(spring)
 
         self.space.add(SimpleMotor(ball1.body, self.space.static_body, 3.14))
-        self.space.add(GearJoint(ball1.body, ball2.body, 0, .5))
+        self.space.add(GearJoint(ball1.body, ball2.body, 0, 0.5))
 
         floor = Segment((0, 20), (500, 20), 5, self.space, btype=pymunk.Body.STATIC)
 
@@ -37,4 +38,3 @@ class ConstraintScene(AbstractPymunkScene):
             if objs:
                 body = objs[0].shape.body
                 body.apply_impulse_at_local_point((0, -20000), (20, 0))
-
