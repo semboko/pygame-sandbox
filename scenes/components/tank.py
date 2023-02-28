@@ -46,9 +46,10 @@ class Tank:
         wheel_y = y - body_height//2
         for _ in range(wheels_number):
             wheel = Ball(wheel_x, wheel_y, wheel_diameter//2, space)
-            wheel.shape.density = .6
+            wheel.shape.density = .7
             wheel.shape.filter = self.collision_filter
             wheel.shape.friction = 1
+            wheel.shape.elasticity = .2
             space.add(PivotJoint(wheel.body, self.body, (0, 0), self.body.world_to_local((wheel_x, wheel_y))))
             if self.wheels:
                 space.add(GearJoint(wheel.body, self.wheels[-1].body, 0, 1))
@@ -69,6 +70,9 @@ class Tank:
         self.turret_shape = Poly(self.body, vertices)
         self.turret_shape.filter = self.collision_filter
         space.add(self.turret_shape)
+
+    def add_gun(self, x, y ,width, height, space: Space):
+        pass
 
     def update_velocity(self, keys: Sequence[bool]):
         if keys[pygame.K_d]:
