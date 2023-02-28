@@ -5,6 +5,7 @@ import pygame
 from scenes.abstract import AbstractScene
 from scenes.gravity import GravityScene
 from scenes.constraints import ConstraintScene
+from scenes.tank import TankScene
 
 
 class Game:
@@ -39,5 +40,5 @@ class Game:
 
 
 with Game() as g:
-    g.load_scene(ConstraintScene)
+    g.load_scene(TankScene)
     g.run()
