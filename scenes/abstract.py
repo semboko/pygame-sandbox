@@ -46,7 +46,7 @@ class AbstractPymunkScene(AbstractScene):
         self.space.step(1 / self.fps)
 
     def render(self):
-        self.display.fill((255, 255, 255))
+        self.display.fill((235, 146, 52))
         for obj in self.objects:
             obj.render(self.display)
 
