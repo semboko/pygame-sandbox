@@ -8,6 +8,7 @@ from pygame.surface import Surface
 from pymunk import Body, GearJoint, PivotJoint, Poly, Shape, ShapeFilter, SimpleMotor, Space, DampedRotarySpring, RatchetJoint, RotaryLimitJoint
 
 from scenes.components.ball import Ball
+from scenes.components.bullet import Bullet
 from scenes.components.rect import Rect
 from scenes.utils import convert
 
@@ -75,14 +76,14 @@ class Tank:
         self.gun.body.mass = 20
         self.gun.shape.filter = self.collision_filter
         space.add(PivotJoint(self.gun.body, self.wheel_holder.body, (-width//2, 2), (0, height//2)))
-        self.gun_joint = RotaryLimitJoint(self.gun.body, self.wheel_holder.body, -.2, 0)
+        self.gun_joint = RotaryLimitJoint(self.gun.body, self.wheel_holder.body, -.1, 0)
         space.add(self.gun_joint)
 
     def add_bullet(self):
         space = self.wheel_holder.body.space
         width, height = self.width, self.height
         x, y = self.wheel_holder.body.position
-        self.bullet = Ball(x, y + height//4, 4, space)
+        self.bullet = Bullet(x, y + height//4, 4, space)
         self.bullet.shape.elasticity = .1
         self.bullet.body.mass = 400
         self.bullet_holder = PivotJoint(self.gun.body, self.bullet.body, (width//2, 0), (0, 0))
@@ -113,12 +114,13 @@ class Tank:
         self.motor.rate *= 0.8
 
     def update_gun_angle(self, keys: Sequence[bool]):
-        if keys[pygame.K_UP]:
-            self.gun_joint.min -= .05
-            self.gun_joint.max -= .05
-        if keys[pygame.K_DOWN]:
-            self.gun_joint.min += .05
-            self.gun_joint.max += .05
+        relative_angle = self.gun.body.angle - self.wheel_holder.body.angle
+        if keys[pygame.K_UP] and relative_angle < 1.2:
+            self.gun_joint.min -= .01
+            self.gun_joint.max -= .01
+        if keys[pygame.K_DOWN] and relative_angle > 0:
+            self.gun_joint.min += .01
+            self.gun_joint.max += .01
 
     def update(self):
         keys = pygame.key.get_pressed()
