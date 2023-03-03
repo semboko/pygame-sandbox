@@ -2,7 +2,8 @@ from typing import List, Sequence
 
 import pygame
 import pymunk
-from math import cos, sin
+from pymunk.vec2d import Vec2d
+from math import cos, sin, degrees
 from pygame import draw
 from pygame.surface import Surface
 from pymunk import Body, GearJoint, PivotJoint, Poly, Shape, ShapeFilter, SimpleMotor, Space, DampedRotarySpring, RatchetJoint, RotaryLimitJoint
@@ -13,48 +14,102 @@ from scenes.components.rect import Rect
 from scenes.utils import convert
 
 
+TANK_WIDTH = 250
+TANK_HEIGHT = 74
+WHEEL_R = 9
+
+
+class TankBase:
+    def __init__(self, tank_x: int, tank_y: int, cf: ShapeFilter, space: Space):
+        self.collision_filter = cf
+        self.width = 213
+        self.height = 44
+
+        delta_x, delta_y = -18.5, -15
+
+        self.body = Body()
+        self.body.position = tank_x + delta_x, tank_y + delta_y
+
+        raw_vertices = (
+            Vec2d(0, 30),
+            Vec2d(0, 50),
+            Vec2d(10, 51),
+            Vec2d(37, 72),
+            Vec2d(172, 72),
+            Vec2d(200, 58),
+            Vec2d(204, 40),
+            Vec2d(73, 36),
+            Vec2d(50, 30),
+            Vec2d(0, 30)
+        )
+        self.relative_verts = [
+            convert(v + (-self.width/2 + delta_x, -self.height/2 + delta_y), self.height) for v in raw_vertices
+        ]
+        self.shape = Poly(self.body, self.relative_verts)
+        self.shape.density = 1
+        space.add(self.body, self.shape)
+
+        self.image = pygame.image.load("./scenes/assets/body.png")
+        self.rect = self.image.get_rect()
+
+    def render(self, display: Surface):
+        h = display.get_height()
+        bb = self.shape.bb
+        self.rect.x, self.rect.y = convert((bb.left, bb.top), h)
+        image = pygame.transform.rotate(self.image, degrees(self.body.angle))
+        display.blit(image, self.rect)
+
+        # verts = [convert(self.body.local_to_world(v), h) for v in self.shape.get_vertices()]
+        # draw.polygon(display, (60, 163, 31), verts)
+
+
+class TankWheel:
+    def __init__(self, global_x: int, global_y: int, space: Space) -> None:
+        self.body = Body()
+        self.body.position = global_x, global_y
+
+        self.shape = pymunk.Circle(self.body, WHEEL_R)
+        self.shape.density = 1
+
+        space.add(self.body, self.shape)
+
+        self.image = pygame.image.load("./scenes/assets/wheel.png")
+        self.rect = self.image.get_rect()
+
+    def render(self, display: Surface) -> None:
+        h = display.get_height()
+        bb = self.shape.bb
+        self.rect.x, self.rect.y = convert((bb.left, bb.top), h)
+        image = pygame.transform.rotate(self.image, degrees(self.body.angle))
+        display.blit(image, self.rect)
+
+
 class Tank:
     wheel_holder: Rect
     collision_filter: ShapeFilter
-    wheels: List[Ball]
+    wheels: Sequence[TankWheel]
     motor: SimpleMotor
     turret_shape: Shape
 
-    def __init__(self, x, y, width, height, space: Space):
-        self.width = width
-        self.height = height
+    def __init__(self, x, y, space: Space):
         self.collision_filter = ShapeFilter(group=0b1)
+        self.space = space
 
-        self.add_wheel_holder(x, y - height // 4, width, height // 2, space)
-        self.add_wheels(x, y, width, height, space)
-        self.add_turret(width, height, space)
-        self.add_gun(x, y, width, height, space)
-        self.add_bullet()
-        self.add_motor(space)
+        self.tank_base = TankBase(x, y, self.collision_filter, space)
+        self.wheels = self.add_wheels(x, y)
+        # self.add_turret(width, height, space)
+        # self.add_gun(x, y, width, height, space)
+        # self.add_bullet()
+        # self.add_motor(space)
 
-    def add_wheel_holder(self, x, y, width: int, height: int, space: Space):
-        self.wheel_holder = Rect(x, y, width, height, space, color=(60, 163, 31))
-        self.wheel_holder.body.mass = 10000
-        self.wheel_holder.shape.filter = self.collision_filter
-
-    def add_wheels(self, x: int, y: int, body_width: int, body_height: int, space: Space):
-        wheel_diameter = body_height // 2
-        wheels_number = (body_width // wheel_diameter) + 1
-        wh_body = self.wheel_holder.body
-        self.wheels = []
-        wheel_x = x + body_width // 2
-        wheel_y = y - body_height // 2
-        for _ in range(wheels_number):
-            wheel = Ball(wheel_x, wheel_y, wheel_diameter // 2, space)
-            wheel.shape.density = 0.7
-            wheel.shape.filter = self.collision_filter
-            wheel.shape.friction = 1
-            wheel.shape.elasticity = 0.2
-            space.add(PivotJoint(wheel.body, wh_body, (0, 0), wh_body.world_to_local((wheel_x, wheel_y))))
-            if self.wheels:
-                space.add(GearJoint(wheel.body, self.wheels[-1].body, 0, 1))
-            self.wheels.append(wheel)
-            wheel_x -= wheel_diameter
+    def add_wheels(self, x: int, y: int) -> Sequence[TankWheel]:
+        wheel_coords = ((37, 55), (57, 55), (76, 55))
+        wheels = []
+        for coord in wheel_coords:
+            wheel_x = x - TANK_WIDTH/2 + coord[0] + WHEEL_R/2
+            wheel_y = y - TANK_HEIGHT//2 + coord[1]
+            wheels.append(TankWheel(wheel_x, wheel_y, self.space))
+        return wheels
 
     def add_motor(self, space: Space):
         self.motor = SimpleMotor(self.wheel_holder.body, self.wheels[-1].body, 0)
@@ -81,7 +136,7 @@ class Tank:
 
     def add_bullet(self):
         space = self.wheel_holder.body.space
-        width, height = self.width, self.height
+        width, height = TANK_WIDTH, TANK_HEIGHT
         x, y = self.wheel_holder.body.position
         self.bullet = Bullet(x, y + height//4, 4, space)
         self.bullet.shape.elasticity = .1
@@ -128,11 +183,6 @@ class Tank:
         self.update_gun_angle(keys)
 
     def render(self, display: Surface):
-        self.wheel_holder.render(display)
-        h = display.get_height()
-        turret_vert = [convert(self.turret_shape.body.local_to_world(v), h) for v in self.turret_shape.get_vertices()]
-        draw.polygon(display, (60, 163, 31), turret_vert)
-        self.gun.render(display)
-        self.bullet.render(display)
+        self.tank_base.render(display)
         for wheel in self.wheels:
             wheel.render(display)
