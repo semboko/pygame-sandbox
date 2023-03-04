@@ -18,12 +18,12 @@ class TankScene(AbstractPymunkScene):
     def reset_scene(self):
         super().reset_scene()
         self.tank = Tank(250, 160, self.space)
-        self.floor = RandomFloor(0, self.display.get_width(), 0, 80, 30, self.space)
+        self.floor = RandomFloor(0, self.display.get_width(), 0, 30, 30, self.space)
         self.objects.extend((self.tank, self.floor))
 
     def update(self):
         super().update()
-        # self.tank.update()
+        self.tank.update()
         # self.update_bullets()
         # self.update_balls()
 
