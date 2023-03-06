@@ -5,6 +5,7 @@ from pygame.surface import Surface
 from pymunk import Body, ShapeFilter, Space
 
 from scenes.components.ball import Ball
+from random import randint
 
 
 class Bullet(Ball):
@@ -21,7 +22,7 @@ class Bullet(Ball):
                 continue
             if neighbor.shape.body.body_type != Body.DYNAMIC:
                 continue
-            neighbor.shape.body.apply_force_at_local_point((0, 30000000))
+            neighbor.shape.body.apply_force_at_local_point((randint(0, 30000000), randint(0, 30000000)))
             for c in neighbor.shape.body.constraints:
                 if c in space.constraints:
                     constraints_to_remove.add(c)

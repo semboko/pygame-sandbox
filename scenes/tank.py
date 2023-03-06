@@ -19,7 +19,7 @@ class TankScene(AbstractPymunkScene):
     def reset_scene(self):
         super().reset_scene()
         pygame.mixer.stop()
-        self.tank = Tank(250, 160, self.space)
+        self.tank = Tank(250, 460, self.space, debug=False)
         self.floor = RandomFloor(0, self.display.get_width(), 0, 30, 30, self.space)
         self.objects.extend((self.tank, self.floor))
 

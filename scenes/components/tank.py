@@ -28,7 +28,7 @@ def unpack_coords(verts: Sequence[Vec2d]) -> Tuple[List[int], List[int]]:
     ys: List[int] = []
     for x, y in verts:
         xs.append(int(x))
-        ys.append(int(x))
+        ys.append(int(y))
     return xs, ys
 
 
@@ -82,7 +82,7 @@ class VisualPart:
         return get_width(raw_verts), get_height(raw_verts)
 
     def generate_body(self, left_x: int, top_y: int) -> Body:
-        cx, cy = left_x + self.width / 2, top_y - self.height / 2
+        cx, cy = left_x + self.width / 2, top_y - self.height/2
         body = Body()
         body.position = cx, cy
         self.space.add(body)
@@ -99,15 +99,16 @@ class VisualPart:
         h = display.get_height()
         # Draw the shape
         verts = [convert(self.body.local_to_world(v), h) for v in self.shape.get_vertices()]
-        draw.polygon(display, (255, 0, 0), verts, 1)
+        draw.polygon(display, (255, 255, 0), verts, 1)
         # Draw the center of mass
-        draw.circle(display, (255, 0, 0), convert(self.body.position, h), 2, 1)
+        draw.circle(display, (255, 255, 0), convert(self.body.position, h), 2, 1)
 
     def render(self, display: Surface):
         h = display.get_height()
-        image = pygame.transform.rotate(self.image, degrees(self.body.angle))
-        x, y = self.shape.bb.left, self.shape.bb.top
-        display.blit(image, convert((int(x), int(y)), h))
+        last_rect = self.image.get_rect()
+        rotated_image = pygame.transform.rotate(self.image, degrees(self.body.angle))
+        new_rect = rotated_image.get_rect(center=convert(self.body.position, h))
+        display.blit(rotated_image, new_rect)
 
         if self.debug:
             self.debug_draw(display)
@@ -237,22 +238,22 @@ class TankSoundEffects:
 
     def update(self, speed: float = 0):
         diff = abs(int(self._current_speed - speed))
-        if diff > 1:
-            diff = 1
-
-        if self._last_diff != diff:
-            self.engine_sound.stop()
-            if diff == 1:
-                self.engine_sound = self.engine_2
-            if diff == 0:
-                self.engine_sound = self.engine_1
-            self.engine_sound.play(0)
-
-        self._current_speed = speed
-        self._last_diff = diff
-
-        if not pygame.mixer.get_busy():
-            self.engine_sound.play(0)
+        # if diff > 1:
+        #     diff = 1
+        #
+        # if self._last_diff != diff:
+        #     self.engine_sound.stop()
+        #     if diff == 1:
+        #         self.engine_sound = self.engine_2
+        #     if diff == 0:
+        #         self.engine_sound = self.engine_1
+        #     self.engine_sound.play(0)
+        #
+        # self._current_speed = speed
+        # self._last_diff = diff
+        #
+        # if not pygame.mixer.get_busy():
+        #     self.engine_sound.play(0)
 
 
 class Tank:
@@ -265,27 +266,24 @@ class Tank:
     def __init__(self, x, y, space: Space, debug: bool = False):
         self.collision_filter = ShapeFilter(group=0b1)
         self.space = space
+        self.debug = debug
 
         self.top_y = y + TANK_HEIGHT / 2
         self.left_x = x - TANK_WIDTH / 2
 
-        self.tank_base = TankBase(self.left_x, self.top_y - 30, self.collision_filter, space)
+        self.tank_base = TankBase(self.left_x, self.top_y - 30, self.collision_filter, space, debug)
         self.wheels = self.get_wheels()
         self.motor_wheel = self.get_motor_wheel()
         self.motor = self.get_motor()
         self.turret = self.get_turret()
         self.gun = self.get_gun()
         self.bullet, self.bullet_holder = self.get_bullet()
-        # self.add_motor(space)]
 
         self.sound_effects = TankSoundEffects()
-        self.sound_effects.engine_sound.play(0)
-
-        self.debug = debug
 
     def get_wheels(self) -> Sequence[TankWheel]:
         wheel_xs = (38, 57, 76, 95, 115, 135, 160)
-        wheel_y = self.top_y - 60
+        wheel_y = self.top_y - 55
         wheels = []
         for wheel_x in wheel_xs:
             wheel_x = self.left_x + wheel_x
@@ -311,12 +309,12 @@ class Tank:
         return motor
 
     def get_turret(self) -> Turret:
-        turret = Turret(self.left_x + 36, self.top_y, self.collision_filter, self.space)
+        turret = Turret(self.left_x + 36, self.top_y + 5, self.collision_filter, self.space, self.debug)
         turret.attach_to(self.tank_base.body)
         return turret
 
     def get_gun(self) -> TankGun:
-        gun = TankGun(self.left_x + 155, self.top_y - 22, self.collision_filter, self.space)
+        gun = TankGun(self.left_x + 155, self.top_y - 22, self.collision_filter, self.space, self.debug)
         self.gun_joint = RotaryLimitJoint(self.turret.body, gun.body, min=0, max=0.1)
         self.space.add(self.gun_joint)
         gun.attach_to(self.turret)
@@ -334,9 +332,12 @@ class Tank:
 
     def shot(self) -> Ball:
         self.sound_effects.shot.play()
-        self.space.remove(self.bullet_holder)
+        try:
+            self.space.remove(self.bullet_holder)
+        except AssertionError:
+            pass
         force = self.bullet.start(self.gun.body.angle)
-        self.tank_base.body.apply_force_at_local_point((-force[0] * 5, -force[1] * 5), (0, 0))
+        self.tank_base.body.apply_force_at_local_point((-force[0] * 4, -force[1] * 4), (0, 0))
         prev_bullet = self.bullet
 
         self.bullet, self.bullet_holder = self.get_bullet()
