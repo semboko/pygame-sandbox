@@ -13,13 +13,14 @@ from scenes.carscene import CarScene
 class Game:
     def __init__(self):
         self.sc = None
-        self.res = (1500, 500)
+        self.res = (2300, 700)
         self.scene: Optional[AbstractScene] = None
         self.clock = pygame.time.Clock()
         self.fps = 60
 
     def __enter__(self):
         pygame.init()
+        pygame.mixer.init()
         self.sc = pygame.display.set_mode(self.res)
         return self
 
