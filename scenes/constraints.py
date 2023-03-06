@@ -1,11 +1,10 @@
 import pygame
 import pymunk
 from pygame.event import Event
-from pymunk.constraints import DampedRotarySpring, DampedSpring, GearJoint, PinJoint, PivotJoint, SimpleMotor
+from pymunk.constraints import GearJoint, PivotJoint, SimpleMotor
 
 from scenes.abstract import AbstractPymunkScene
 from scenes.components import Ball, Segment
-from scenes.components.pj import PJ
 from scenes.utils import convert
 
 
@@ -35,6 +34,6 @@ class ConstraintScene(AbstractPymunkScene):
         if event.type == pygame.MOUSEBUTTONDOWN and event.dict["button"] == 3:
             x, y = convert(event.dict["pos"], h)
             objs = self.space.point_query((x, y), 2, pymunk.ShapeFilter())
-            if objs:
+            if objs and objs[0].shape:
                 body = objs[0].shape.body
                 body.apply_impulse_at_local_point((0, -20000), (20, 0))

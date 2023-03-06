@@ -12,7 +12,7 @@ class PJ:
         self.joint = joint
         self.color = color
 
-    def render(self, display: pygame.Surface) -> None:
+    def render(self, display: pygame.surface.Surface) -> None:
         h = display.get_height()
         if isinstance(self.joint, (PivotJoint, PinJoint, DampedSpring)):
             anchor_a = self.joint.a.local_to_world(self.joint.anchor_a)

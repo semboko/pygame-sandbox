@@ -1,15 +1,23 @@
 from math import cos, sin
+from typing import Tuple
 
 import pygame
 import pymunk
 from pygame.surface import Surface
-from typing import Tuple
 
 from scenes.utils import convert
 
 
 class Ball:
-    def __init__(self, x: int, y: int, r: int, space: pymunk.Space, btype: int = pymunk.Body.DYNAMIC, color: Tuple[int, int, int] = (244, 0, 0)):
+    def __init__(
+        self,
+        x: int,
+        y: int,
+        r: int,
+        space: pymunk.Space,
+        btype: int = pymunk.Body.DYNAMIC,
+        color: Tuple[int, int, int] = (244, 0, 0),
+    ):
         self.body = pymunk.Body(body_type=btype)
         self.body.position = x, y
         self.shape = pymunk.Circle(self.body, r)

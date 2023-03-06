@@ -1,9 +1,10 @@
-from scenes.components.ball import Ball
-from pymunk import Space, ShapeFilter, Body
-from pygame.surface import Surface
-from pygame import mixer
 from math import cos, sin
 from typing import Tuple
+
+from pygame.surface import Surface
+from pymunk import Body, ShapeFilter, Space
+
+from scenes.components.ball import Ball
 
 
 class Bullet(Ball):
@@ -14,10 +15,18 @@ class Bullet(Ball):
 
     def explode(self, space: Space):
         neighbors = space.point_query(self.body.position, 150, ShapeFilter())
+        constraints_to_remove = set()
         for neighbor in neighbors:
+            if not neighbor.shape:
+                continue
             if neighbor.shape.body.body_type != Body.DYNAMIC:
                 continue
             neighbor.shape.body.apply_force_at_local_point((0, 30000000))
+            for c in neighbor.shape.body.constraints:
+                if c in space.constraints:
+                    constraints_to_remove.add(c)
+
+        space.remove(*constraints_to_remove)
         self._exploded = True
         self.remove(space)
 

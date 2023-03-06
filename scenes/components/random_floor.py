@@ -34,5 +34,5 @@ class RandomFloor:
     def render(self, display: Surface):
         h = display.get_height()
         verts = [convert(s, h) for s in self.points]
-        verts = [convert((self.start_x, 0), h)] + verts + [convert((self.end_x, 0), h)]
+        verts = [convert((int(self.start_x), 0), h)] + verts + [convert((int(self.end_x), 0), h)]
         draw.polygon(display, (0, 0, 0), verts)

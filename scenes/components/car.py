@@ -53,7 +53,7 @@ class CarBody:
 
     def add_rear_suspension(self, wheel_x: int, wheel_y: int):
         gwheel_x, gwheel_y = self.body.local_to_world((wheel_x, wheel_y))
-        self.rear_sleeve = Ball(gwheel_x, gwheel_y, 5, self.space)
+        self.rear_sleeve = Ball(int(gwheel_x), int(gwheel_y), 5, self.space)
         joint = pymunk.PinJoint(self.body, self.rear_sleeve.body, (-self.width // 2, -self.height // 2), (0, 0))
         suspension = pymunk.PinJoint(self.body, self.rear_sleeve.body, (self.width // 2, 0), (0, 0))
         self.rear_joint = PJ(joint)
@@ -61,7 +61,7 @@ class CarBody:
         self.space.add(joint)
         self.space.add(suspension)
 
-        self.rear_wheel = Ball(gwheel_x, gwheel_y, 30, self.space)
+        self.rear_wheel = Ball(int(gwheel_x), int(gwheel_y), 30, self.space)
         self.rear_wheel.shape.density = 0.2
         self.rear_wheel.shape.friction = 1
 
@@ -71,7 +71,7 @@ class CarBody:
 
     def add_front_suspension(self, wheel_x: int, wheel_y: int):
         gwheel_x, gwheel_y = self.body.local_to_world((wheel_x, wheel_y))
-        self.front_sleeve = Ball(gwheel_x, gwheel_y, 5, self.space)
+        self.front_sleeve = Ball(int(gwheel_x), int(gwheel_y), 5, self.space)
 
         joint = pymunk.PinJoint(self.body, self.front_sleeve.body, (self.width // 2, -self.height // 2), (0, 0))
         self.space.add(joint)
@@ -81,7 +81,7 @@ class CarBody:
         self.space.add(suspension)
         self.front_suspension = PJ(suspension, color=(0, 0, 0))
 
-        self.front_wheel = Ball(gwheel_x, gwheel_y, 30, self.space)
+        self.front_wheel = Ball(int(gwheel_x), int(gwheel_y), 30, self.space)
         self.front_wheel.shape.density = 0.2
         self.front_wheel.shape.friction = 1
 

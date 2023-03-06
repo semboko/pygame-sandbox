@@ -1,12 +1,12 @@
+from random import random
+
 import pygame
 from pygame.event import Event
-from pymunk import Body, Poly
 
 from scenes.abstract import AbstractPymunkScene
-from scenes.components.random_floor import RandomFloor
-from scenes.components.segment import Segment
-from scenes.components.bullet import Bullet
 from scenes.components.ball import Ball
+from scenes.components.bullet import Bullet
+from scenes.components.random_floor import RandomFloor
 from scenes.components.rect import Rect
 from scenes.components.tank import Tank
 from scenes.utils import convert
@@ -44,7 +44,11 @@ class TankScene(AbstractPymunkScene):
 
     def update_balls(self):
         for obj in self.objects:
-            if type(obj) in (Ball, Rect, Bullet, ):
+            if type(obj) in (
+                Ball,
+                Rect,
+                Bullet,
+            ):
                 _, y = obj.body.position
                 if y < 0:
                     self.space.remove(obj.body, obj.shape)
@@ -69,8 +73,8 @@ class TankScene(AbstractPymunkScene):
             else:
                 obj = Ball(*convert((x, y), h), 10, self.space, color=(55, 252, 10))
             obj.shape.friction = 1
-            obj.shape.density = .1
+            obj.shape.density = 0.1
+            obj.body.angle = 3.14 * random()
             # obj.shape.elasticity = 1
             # rect.body.mass = 100
             self.objects.append(obj)
-
