@@ -1,6 +1,7 @@
-import pymunk
 import pygame
-from pymunk import PivotJoint, PinJoint, DampedSpring
+import pymunk
+from pymunk import DampedSpring, PinJoint, PivotJoint
+
 from scenes.utils import convert
 
 

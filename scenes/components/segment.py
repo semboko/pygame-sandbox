@@ -1,9 +1,10 @@
 from typing import Tuple
 
 import pygame
-from scenes.utils import convert
-from pygame.surface import Surface
 import pymunk
+from pygame.surface import Surface
+
+from scenes.utils import convert
 
 
 class Segment:
@@ -15,7 +16,7 @@ class Segment:
         self.shape.elasticity = 0.9
         self.shape.density = 1
         self.shape.mass = 2
-        self.shape.friction = .7
+        self.shape.friction = 0.7
         self.r = r
         space.add(self.body, self.shape)
 

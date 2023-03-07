@@ -4,9 +4,9 @@ from typing import Tuple
 import pygame.draw
 import pymunk
 from pygame.event import Event
-from scenes.components import Ball, Segment
 
 from scenes.abstract import AbstractScene
+from scenes.components import Ball, Segment
 
 from .utils import convert
 
@@ -41,15 +41,15 @@ class GravityScene(AbstractScene):
             if event.dict["button"] == 1:
                 self.renders_objs.append(Ball(*convert(event.pos, self.size_sc[1]), 15, self.space))
             # elif event.dict["button"] == 3:
-                # for obj in self.renders_objs:
-                #     if isinstance(obj, Ball):
-                #         print(obj.rect.colliderect(pygame.Rect(mouse[0] - 20, mouse[1] - 20, 40, 40)))
-                #         if obj.rect.colliderect(
-                #             pygame.Rect(mouse[0] - obj.r, mouse[1] - obj.r, obj.r * 2, obj.r * 2)
-                #         ):
-                #             self.movement = True
-                #             self.moving_obj = obj
-                #             obj.body.position = convert(mouse, self.display.get_height())
+            # for obj in self.renders_objs:
+            #     if isinstance(obj, Ball):
+            #         print(obj.rect.colliderect(pygame.Rect(mouse[0] - 20, mouse[1] - 20, 40, 40)))
+            #         if obj.rect.colliderect(
+            #             pygame.Rect(mouse[0] - obj.r, mouse[1] - obj.r, obj.r * 2, obj.r * 2)
+            #         ):
+            #             self.movement = True
+            #             self.moving_obj = obj
+            #             obj.body.position = convert(mouse, self.display.get_height())
         # if event.type == pygame.MOUSEBUTTONUP:
         #     if event.dict["button"] == 3:
         #         self.movement = False
