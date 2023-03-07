@@ -2,10 +2,12 @@ from pygame.surface import Surface
 import pymunk
 import pygame
 from scenes.utils import convert
+from typing import Tuple
 
 
 class Rect:
-    def __init__(self, x: int, y: int, width: int, height: int, space: pymunk.Space) -> None:
+    def __init__(self, x: int, y: int, width: int, height: int, space: pymunk.Space, color: Tuple[int, int, int] = (255, 0, 0)) -> None:
+        self.color = color
         self.body = pymunk.Body()
         self.body.position = x, y
         verts = (
@@ -24,4 +26,4 @@ class Rect:
             convert(self.body.local_to_world(v), h)
             for v in self.shape.get_vertices()
         ]
-        pygame.draw.polygon(display, (255, 0, 0), verts)
+        pygame.draw.polygon(display, self.color, verts)
