@@ -2,6 +2,7 @@ from math import cos, sin
 
 import pygame
 import pymunk
+from pymunk import Vec2d
 from pygame.surface import Surface
 
 from scenes.utils import convert
@@ -18,11 +19,14 @@ class Ball:
         self.r = r
         space.add(self.body, self.shape)
 
-    def render(self, display: Surface) -> None:
+    def render(self, display: Surface, pymunk_shift: Vec2d = Vec2d(0, 0)) -> None:
         h = display.get_height()
-        pygame.draw.circle(display, (244, 0, 0), convert(self.body.position, h), self.r)
+        pygame.draw.circle(display, (244, 0, 0), convert(self.body.position - pymunk_shift, h), self.r)
         alpha = self.body.angle
         line_end = cos(alpha) * self.r, sin(alpha) * self.r
         pygame.draw.line(
-            display, (0, 0, 0), convert(self.body.position, h), convert(self.body.local_to_world(line_end), h), 1
+            display, (0, 0, 0),
+            convert(self.body.position - pymunk_shift, h),
+            convert(- pymunk_shift + self.body.local_to_world(line_end), h),
+            1
         )

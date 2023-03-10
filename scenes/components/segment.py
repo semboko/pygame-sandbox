@@ -3,6 +3,7 @@ from typing import Tuple
 import pygame
 import pymunk
 from pygame.surface import Surface
+from pymunk.vec2d import Vec2d
 
 from scenes.utils import convert
 
@@ -27,8 +28,8 @@ class Segment:
         max_y = max(a[1], b[1]) + r
         self.rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
 
-    def render(self, display: Surface) -> None:
+    def render(self, display: Surface, pymunk_shift: Vec2d = Vec2d(0, 0)) -> None:
         h = display.get_height()
-        a = convert(self.shape.a, h)
-        b = convert(self.shape.b, h)
+        a = convert(self.shape.a - pymunk_shift, h)
+        b = convert(self.shape.b - pymunk_shift, h)
         pygame.draw.line(display, (0, 0, 0), a, b, 10)
