@@ -4,9 +4,9 @@ from typing import Tuple
 import pygame.draw
 import pymunk
 from pygame.event import Event
-from scenes.components import Ball, Segment
 
 from scenes.abstract import AbstractScene
+from scenes.components import Ball, Segment
 
 from .utils import convert
 
@@ -26,47 +26,45 @@ class GravityScene(AbstractScene):
         super().__init__(*args, **kwargs)
         self.reset_scene()
 
-    def handle_events(self, events: Tuple[Event], mouse: Tuple[int, int]) -> None:
-        for event in events:
+    def handle_event(self, event: Event) -> None:
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                self.pause = True
+            elif event.key == pygame.K_r:
+                self.reset_scene()
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.pause = True
-                elif event.key == pygame.K_r:
-                    self.reset_scene()
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_ESCAPE:
+                self.pause = False
 
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_ESCAPE:
-                    self.pause = False
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.dict["button"] == 1:
-                    self.renders_objs.append(Ball(*convert(event.pos, self.size_sc[1]), 15, self.space))
-                elif event.dict["button"] == 3:
-                    for obj in self.renders_objs:
-                        if isinstance(obj, Ball):
-                            print(obj.rect.colliderect(pygame.Rect(mouse[0] - 20, mouse[1] - 20, 40, 40)))
-                            if obj.rect.colliderect(
-                                pygame.Rect(mouse[0] - obj.r, mouse[1] - obj.r, obj.r * 2, obj.r * 2)
-                            ):
-                                self.movement = True
-                                self.moving_obj = obj
-                                obj.body.position = convert(mouse, self.display.get_height())
-            if event.type == pygame.MOUSEBUTTONUP:
-                if event.dict["button"] == 3:
-                    self.movement = False
-                    self.moving_obj = None
-            if event.type == pygame.MOUSEMOTION and self.movement:
-                dx, dy = event.pos[0] - self.move_old[0], event.pos[1] - self.move_old[1]
-                dx *= 5
-                dy *= 5
-                self.move_old = event.pos
-                new_pos = self.moving_obj.body.position[0] - dx, self.moving_obj.body.position[1] + dy
-                query_info = self.space.point_query_nearest(new_pos, 0, pymunk.ShapeFilter())
-                if query_info is None or query_info.shape in (self.moving_obj.shape, self.segment.shape):
-                    self.moving_obj.body.position = new_pos
-                    self.moving_obj.pos = new_pos
-            self.move_old = mouse
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.dict["button"] == 1:
+                self.renders_objs.append(Ball(*convert(event.pos, self.size_sc[1]), 15, self.space))
+            # elif event.dict["button"] == 3:
+            # for obj in self.renders_objs:
+            #     if isinstance(obj, Ball):
+            #         print(obj.rect.colliderect(pygame.Rect(mouse[0] - 20, mouse[1] - 20, 40, 40)))
+            #         if obj.rect.colliderect(
+            #             pygame.Rect(mouse[0] - obj.r, mouse[1] - obj.r, obj.r * 2, obj.r * 2)
+            #         ):
+            #             self.movement = True
+            #             self.moving_obj = obj
+            #             obj.body.position = convert(mouse, self.display.get_height())
+        # if event.type == pygame.MOUSEBUTTONUP:
+        #     if event.dict["button"] == 3:
+        #         self.movement = False
+        #         self.moving_obj = None
+        # if event.type == pygame.MOUSEMOTION and self.movement:
+        #     dx, dy = event.pos[0] - self.move_old[0], event.pos[1] - self.move_old[1]
+        #     dx *= 5
+        #     dy *= 5
+        #     self.move_old = event.pos
+        #     new_pos = self.moving_obj.body.position[0] - dx, self.moving_obj.body.position[1] + dy
+        #     query_info = self.space.point_query_nearest(new_pos, 0, pymunk.ShapeFilter())
+        #     if query_info is None or query_info.shape in (self.moving_obj.shape, self.segment.shape):
+        #         self.moving_obj.body.position = new_pos
+        #         self.moving_obj.pos = new_pos
+        #     self.move_old = mouse
 
     def reset_scene(self):
         # Reset the objects in the scene to their initial positions

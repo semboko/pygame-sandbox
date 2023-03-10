@@ -1,10 +1,10 @@
 from abc import ABC
+from logging import getLogger
+from typing import Any, List
 
+import pymunk
 from pygame.event import Event
 from pygame.surface import Surface
-import pymunk
-from typing import List, Any
-from logging import getLogger
 
 log = getLogger()
 
@@ -40,7 +40,7 @@ class AbstractPymunkScene(AbstractScene):
         self.objects = []
         self.space = pymunk.Space()
         self.space.gravity = 0, -1000  # Set the friction coefficient of the space object
-        self.space.damping = .5
+        self.space.damping = 0.5
 
     def update(self):
         self.space.step(1 / self.fps)
@@ -49,6 +49,3 @@ class AbstractPymunkScene(AbstractScene):
         self.display.fill((255, 255, 255))
         for obj in self.objects:
             obj.render(self.display)
-
-
-
