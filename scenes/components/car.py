@@ -45,10 +45,10 @@ class Suspension:
         angle_limit = (.2, 0.8) if side == -1 else (-0.8, .2)
         space.add(pymunk.RotaryLimitJoint(car_body, self.arm.body, *angle_limit))
 
-    def render(self, display: Surface):
-        self.wheel.render(display)
-        self.arm.render(display)
-        PJ(self.spring).render(display)
+    def render(self, display: Surface, camera_shift: pymunk.Vec2d):
+        self.wheel.render(display, camera_shift)
+        self.arm.render(display, camera_shift)
+        PJ(self.spring).render(display, camera_shift)
 
 
 class Car:
@@ -60,18 +60,23 @@ class Car:
         self.front_suspension = Suspension(self.car_body.body, width, height, self.cf, 1, space)
         self.rear_suspension = Suspension(self.car_body.body, width, height, self.cf, -1, space)
 
+        self.init_x = x
+
         space.add(pymunk.GearJoint(self.front_suspension.wheel.body, self.rear_suspension.wheel.body, 0, 1))
         self.motor = pymunk.SimpleMotor(self.rear_suspension.wheel.body, self.rear_suspension.arm.body, -1)
         space.add(self.motor)
 
-    def jump(self, floor_shape: pymunk.Shape):
+    def get_x_shift(self) -> float:
+        return self.car_body.body.position.x - self.init_x
+
+    def jump(self):
         _, car_y = self.car_body.body.position
         if car_y > 150:
             return
 
         self.car_body.body.apply_impulse_at_local_point((0, 700000), (0, 0))
 
-    def render(self, display: Surface) -> None:
-        self.car_body.render(display)
-        self.front_suspension.render(display)
-        self.rear_suspension.render(display)
+    def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
+        self.car_body.render(display, camera_shift)
+        self.front_suspension.render(display, camera_shift)
+        self.rear_suspension.render(display, camera_shift)

@@ -24,7 +24,7 @@ class Rect:
         self.shape.density = 1
         space.add(self.body, self.shape)
 
-    def render(self, display: Surface) -> None:
+    def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()
-        verts = [convert(self.body.local_to_world(v), h) for v in self.shape.get_vertices()]
+        verts = [convert(self.body.local_to_world(v) - camera_shift, h) for v in self.shape.get_vertices()]
         pygame.draw.polygon(display, self.color, verts)

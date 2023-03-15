@@ -27,8 +27,8 @@ class Segment:
         max_y = max(a[1], b[1]) + r
         self.rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
 
-    def render(self, display: Surface) -> None:
+    def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()
-        a = convert(self.shape.a, h)
-        b = convert(self.shape.b, h)
+        a = convert(self.shape.a, h) - camera_shift
+        b = convert(self.shape.b, h) - camera_shift
         pygame.draw.line(display, (0, 0, 0), a, b, 10)
