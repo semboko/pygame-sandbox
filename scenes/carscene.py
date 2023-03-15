@@ -4,15 +4,14 @@ from pygame.event import Event
 
 from scenes.abstract import AbstractPymunkScene
 from scenes.components.car import Car
-from scenes.components.segment import Segment
+from scenes.components.terrain import Terrain
 
 
 class CarScene(AbstractPymunkScene):
     def reset_scene(self):
         super().reset_scene()
         self.car = Car(250, 250, 100, 50, self.space)
-        self.floor = Segment((0, 20), (self.display.get_width(), 20), 5, self.space, btype=pymunk.Body.STATIC)
-        self.floor.shape.friction = .9
+        self.floor = Terrain(0, self.display.get_width(), 0, 20, 20, self.space)
         self.objects.extend((self.car, self.floor))
 
     def update(self):
@@ -25,9 +24,12 @@ class CarScene(AbstractPymunkScene):
         else:
             self.car.motor.rate = int(self.car.motor.rate * 0.96)
 
+        self.camera_shift = pymunk.Vec2d(self.car.get_x_shift(), 0)
+        self.floor.update(self.camera_shift.x)
+
     def handle_event(self, event: Event) -> None:
         if event.type == pygame.KEYDOWN:
-            if event.key== pygame.K_r:
+            if event.key == pygame.K_r:
                 self.reset_scene()
             if event.key == pygame.K_SPACE:
-                self.car.jump(self.floor.shape)
+                self.car.jump()

@@ -9,11 +9,11 @@ class PJ:
     def __init__(self, joint: pymunk.Constraint) -> None:
         self.joint = joint
 
-    def render(self, display: pygame.Surface) -> None:
+    def render(self, display: pygame.Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()
         if isinstance(self.joint, (PivotJoint, PinJoint, DampedSpring)):
-            anchor_a = self.joint.a.local_to_world(self.joint.anchor_a)
-            anchor_b = self.joint.b.local_to_world(self.joint.anchor_b)
+            anchor_a = self.joint.a.local_to_world(self.joint.anchor_a) - camera_shift
+            anchor_b = self.joint.b.local_to_world(self.joint.anchor_b) - camera_shift
         else:
             anchor_a = self.joint.a.position
             anchor_b = self.joint.b.position
