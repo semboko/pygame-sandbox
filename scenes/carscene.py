@@ -5,14 +5,16 @@ from pygame.event import Event
 from scenes.abstract import AbstractPymunkScene
 from scenes.components.car import Car
 from scenes.components.terrain import Terrain
+from scenes.components.speedometer import Speedometer
 
 
 class CarScene(AbstractPymunkScene):
     def reset_scene(self):
         super().reset_scene()
         self.car = Car(250, 250, 100, 50, self.space)
-        self.floor = Terrain(0, self.display.get_width(), 0, 20, 20, self.space)
-        self.objects.extend((self.car, self.floor))
+        self.floor = Terrain(0, self.display.get_width(), 0, 3, 2, self.space)
+        self.speedometer = Speedometer(70, 70, 0, 1000)
+        self.objects.extend((self.car, self.floor, self.speedometer))
 
     def update(self):
         super().update()
@@ -26,6 +28,7 @@ class CarScene(AbstractPymunkScene):
 
         self.camera_shift = pymunk.Vec2d(self.car.get_x_shift(), 0)
         self.floor.update(self.camera_shift.x)
+        self.speedometer.update(self.car.car_body.body.velocity.x)
 
     def handle_event(self, event: Event) -> None:
         if event.type == pygame.KEYDOWN:
