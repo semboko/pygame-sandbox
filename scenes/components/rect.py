@@ -9,9 +9,10 @@ from scenes.utils import convert
 
 class Rect:
     def __init__(
-        self, x: int, y: int, width: int, height: int, space: pymunk.Space, color: Tuple[int, int, int] = (255, 0, 0)
+        self, x: int, y: int, width: int, height: int, space: pymunk.Space, color: Tuple[int, int, int] = (255, 0, 0), debug: bool = False
     ) -> None:
         self.color = color
+        self.debug = debug
         self.body = pymunk.Body()
         self.body.position = x, y
         verts = (
@@ -28,3 +29,10 @@ class Rect:
         h = display.get_height()
         verts = [convert(self.body.local_to_world(v) - camera_shift, h) for v in self.shape.get_vertices()]
         pygame.draw.polygon(display, self.color, verts)
+        if self.debug:
+            pygame.draw.circle(
+                display, (0, 0, 0),
+                convert(self.body.local_to_world(self.body.center_of_gravity) - camera_shift, h),
+                5,
+                1
+            )

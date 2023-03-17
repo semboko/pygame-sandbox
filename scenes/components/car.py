@@ -36,7 +36,7 @@ class Suspension:
             )
         )
         arm_x, arm_y = self.arm.body.position
-        self.wheel = Ball(arm_x + (arm_width / 2 + arm_height) * side, arm_y, arm_width // 2, space)
+        self.wheel = Ball(arm_x + (arm_width / 2 + arm_height) * side, arm_y, arm_width//3, space)
         self.wheel.shape.filter = cf
         self.wheel.shape.friction = 1
         space.add(pymunk.PivotJoint(self.arm.body, self.wheel.body, ((arm_width / 2 - arm_height) * side, 0), (0, 0)))
@@ -54,8 +54,9 @@ class Suspension:
 class Car:
     def __init__(self, x: int, y: int, width: int, height: int, space: pymunk.Space) -> None:
         self.cf = pymunk.ShapeFilter(group=0b1)
-        self.car_body = Rect(x, y, width, height, space)
+        self.car_body = Rect(x, y, width, height, space, debug=True)
         self.car_body.body.mass = 500
+        self.car_body.body.center_of_gravity = (width/2, -height)
         self.car_body.shape.filter = self.cf
         self.front_suspension = Suspension(self.car_body.body, width, height, self.cf, 1, space)
         self.rear_suspension = Suspension(self.car_body.body, width, height, self.cf, -1, space)
@@ -63,7 +64,7 @@ class Car:
         self.init_x = x
 
         space.add(pymunk.GearJoint(self.front_suspension.wheel.body, self.rear_suspension.wheel.body, 0, 1))
-        self.motor = pymunk.SimpleMotor(self.rear_suspension.wheel.body, self.rear_suspension.arm.body, -1)
+        self.motor = pymunk.SimpleMotor(self.front_suspension.wheel.body, self.rear_suspension.arm.body, -1)
         space.add(self.motor)
 
     def get_x_shift(self) -> float:
