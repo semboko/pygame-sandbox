@@ -2,7 +2,7 @@ import pymunk
 import pygame
 from pygame.surface import Surface
 from pymunk import Vec2d
-from math import sin, cos
+from math import sin, cos, radians
 
 
 class Speedometer:
@@ -18,9 +18,12 @@ class Speedometer:
             speed = self.min_speed
         if speed > self.max_speed:
             speed = self.max_speed
-        self.speed = round(speed / (self.max_speed - self.min_speed), 2)
-        print(self.speed)
+        self.speed = round(speed / (self.max_speed - self.min_speed), 5)
 
     def render(self, display: Surface, camera_shift: Vec2d) -> None:
         pygame.draw.circle(display, (255, 0, 0), (self.x, self.y), self.r, 2)
-
+        angle = 270 * self.speed - 135
+        ir = self.r - 10
+        dx, dy = sin(radians(angle)) * ir, cos(radians(angle)) * ir
+        line_end = (self.x + dx, self.y - dy)
+        pygame.draw.line(display, (255, 0, 0), (self.x, self.y), line_end, 1)
