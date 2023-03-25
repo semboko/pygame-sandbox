@@ -1,5 +1,5 @@
 import random
-from typing import Tuple
+from typing import Tuple, List
 
 import pymunk
 
@@ -22,36 +22,27 @@ class TerrainBlock(Rect):
 class Terrain:
     def __init__(self, x_min: int, x_max: int, y_min: int, y_max: int, steps: int, seed: str, space: Space):
         self.space = space
-        # self.segments = []
-        self.bricks = []
         self.x_max, self.x_min, self.y_max, self.y_min = x_max, x_min, y_max, y_min
         self.abs_min_y = self.y_min - 500
         random.seed(seed)
+        self.bricks = self.generate_bricks()
 
-        y_top = y_min
+    def generate_bricks(self) -> List[TerrainBlock]:
+        y_top = self.y_min
+        bricks = []
         for x_start in range(self.x_min, self.x_max, TerrainBlock.width):
             x = x_start + TerrainBlock.width//2
             noise = random.random()
-            if noise > .5 and y_top < y_max:
+            if noise > .5 and y_top < self.y_max:
                 y_top = y_top + random.randint(1, 2) * TerrainBlock.height
             elif noise < .5 and y_top > self.abs_min_y:
                 y_top = y_top - random.randint(1, 2) * TerrainBlock.height
 
             for y_start in range(y_top, self.abs_min_y, -TerrainBlock.height):
                 y = y_start - TerrainBlock.height//2
-                brick = TerrainBlock(x, y, space)
-                self.bricks.append(brick)
-
-        # self.seg_width = (x_max - x_min)//steps
-        # for x in range(x_min, x_max, self.seg_width):
-        #     p1 = self.segments[-1].shape.b if self.segments else (x, random.randint(y_min, y_max))
-        #     p2 = (p1[0] + self.seg_width, random.randint(y_min, y_max))
-        #     self.segments.append(self.create_segment(p1, p2))
-
-    def create_segment(self, p1: Tuple[int, int], p2: Tuple[int, int]) -> Segment:
-        s = Segment(p1, p2, 1, self.space, btype=Body.STATIC)
-        s.shape.friction = 0.95
-        return s
+                brick = TerrainBlock(x, y, self.space)
+                bricks.append(brick)
+        return bricks
 
     def update(self, x_shift: float) -> None:
         # left_x = self.segments[0].shape.a[0]
