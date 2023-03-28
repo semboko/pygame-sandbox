@@ -17,7 +17,7 @@ class VoxelWorld(AbstractPymunkScene):
     def reset_scene(self):
         super().reset_scene()
         self.player = Rect(250, 250, 50, 50, self.space, (25, 25, 25), True)
-        self.floor = Terrain(0, self.display.get_width()*4, 5, 200, 400, int(random.random()*100_000_000), self.space, max_nfs)
+        self.floor = Terrain(0, self.display.get_width()*4, 10, 200, 400, int(random.random()*100_000_000), self.space, max_nfs)
         self.objects.extend((self.player,self.floor))
         self.menu_state = 0
         self.speed_x = 0
