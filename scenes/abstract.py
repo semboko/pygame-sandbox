@@ -10,10 +10,11 @@ log = getLogger()
 
 
 class AbstractScene(ABC):
-    def __init__(self, display: Surface, fps: int) -> None:
+    def __init__(self, display: Surface, fps: int, game) -> None:
         self.display: Surface = display
         self.size_sc: tuple = display.get_size()
         self.fps: int = fps
+        self.game = game
 
     def handle_event(self, event: Event) -> None:
         raise NotImplementedError()
