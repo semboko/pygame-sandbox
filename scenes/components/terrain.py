@@ -80,11 +80,13 @@ class Terrain:
             x = x_start + TerrainBlock.width//2
             noise = random.random()
             y_top = noise_filter(noise, y_top, y_min, y_max)
-
+            old_col = (0,0,0)
             for y_start in range(y_top,  self.abs_min_y, -TerrainBlock.height):
                 y = y_start - TerrainBlock.height//2
                 brick = TerrainBlock(x, y, space, self.sf)
+                brick.color = self.get_color(old_col, brick.body.position.y)
                 self.bricks.append(brick)
+                old_col = brick.color
         # self.seg_width = (x_max - x_min)//steps
         # for x in range(x_min, x_max, self.seg_width):
         #     p1 = self.segments[-1].shape.b if self.segments else (x, random.randint(y_min, y_max))
@@ -92,6 +94,30 @@ class Terrain:
         #     self.segments.append(self.create_segment(p1, p2))
         self.nfs_name = noise_filter.__name__
         self.nfs_func = noise_filter
+
+    def get_color(self,o,n) :
+        value = (n - self.y_min) / self.y_max
+        #if o in [(128,198,57), (227,242,239)]:
+        #    return (90,77,65)
+        if value <= 0.1 :
+            if not o in [(25,25,255),(90,77,65)]:
+                n = random.random()
+                if o != (0,0,0):
+                    return (90,77,65)
+                if n < .5:
+                    return (25,25,255)
+                else:
+                    return (90,77,65)
+            return o
+        if value <= 0.2 :
+            if o == (0,0,0):
+                return (221,221,48)
+            else:
+                return (90,77,65)
+        if value <= 0.85 :
+            return (128,198,57)
+        else:
+            return (227,242,239)
 
     def update(self, x_shift: float) -> None:
         # left_x = self.segments[0].shape.a[0]
@@ -128,13 +154,15 @@ class Terrain:
             x = self.bricks[0].body.position.x - TerrainBlock.width // 2 - TerrainBlock.width // 2
             noise = int(random.random())
             y_top = self.nfs_func(noise,self.y_min,self.y_min,self.y_max * 20)
-
+            old_col = (0,0,0)
             for y_start in range(y_top,self.abs_min_y,-TerrainBlock.height) :
                 y = y_start - TerrainBlock.height // 2
                 brick = TerrainBlock(x,y,self.space,self.sf)
+                brick.color = self.get_color(old_col,brick.body.position.y)
                 self.bricks.insert(0, brick)
                 self.space.remove(self.bricks[-1].shape,self.bricks[-1].body)
                 del (self.bricks[-1])
+                old_col = brick.color
 
         # bugs: in ~5971.52+ x coord generation stopped
         if x_shift + 700 > self.bricks[0].body.position.x:
@@ -142,12 +170,15 @@ class Terrain:
             noise = int(random.random())
             y_top = self.nfs_func(noise,self.y_min,self.y_min,self.y_max * 20)
 
+            old_col = (0,0,0)
             for y_start in range(y_top,self.abs_min_y,-TerrainBlock.height) :
                 y = y_start - TerrainBlock.height // 2
                 brick = TerrainBlock(x,y,self.space,self.sf)
+                brick.color = self.get_color(old_col,brick.body.position.y)
                 self.bricks.insert(0, brick)
                 self.space.remove(self.bricks[0].shape,self.bricks[0].body)
                 del (self.bricks[0])
+                old_col = brick.color
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         for s in self.bricks:
             s.render(display, camera_shift)
