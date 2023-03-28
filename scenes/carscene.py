@@ -10,7 +10,6 @@ from scenes.components.terrain import Terrain
 from scenes.components.speedometer import Speedometer
 
 
-
 class CarScene(AbstractPymunkScene):
     def reset_scene(self):
         super().reset_scene()
@@ -23,9 +22,9 @@ class CarScene(AbstractPymunkScene):
         super().update()
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
-            self.car.motor.rate += .5
+            self.car.motor.rate += 0.5
         elif keys[pygame.K_d]:
-            self.car.motor.rate -= .5
+            self.car.motor.rate -= 0.5
         else:
             self.car.motor.rate = int(self.car.motor.rate * 0.96)
 

@@ -24,7 +24,9 @@ class Ball:
         alpha = self.body.angle
         line_end = cos(alpha) * self.r, sin(alpha) * self.r
         pygame.draw.line(
-            display, (0, 0, 0),
+            display,
+            (0, 0, 0),
             convert(self.body.position - camera_shift, h),
-            convert(self.body.local_to_world(line_end) - camera_shift, h), 1
+            convert(self.body.local_to_world(line_end) - camera_shift, h),
+            1,
         )
