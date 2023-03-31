@@ -65,5 +65,5 @@ class VoxelWorld(AbstractPymunkScene):
         if 1 <= self.menu_state <= 2:
             font = pygame.font.SysFont("Comic Sans MS", 30)
             pos = " ".join([str(round(i, 2)) for i in list(self.player.body.position)])
-            text = f"position: {pos}, fps: {round(self.game.clock.get_fps(), 2)}, seed: {str(self.floor.seed)}, nfs_func: {self.floor.nfs_name}"
+            text = f"position: {pos}, fps: {round(self.game.clock.get_fps(), 2)}"
             self.display.blit(font.render(text, True, (0, 0, 0)), (10, 10))
