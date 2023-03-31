@@ -6,6 +6,7 @@ from scenes.abstract import AbstractScene
 from scenes.gravity import GravityScene
 from scenes.constraints import ConstraintScene
 from scenes.carscene import CarScene
+from scenes.VoxelWorld import VoxelWorld
 
 
 class Game:
@@ -25,7 +26,7 @@ class Game:
         pygame.quit()
 
     def load_scene(self, scene: Type[AbstractScene]):
-        self.scene = scene(self.sc, self.fps)
+        self.scene = scene(self.sc, self.fps, self)
 
     def run(self):
         while True:
@@ -40,5 +41,5 @@ class Game:
 
 
 with Game() as g:
-    g.load_scene(CarScene)
+    g.load_scene(VoxelWorld)
     g.run()

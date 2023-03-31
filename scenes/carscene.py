@@ -1,3 +1,5 @@
+import random
+
 import pygame
 import pymunk
 from pygame.event import Event
@@ -12,7 +14,7 @@ class CarScene(AbstractPymunkScene):
     def reset_scene(self):
         super().reset_scene()
         self.car = Car(250, 250, 100, 50, self.space)
-        self.floor = Terrain(0, self.display.get_width(), 200, 400, 10, "2424", self.space)
+        self.floor = Terrain(0, self.display.get_width(), 5, 200, 205, random.random(), self.space)
         self.speedometer = Speedometer(70, 70, 0, 3000)
         self.objects.extend((self.car, self.floor, self.speedometer))
 
@@ -20,9 +22,9 @@ class CarScene(AbstractPymunkScene):
         super().update()
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
-            self.car.motor.rate += .5
+            self.car.motor.rate += 0.5
         elif keys[pygame.K_d]:
-            self.car.motor.rate -= .5
+            self.car.motor.rate -= 0.5
         else:
             self.car.motor.rate = int(self.car.motor.rate * 0.96)
 

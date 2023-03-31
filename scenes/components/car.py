@@ -36,13 +36,13 @@ class Suspension:
             )
         )
         arm_x, arm_y = self.arm.body.position
-        self.wheel = Ball(arm_x + (arm_width / 2 + arm_height) * side, arm_y, arm_width//3, space)
+        self.wheel = Ball(arm_x + (arm_width / 2 + arm_height) * side, arm_y, arm_width // 3, space)
         self.wheel.shape.filter = cf
         self.wheel.shape.friction = 1
         space.add(pymunk.PivotJoint(self.arm.body, self.wheel.body, ((arm_width / 2 - arm_height) * side, 0), (0, 0)))
         self.spring = pymunk.DampedSpring(car_body, self.arm.body, ((car_width / 2) * side, 0), (0, 0), 5, -74000, 10)
         space.add(self.spring)
-        angle_limit = (.2, 0.8) if side == -1 else (-0.8, .2)
+        angle_limit = (0.2, 0.8) if side == -1 else (-0.8, 0.2)
         space.add(pymunk.RotaryLimitJoint(car_body, self.arm.body, *angle_limit))
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d):
@@ -56,7 +56,7 @@ class Car:
         self.cf = pymunk.ShapeFilter(group=0b1)
         self.car_body = Rect(x, y, width, height, space, debug=True)
         self.car_body.body.mass = 500
-        self.car_body.body.center_of_gravity = (width/2, -height)
+        self.car_body.body.center_of_gravity = (width / 2, -height)
         self.car_body.shape.filter = self.cf
         self.front_suspension = Suspension(self.car_body.body, width, height, self.cf, 1, space)
         self.rear_suspension = Suspension(self.car_body.body, width, height, self.cf, -1, space)

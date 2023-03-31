@@ -9,7 +9,14 @@ from scenes.utils import convert
 
 class Rect:
     def __init__(
-        self, x: int, y: int, width: int, height: int, space: pymunk.Space, color: Tuple[int, int, int] = (255, 0, 0), debug: bool = False
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        space: pymunk.Space,
+        color: Tuple[int, int, int] = (255, 0, 0),
+        debug: bool = False,
     ) -> None:
         self.color = color
         self.debug = debug
@@ -31,8 +38,9 @@ class Rect:
         pygame.draw.polygon(display, self.color, verts)
         if self.debug:
             pygame.draw.circle(
-                display, (0, 0, 0),
+                display,
+                (0, 0, 0),
                 convert(self.body.local_to_world(self.body.center_of_gravity) - camera_shift, h),
                 5,
-                1
+                1,
             )
