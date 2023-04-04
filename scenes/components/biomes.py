@@ -11,7 +11,7 @@ class Flatland(BaseBiome):
 
 
 class Swamp(BaseBiome):
-    pass
+    image: Surface = load("./assets/swamp.jpg")
 
 
 class Mine(BaseBiome):
@@ -19,4 +19,4 @@ class Mine(BaseBiome):
 
 
 class Mountain(BaseBiome):
-    pass
+    image: Surface = load("./assets/snow.jpg")
