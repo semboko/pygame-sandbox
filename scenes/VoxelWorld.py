@@ -37,6 +37,12 @@ class VoxelWorld(AbstractPymunkScene):
         self.camera_shift = pymunk.Vec2d(self.player.body.position.x - 250, self.player.body.position.y - 250)
         self.floor.update(self.camera_shift.x)
 
+        for obj in self.objects:
+            if type(obj) == BaseResource and self.player.shape.shapes_collide(obj.rect.shape).points:
+                self.player.consume_resource(obj)
+                self.objects.remove(obj)
+                self.space.remove(obj.rect.body, obj.rect.shape)
+
     def handle_event(self, event: Event) -> None:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
@@ -56,9 +62,9 @@ class VoxelWorld(AbstractPymunkScene):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == pygame.BUTTON_LEFT:
                 pos = convert(event.pos, self.size_sc[1])
-                Res = self.player.mine(self.floor,self.camera_shift + pos)
-                if Res:
-                    self.objects.append(Res)
+                resources = self.player.mine(self.floor,self.camera_shift + pos)
+                if resources:
+                    self.objects.extend(resources)
 
     def render(self):
         super(VoxelWorld, self).render()
