@@ -1,5 +1,5 @@
 import random
-from typing import Tuple
+from typing import Tuple, Optional
 
 import pygame
 import pymunk
@@ -8,6 +8,7 @@ from scenes.components.biomes import BaseBiome, Flatland, Mine, Swamp, Mountain
 from pymunk import Space, Body
 from pygame.surface import Surface
 from scenes.components.rect import Rect
+from scenes.components.resources import BaseResource
 from scenes.utils import convert
 
 from noise.perlin import SimplexNoise
@@ -24,6 +25,10 @@ class TerrainBlock(Rect):
         self.body.body_type = Body.STATIC
         self.shape.filter = sf
         self.biome = biome
+
+    @staticmethod
+    def get_resources() -> Tuple[BaseResource]:
+        return (BaseResource(), )
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()
@@ -95,25 +100,35 @@ class Terrain:
     ):
         self.space = space
         self.noise = SimplexNoise()
-        self.sf = pymunk.ShapeFilter(group=0b10)
+        self.sf = pymunk.ShapeFilter(group=0b0010, categories = 0b1101)
         self.bricks = []
         self.x_max, self.x_min, self.y_max, self.y_min = x_max, x_min, y_max, y_min
-        self.abs_min_y = -10
+        self.abs_min_y = -300
 
         for x in range(x_min, x_max, TerrainBlock.width):
-            self.bricks.append(self.get_block(x))
+            y_top = int(self.get_y(x))
+            for y_start in range(y_top,self.abs_min_y,-TerrainBlock.height) :
+                block = self.get_block(x, y_start)
+                if y_start != y_top:
+                    block.biome.image = pygame.image.load("assets/stone1.png")
+                self.bricks.append(block)
 
     def get_noise(self, x: float) -> float:
         return self.noise.noise2(x/700, 0)
 
-    def get_block(self, x: int) -> TerrainBlock:
-        noise_value = self.get_noise(x)
-        biome = self.get_biome(noise_value)
-        block = TerrainBlock(x, self.get_y(x), self.space, self.sf, biome)
+    def get_block(self, x: int, y: int = None) -> TerrainBlock:
+        if not y:
+            noise_value = self.get_noise(x)
+            biome = self.get_biome(noise_value)
+            y = self.get_y(x)
+        else:
+            biome = self.get_biome(y)
+        block = TerrainBlock(x, y, self.space, self.sf, biome)
         return block
 
     def get_y(self, x: float) -> float:
-        return self.y_min + (self.y_max - self.y_min) * self.get_noise(x)
+        y = self.y_min + (self.y_max - self.y_min) * self.get_noise(x)
+        return y - y % TerrainBlock.height
 
     def get_biome(self, noise_value: float) -> BaseBiome:
         if noise_value > 0.8:
@@ -123,18 +138,38 @@ class Terrain:
         else:
             return Flatland()
 
+    def get_brick_by_body(self, body: Body) -> Optional[TerrainBlock]:
+        for b in self.bricks:
+            if b.body == body:
+                return b
+
+    def delete_block(self, brick: TerrainBlock) -> None:
+        self.bricks.remove(brick)
+        self.space.remove(brick.body, brick.shape)
+
     def update(self, x_shift: float) -> None:
         lb = self.bricks[0]
         rb = self.bricks[-1]
 
         lbx = lb.body.position.x
         if x_shift + 50 < lbx:
-            self.bricks.insert(0, self.get_block(lbx - TerrainBlock.width))
+            y_top = int(self.get_y(lbx - TerrainBlock.width))
+            for y_start in range(y_top, self.abs_min_y, -TerrainBlock.height) :
+                block = self.get_block(lbx - TerrainBlock.width, y_start)
+                if y_start != y_top:
+                    block.biome.image = pygame.image.load("assets/stone1.png")
+                self.bricks.insert(0, block)
 
         rbx = rb.body.position.x
         if x_shift > rbx - 1000:
-            self.bricks.append(self.get_block(rbx + TerrainBlock.width))
+            y_top = int(self.get_y(rbx + TerrainBlock.width))
+            for y_start in range(y_top,self.abs_min_y,-TerrainBlock.height) :
+                block = self.get_block(rbx + TerrainBlock.width, y_start)
+                if y_start != y_top:
+                    block.biome.image = pygame.image.load("assets/stone1.png")
+                self.bricks.append(block)
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
+
         for s in self.bricks:
             s.render(display, camera_shift)
