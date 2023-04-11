@@ -17,8 +17,9 @@ class Player(Rect):
         self.body.apply_impulse_at_local_point((direction * 20_000, 0), (0, 0))
         self.direction = direction
 
-    def jump(self):
-        self.body.apply_impulse_at_local_point((0, 700000), (0, 0))
+    def jump(self, space: pymunk.Space):
+        if space.segment_query(self.body.position,(self.body.position.x,self.body.position.y - 100), 0, self.sf):
+            self.body.apply_impulse_at_local_point((0, 700000), (0, 0))
 
     def mine(self, terrain: Terrain, mouse_pos: pymunk.Vec2d) -> BaseResource:
         space = terrain.space

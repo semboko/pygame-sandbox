@@ -42,7 +42,7 @@ class VoxelWorld(AbstractPymunkScene):
             if event.key == pygame.K_r:
                 self.reset_scene()
             if event.key == pygame.K_SPACE:
-                self.player.jump()
+                self.player.jump(self.floor.space)
             if event.key == pygame.K_ESCAPE:
                 if self.menu_state != 2:
                     self.menu_state = 2
