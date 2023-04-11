@@ -56,9 +56,9 @@ class VoxelWorld(AbstractPymunkScene):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == pygame.BUTTON_LEFT:
                 pos = convert(event.pos, self.size_sc[1])
-                Res = self.player.mine(self.floor,self.camera_shift + pos)
-                if Res:
-                    self.objects.append(Res)
+                resources = self.player.mine(self.floor,self.camera_shift + pos)
+                if resources:
+                    self.objects.extend(resources)
 
     def render(self):
         super(VoxelWorld, self).render()

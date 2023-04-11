@@ -1,5 +1,5 @@
 import random
-from typing import Tuple
+from typing import Tuple, Optional
 
 import pygame
 import pymunk
@@ -8,6 +8,7 @@ from scenes.components.biomes import BaseBiome, Flatland, Mine, Swamp, Mountain
 from pymunk import Space, Body
 from pygame.surface import Surface
 from scenes.components.rect import Rect
+from scenes.components.resources import BaseResource
 from scenes.utils import convert
 
 from noise.perlin import SimplexNoise
@@ -24,6 +25,10 @@ class TerrainBlock(Rect):
         self.body.body_type = Body.STATIC
         self.shape.filter = sf
         self.biome = biome
+
+    @staticmethod
+    def get_resources() -> Tuple[BaseResource]:
+        return (BaseResource(), )
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()
@@ -133,11 +138,14 @@ class Terrain:
         else:
             return Flatland()
 
-    def delete_block(self, body: Body) -> None:
+    def get_brick_by_body(self, body: Body) -> Optional[TerrainBlock]:
         for b in self.bricks:
             if b.body == body:
-                self.bricks.remove(b)
-        self.space.remove(body, *body.shapes)
+                return b
+
+    def delete_block(self, brick: TerrainBlock) -> None:
+        self.bricks.remove(brick)
+        self.space.remove(brick.body, brick.shape)
 
     def update(self, x_shift: float) -> None:
         lb = self.bricks[0]
@@ -146,9 +154,9 @@ class Terrain:
         lbx = lb.body.position.x
         if x_shift + 50 < lbx:
             y_top = int(self.get_y(lbx - TerrainBlock.width))
-            for y_start in range(y_top,self.abs_min_y,-TerrainBlock.height) :
+            for y_start in range(y_top, self.abs_min_y, -TerrainBlock.height) :
                 block = self.get_block(lbx - TerrainBlock.width, y_start)
-                if y_start!=y_top :
+                if y_start != y_top:
                     block.biome.image = pygame.image.load("assets/stone1.png")
                 self.bricks.insert(0, block)
 

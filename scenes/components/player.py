@@ -20,7 +20,7 @@ class Player(Rect):
     def jump(self):
         self.body.apply_impulse_at_local_point((0, 700000), (0, 0))
 
-    def mine(self, terrain: Terrain, mouse_pos: pymunk.Vec2d) -> BaseResource:
+    def mine(self, terrain: Terrain, mouse_pos: pymunk.Vec2d) -> Optional[Tuple[BaseResource]]:
         space = terrain.space
         distance = self.body.position.get_distance(mouse_pos)
         if distance > 80:
@@ -28,9 +28,11 @@ class Player(Rect):
         query = space.point_query(mouse_pos, 0, self.sf)
         if not query:
             return
-        tb = query[0]
-        if tb:
-            br = BaseResource()
-            br.materialize(tb.point + pymunk.Vec2d(0, 25), space)
-            terrain.delete_block(tb.shape.body)
-            return br
+        brick = terrain.get_brick_by_body(query[0].shape.body)
+        if not brick:
+            return
+        resources = brick.get_resources()
+        for r in resources:
+            r.materialize(mouse_pos, space)
+        terrain.delete_block(brick)
+        return resources
