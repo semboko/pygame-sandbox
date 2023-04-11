@@ -51,6 +51,6 @@ class ConstraintScene(AbstractPymunkScene):
         if event.type == pygame.MOUSEBUTTONDOWN and event.dict["button"] == 3:
             x, y = convert(event.dict["pos"], h)
             objs = self.space.point_query((x, y), 2, pymunk.ShapeFilter())
-            if objs:
+            if len(objs) == 1:
                 body = objs[0].shape.body
                 body.apply_impulse_at_local_point((0, -20000), (20, 0))

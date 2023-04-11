@@ -9,6 +9,8 @@ from scenes.components.rect import Rect
 from scenes.components.terrain import Terrain, min_nfs, nfs, max_nfs, micro_nfs
 from scenes.components.speedometer import Speedometer
 from scenes.components.player import Player
+from scenes.components.resources import *
+from scenes.utils import convert
 
 pygame.init()
 pygame.font.init()
@@ -51,9 +53,18 @@ class VoxelWorld(AbstractPymunkScene):
                     self.menu_state = 1
                 else:
                     self.menu_state = 0
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == pygame.BUTTON_LEFT:
+                pos = convert(event.pos, self.size_sc[1])
+                Res = self.player.mine(self.floor,self.camera_shift + pos)
+                if Res:
+                    self.objects.append(Res)
 
     def render(self):
         super(VoxelWorld, self).render()
+        for p in self.player.dp:
+            pos = [p.x - self.camera_shift[0], p.y + self.camera_shift[1]]
+            pygame.draw.circle(self.display, (255, 0, 0), pos, 10)
         if 1 <= self.menu_state <= 2:
             font = pygame.font.SysFont("Comic Sans MS", 30)
             pos = " ".join([str(round(i, 2)) for i in list(self.player.body.position)])
