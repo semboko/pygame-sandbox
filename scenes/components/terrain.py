@@ -133,6 +133,12 @@ class Terrain:
         else:
             return Flatland()
 
+    def delete_block(self, body: Body) -> None:
+        for b in self.bricks:
+            if b.body == body:
+                self.bricks.remove(b)
+        self.space.remove(body, *body.shapes)
+
     def update(self, x_shift: float) -> None:
         lb = self.bricks[0]
         rb = self.bricks[-1]

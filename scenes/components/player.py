@@ -23,19 +23,14 @@ class Player(Rect):
     def mine(self, terrain: Terrain, mouse_pos: pymunk.Vec2d) -> BaseResource:
         space = terrain.space
         distance = self.body.position.get_distance(mouse_pos)
-        pos = mouse_pos
-        x = pos.x - pos.x % 25
-        y = pos.y - pos.y % 25
-        pos = pymunk.Vec2d(x, y)
-        block = space.point_query(mouse_pos,0,self.sf)
-        if len(block) == 0:
+        if distance > 80:
             return
-        block = block[0]
-        #self.dp.append(pos)
-        print(distance, pos, block)
-        if block:
+        query = space.point_query(mouse_pos, 0, self.sf)
+        if not query:
+            return
+        tb = query[0]
+        if tb:
             br = BaseResource()
-            br.materialize(block.point + pymunk.Vec2d(0, 25), space)
-            block.shape.body.body_type = pymunk.Body.DYNAMIC
-            block.shape.mass = 100_000_000
+            br.materialize(tb.point + pymunk.Vec2d(0, 25), space)
+            terrain.delete_block(tb.shape.body)
             return br
