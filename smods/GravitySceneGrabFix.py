@@ -8,7 +8,7 @@ from scenes.utils import *
 
 class GravitySceneGrabFix(BaseMod):
 
-    name = "GavitySceneRepair"
+    name = "GavitySceneGrabFix"
     author = "Kolya142"
     locked = False
     sf = None
