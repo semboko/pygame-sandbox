@@ -83,7 +83,7 @@ class GravityScene(AbstractScene):
     def update(self):
         if not self.pause:
             self.space.step(1 / self.fps)
-        self.clean_up()
+        #self.clean_up()
 
     def clean_up(self):
         for i in self.renders_objs:
@@ -94,4 +94,4 @@ class GravityScene(AbstractScene):
     def render(self, obj=None):
         self.display.fill((255, 255, 255))
         for obj in self.renders_objs:
-            obj.render(self.display)
+            obj.render(self.display,pymunk.vec2d.Vec2d(0,0))
