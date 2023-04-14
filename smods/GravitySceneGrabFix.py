@@ -25,7 +25,7 @@ class GravitySceneGrabFix(BaseMod):
                     for obj in self.scene.renders_objs:
                         if not isinstance(obj, Ball):
                             continue
-                        if obj.body.position.get_distance(convert(event.pos, self.scene.size_sc[1])) <= 15:
+                        if obj.body.position.get_distance(convert(event.pos, self.scene.size_sc[1])) <= obj.shape.radius:
                             print(2)
                             self.move_obj = obj
                             break
