@@ -26,6 +26,7 @@ class AbstractScene(ABC):
         raise NotImplementedError()
 
 
+
 class AbstractPymunkScene(AbstractScene):
     space: pymunk.Space
     objects: List[Any]

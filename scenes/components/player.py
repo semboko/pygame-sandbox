@@ -4,6 +4,7 @@ from scenes.components.terrain import Terrain
 from pygame import Vector2
 from typing import Tuple
 from scenes.components.resources import *
+from scenes.components.invertory import Invertory
 
 
 class Player(Rect):
@@ -13,6 +14,7 @@ class Player(Rect):
         self.dp = []
         self.sf = pymunk.ShapeFilter(group = 0b0001, categories = 0b0110)
         self.shape.filter = self.sf
+        self.inv = Invertory()
 
     def move(self, direction: int):
         self.body.apply_impulse_at_local_point((direction * 20_000, 0), (0, 0))
@@ -40,4 +42,4 @@ class Player(Rect):
         return resources
 
     def consume_resource(self, res: BaseResource) -> None:
-        pass
+        self.inv.pickup(res)

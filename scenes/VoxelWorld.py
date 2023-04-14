@@ -76,3 +76,4 @@ class VoxelWorld(AbstractPymunkScene):
             pos = " ".join([str(round(i, 2)) for i in list(self.player.body.position)])
             text = f"position: {pos}, fps: {round(self.game.clock.get_fps(), 2)}"
             self.display.blit(font.render(text, True, (0, 0, 0)), (10, 10))
+        self.player.inv.render(self.display)
