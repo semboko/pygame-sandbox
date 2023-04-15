@@ -7,7 +7,7 @@ class InfJump(BaseMod):
 
     name = "InfJump"
     author = "Kolya142"
-    locked = False
+    locked = True
 
     def start(self, *args, **kwargs):
         super(InfJump, self).start(*args, **kwargs)
