@@ -5,7 +5,7 @@ import os
 
 from scenes.abstract import AbstractScene
 from scenes.gravity import GravityScene
-from scenes.CMS import CMS
+# from scenes.CMS import CMS
 from scenes.constraints import ConstraintScene
 from scenes.carscene import CarScene
 from scenes.VoxelWorld import VoxelWorld
@@ -67,7 +67,7 @@ class Game:
 
 
 with Game() as g:
-    g.load_scene(CMS)
+    g.load_scene(VoxelWorld)
     modss = []
     for modf in os.listdir(os.getcwd() + "\\smods"):
         # if len(modf.split(".")) != 1:
