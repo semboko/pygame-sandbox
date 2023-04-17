@@ -15,12 +15,13 @@ class Ball:
         self.shape.density = 0.1
         self.shape.elasticity = 0.9
         self.shape.friction = 0.7
+        self.color = (255, 0, 0)
         self.r = r
         space.add(self.body, self.shape)
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()
-        pygame.draw.circle(display, (244, 0, 0), convert(self.body.position - camera_shift, h), self.r)
+        pygame.draw.circle(display, self.color, convert(self.body.position - camera_shift, h), self.r)
         alpha = self.body.angle
         line_end = cos(alpha) * self.r, sin(alpha) * self.r
         pygame.draw.line(

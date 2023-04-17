@@ -5,6 +5,7 @@ import os
 
 from scenes.abstract import AbstractScene
 from scenes.gravity import GravityScene
+from scenes.CMS import CMS
 from scenes.constraints import ConstraintScene
 from scenes.carscene import CarScene
 from scenes.VoxelWorld import VoxelWorld
@@ -66,13 +67,13 @@ class Game:
 
 
 with Game() as g:
-    g.load_scene(VoxelWorld)
+    g.load_scene(CMS)
     modss = []
     for modf in os.listdir(os.getcwd() + "\\smods"):
         # if len(modf.split(".")) != 1:
         #     continue
-        # if not modf.split(".")[1] == "mod":
-        #     continue
+        if modf == "__pycache__":
+            continue
         with open(os.getcwd() + "\\smods\\" + modf) as f:
             exec(f.read())
             modss.append(eval(modf.split(".")[0]))
