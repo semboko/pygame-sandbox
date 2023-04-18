@@ -1,4 +1,4 @@
-from typing import Optional, Type, Sequence
+from typing import Optional, Type, Sequence, List
 
 import pygame
 import os
@@ -18,7 +18,7 @@ class Game:
         self.sc = None
         self.res = (1500, 500)
         self.scene: Optional[AbstractScene] = None
-        self.mods: Sequence[BaseMod] = []
+        self.mods: List[BaseMod] = []
         self.clock = pygame.time.Clock()
         self.fps = 60
 
@@ -35,7 +35,7 @@ class Game:
     def load_scene(self, scene: Type[AbstractScene]):
         self.scene = scene(self.sc, self.fps, self)
 
-    def load_mods(self, mods: Sequence[Type[BaseMod]]) -> None:
+    def load_mods(self, mods: List[Type[BaseMod]]) -> None:
 
         for Mod in mods:
             m = Mod(self.sc, self.scene, self.clock)

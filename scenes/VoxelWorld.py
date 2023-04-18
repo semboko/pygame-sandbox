@@ -38,7 +38,7 @@ class VoxelWorld(AbstractPymunkScene):
         self.floor.update(self.camera_shift.x)
 
         for obj in self.objects:
-            if type(obj) == BaseResource and self.player.shape.shapes_collide(obj.rect.shape).points:
+            if issubclass(type(obj), BaseResource) and self.player.shape.shapes_collide(obj.rect.shape).points:
                 self.player.consume_resource(obj)
                 self.objects.remove(obj)
                 self.space.remove(obj.rect.body, obj.rect.shape)

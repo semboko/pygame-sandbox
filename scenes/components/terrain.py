@@ -26,9 +26,12 @@ class TerrainBlock(Rect):
         self.shape.filter = sf
         self.biome = biome
 
-    @staticmethod
-    def get_resources() -> Tuple[BaseResource]:
-        return (BaseResource(), )
+    def get_resources(self) -> Tuple[BaseResource]:
+        result = []
+        for res, quantity in self.biome.resources.items():
+            for i in range(quantity):
+                result.append(res())
+        return tuple(result)
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()
@@ -100,14 +103,14 @@ class Terrain:
     ):
         self.space = space
         self.noise = SimplexNoise()
-        self.sf = pymunk.ShapeFilter(group=0b0010, categories = 0b1101)
+        self.sf = pymunk.ShapeFilter(group=0b0010, categories=0b1101)
         self.bricks = []
         self.x_max, self.x_min, self.y_max, self.y_min = x_max, x_min, y_max, y_min
         self.abs_min_y = -300
 
         for x in range(x_min, x_max, TerrainBlock.width):
             y_top = int(self.get_y(x))
-            for y_start in range(y_top,self.abs_min_y,-TerrainBlock.height) :
+            for y_start in range(y_top,self.abs_min_y,-TerrainBlock.height):
                 block = self.get_block(x, y_start)
                 if y_start != y_top:
                     block.biome.image = pygame.image.load("assets/stone1.png")

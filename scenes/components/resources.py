@@ -24,3 +24,9 @@ class Stone(BaseResource):
     pass
 
 
+class Wood(BaseResource):
+    pass
+
+
+class Ice(BaseResource):
+    pass
