@@ -12,7 +12,7 @@ from .utils import convert
 
 pygame.init()
 pygame.font.init()
-map_file = "map_lines.txt"
+map_file = "map.txt"
 maps = []
 with open(map_file) as f:
     lines = f.read().split("\n")

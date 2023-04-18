@@ -2,6 +2,7 @@ from mods.basemod import *
 from smods.UserData import *
 from typing import Tuple
 import os
+import math
 
 import pygame.draw
 import pymunk
@@ -15,7 +16,7 @@ maps = []
 player = (250, 250)
 mapsc = []
 if len(UserData.get_files("CMSmod")) == 3:
-    defs = f'{os.getcwd()}\\user_data\\{"CMSmod"}\\'
+    defs = f'{os.getcwd()}/user_data/{"CMSmod"}/'
     map_file = defs+"map.txt"
     map_file_circles = defs+"map_circles.txt"
     with open(map_file_circles) as f:
@@ -109,4 +110,6 @@ class CMSmod(BaseMod):
                 obj.render(self.scene.display, pymunk.Vec2d(+self.scene.camera_shift.x, -self.scene.camera_shift.y))
             else:
                 obj: Ball
-                obj.render(self.scene.display,pymunk.Vec2d(+self.scene.camera_shift.x, +self.scene.camera_shift.y))
+                print(obj.body.position.y)
+                if not math.isnan(obj.body.position.y):
+                    obj.render(self.scene.display,pymunk.Vec2d(+self.scene.camera_shift.x, +self.scene.camera_shift.y))

@@ -14,7 +14,7 @@ class CarScene(AbstractPymunkScene):
     def reset_scene(self):
         super().reset_scene()
         self.car = Car(250, 250, 100, 50, self.space)
-        self.floor = Terrain(0, self.display.get_width(), 5, 200, 205, random.random(), self.space)
+        self.floor = Terrain(0, self.display.get_width(), 100, 200, 400, self.space)
         self.speedometer = Speedometer(70, 70, 0, 3000)
         self.objects.extend((self.car, self.floor, self.speedometer))
 

@@ -15,12 +15,12 @@ class AudioLib(BaseMod):
     author = "Kolya142"
 
     def start(self, *args, **kwargs):
-        super(AudioLib, self).start(*args, **kwargs)
+        pass
 
     @staticmethod
     def play(dirpath: str, name: str, volume: float) -> None:
-        dirs = f'user_data\\{dirpath}\\{name}'
-        if name not in UserData.get_files(f'{os.getcwd()}\\user_data\\{dirpath}'):
+        dirs = f'{os.getcwd()}/user_data/{dirpath}/{name}'
+        if name not in UserData.get_files(dirpath):
             return
         mixer.music.load(dirs)
         mixer.music.set_volume(volume)

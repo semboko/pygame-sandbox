@@ -69,12 +69,12 @@ class Game:
 with Game() as g:
     g.load_scene(VoxelWorld)
     modss = []
-    for modf in os.listdir(os.getcwd() + "\\smods"):
+    for modf in os.listdir(os.getcwd() + "/smods"):
         # if len(modf.split(".")) != 1:
         #     continue
         if modf == "__pycache__":
             continue
-        with open(os.getcwd() + "\\smods\\" + modf) as f:
+        with open(os.getcwd() + "/smods/" + modf) as f:
             exec(f.read())
             modss.append(eval(modf.split(".")[0]))
     g.load_mods(modss)
