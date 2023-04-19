@@ -29,7 +29,7 @@ class UserData(BaseMod):
                 f.write(data)
 
     @staticmethod
-    def get_file(dirpath: str, file: str, isbytesdata: bool) -> Union[str, bytes]:
+    def get_file(dirpath: str, file: str, isbytesdata: bool = False) -> Union[str, bytes]:
         dirs = f'{os.getcwd()}/user_data/{dirpath}/{file}'
 
         if not isbytesdata:

@@ -42,6 +42,9 @@ class Game:
             print(f'mod loading: {m.name} by {m.author}')
             self.mods.append(m)
 
+        for m in self.mods:
+            m.mods = self.mods
+
     def run(self):
         for mod in self.mods :
             mod.start()

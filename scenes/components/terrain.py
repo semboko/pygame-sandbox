@@ -4,7 +4,7 @@ from typing import Tuple, Optional
 import pygame
 import pymunk
 
-from scenes.components.biomes import BaseBiome, Flatland, Mine, Swamp, Mountain
+from scenes.components.biomes import BaseBiome, Flatland, Mine, Swamp, Mountain, Stone
 from pymunk import Space, Body
 from pygame.surface import Surface
 from scenes.components.rect import Rect
@@ -20,15 +20,14 @@ class TerrainBlock(Rect):
 
     biome: BaseBiome
 
-    def __init__(self, x: float, y: float, space: pymunk.Space, sf: pymunk.ShapeFilter, biome: BaseBiome = Flatland):
+    def __init__(self, x: float, y: float, space: pymunk.Space, sf: pymunk.ShapeFilter, biome: BaseBiome):
         super().__init__(x, y, self.width, self.height, space, (25, 255, 25))
         self.body.body_type = Body.STATIC
         self.shape.filter = sf
         self.biome = biome
 
-    @staticmethod
-    def get_resources() -> Tuple[BaseResource]:
-        return (BaseResource(), )
+    def get_resources(self) -> Tuple[BaseResource]:
+        return (self.biome.resource(), )
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()

@@ -1,3 +1,4 @@
+import pygame.image
 from pygame.surface import Surface
 from pymunk.vec2d import Vec2d
 from pymunk import Body, Poly, Space
@@ -21,6 +22,11 @@ class BaseResource:
 
 
 class Stone(BaseResource):
-    pass
+    icon: Surface = pygame.image.load("assets/stone1.png")
 
+class Snow(BaseResource):
+    icon: Surface = pygame.image.load("assets/snow.jpg")
+
+class Grass(BaseResource):
+    icon: Surface = pygame.image.load("assets/grass.jpg")
 

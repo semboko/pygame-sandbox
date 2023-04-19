@@ -13,6 +13,12 @@ class BaseMod:
         self.disp = display
         self.scene = scene
         self.clock = clock
+        self.mods = []
+
+    def get_mod(self, name):
+        for i in self.mods:
+            if i.name == name:
+                return i
 
     def start(self):
         pass

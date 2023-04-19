@@ -1,6 +1,7 @@
 
   PGraphics pg;
   int v1;
+  JSONObject datas;
   PVector[] lines1;
   PVector[] lines2;
   PVector[] circles1;
@@ -70,6 +71,29 @@
     image(pg, 0, 0);
   }
  void keyPressed() {
+  if (key == 'e') {
+    datas = loadJSONObject("map.json");
+    lines = 0;
+    lines1 = new PVector[200];
+    lines2 = new PVector[200];
+    circles = 0;
+    circles1 = new PVector[200];
+    for (int i = 0; i < datas.getString("lines").split("\n").length; i += 1) {
+      String strs = datas.getString("lines").split("\n")[i];
+      String[] l = strs.split(" ");
+      lines += 1;
+      lines1[i] = new PVector(float(l[0]), float(l[1]));
+      lines2[i] = new PVector(float(l[2]), float(l[3]));
+    }
+    for (int i = 0; i < datas.getString("circles").split("\n").length; i += 1) {
+      String strs = datas.getString("circles").split("\n")[i];
+      String[] l = strs.split(" ");
+      circles += 1;
+      circles1[i] = new PVector(float(l[0]), float(l[1]), float(l[2]));
+    }
+    String[] d = datas.getString("player").split(" ");
+    player = new PVector(float(d[0]), float(d[1]));
+  }
   // if (key == 's') {
   //   String[] slines = loadStrings("map.txt");
   //   lines1 = new PVector[200];
@@ -121,19 +145,32 @@
     }
   }
   if (key == 'q') {
-    String[] datas = new String[lines];
+    datas = new JSONObject();
+    datas.setString("circles", "");
+    datas.setString("lines", "");
     for (int i = 0; i < lines; i += 1) {
-      datas[i] = lines1[i].x + " " + lines1[i].y + " " + lines2[i].x + " " + lines2[i].y;
+      String l = lines1[i].x + " " + lines1[i].y + " " + lines2[i].x + " " + lines2[i].y;
+      datas.setString("lines", datas.getString("lines") + l + "\n");
     }
-    saveStrings("map.txt", datas);
-    String[] datas_circles = new String[circles];
     for (int i = 0; i < circles; i += 1) {
-      datas_circles[i] = circles1[i].x + " " + circles1[i].y + " " + circles1[i].z;
+      String l = circles1[i].x + " " + circles1[i].y + " " + circles1[i].z;
+      datas.setString("circles", datas.getString("circles") + l + "\n");
     }
-    saveStrings("map_circles.txt", datas_circles);
-    String[] player_data = {player.x + " " + player.y};
-    saveStrings("map_player.txt", player_data);
-    // exit();
+    datas.setString("player", player.x + " " + player.y);
+    datas.setString("code", "");
+    saveJSONObject(datas, "map.json");
+    //for (int i = 0; i < lines; i += 1) {
+    //  datas[i] = lines1[i].x + " " + lines1[i].y + " " + lines2[i].x + " " + lines2[i].y;
+    //}
+    //saveStrings("map.txt", datas);
+    //String[] datas_circles = new String[circles];
+    //for (int i = 0; i < circles; i += 1) {
+    //  datas_circles[i] = circles1[i].x + " " + circles1[i].y + " " + circles1[i].z;
+    //}
+    //saveStrings("map_circles.txt", datas_circles);
+    //String[] player_data = {player.x + " " + player.y};
+    //saveStrings("map_player.txt", player_data);
+    //// exit();
   }
  }
   public void mouseWheel(MouseEvent me) {
