@@ -6,8 +6,8 @@ from pygame.event import Event
 
 from scenes.abstract import AbstractPymunkScene
 from scenes.components.car import Car
-from scenes.components.terrain import Terrain
 from scenes.components.speedometer import Speedometer
+from scenes.components.terrain import Terrain
 
 
 class CarScene(AbstractPymunkScene):

@@ -1,9 +1,11 @@
-from pygame.surface import Surface
-from pymunk.vec2d import Vec2d
-from pymunk import Body, Poly, Space
-from scenes.utils import convert
 from typing import Optional
+
+from pygame.surface import Surface
+from pymunk import Body, Poly, Space
+from pymunk.vec2d import Vec2d
+
 from scenes.components.rect import Rect
+from scenes.utils import convert
 
 
 class BaseResource:

@@ -2,8 +2,8 @@ import pygame
 
 from mods.basemod import *
 
-class DebugMod(BaseMod):
 
+class DebugMod(BaseMod):
     name = "DebugMod"
     author = "Kolya142"
 
@@ -11,17 +11,17 @@ class DebugMod(BaseMod):
         super(DebugMod, self).start(*args, **kwargs)
         print("OnSetup")
 
-#     def update(self) :
-#         print("OnUpdate")
+    #     def update(self) :
+    #         print("OnUpdate")
 
-#     def onrender(self) :
-#         print("OnRender")
+    #     def onrender(self) :
+    #         print("OnRender")
 
-#     def handle_pressed_keys(self, keys: Sequence[bool]):
-#         print(keys[pygame.K_a], keys[pygame.K_SPACE], keys[pygame.K_d])
+    #     def handle_pressed_keys(self, keys: Sequence[bool]):
+    #         print(keys[pygame.K_a], keys[pygame.K_SPACE], keys[pygame.K_d])
 
-#     def handle_events(self,event: Event) :
-#         print(f'event: {event}')
+    #     def handle_events(self,event: Event) :
+    #         print(f'event: {event}')
 
     def quit(self, error: str = None):
-        print(f'quit \n{error}')
+        print(f"quit \n{error}")

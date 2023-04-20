@@ -1,16 +1,16 @@
-from typing import Optional, Type, Sequence, List
+import os
+from pickle import load as pload
+from typing import List, Optional, Sequence, Type
 
 import pygame
-import os
 
+from mods.basemod import BaseMod
 from scenes.abstract import AbstractScene
-from scenes.gravity import GravityScene
+from scenes.carscene import CarScene
 # from scenes.CMS import CMS
 from scenes.constraints import ConstraintScene
-from scenes.carscene import CarScene
+from scenes.gravity import GravityScene
 from scenes.VoxelWorld import VoxelWorld
-from pickle import load as pload
-from mods.basemod import BaseMod
 
 
 class Game:
@@ -28,7 +28,7 @@ class Game:
         return self
 
     def __exit__(self, exc_class, exc_message, traceback_obj):
-        for mod in self.mods :
+        for mod in self.mods:
             mod.quit(exc_message)
         pygame.quit()
 
@@ -36,23 +36,22 @@ class Game:
         self.scene = scene(self.sc, self.fps, self)
 
     def load_mods(self, mods: List[Type[BaseMod]]) -> None:
-
         for Mod in mods:
             m = Mod(self.sc, self.scene, self.clock)
-            print(f'mod loading: {m.name} by {m.author}')
+            print(f"mod loading: {m.name} by {m.author}")
             self.mods.append(m)
 
     def run(self):
-        for mod in self.mods :
+        for mod in self.mods:
             mod.start()
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    for mod in self.mods :
+                    for mod in self.mods:
                         mod.quit()
                     return
                 self.scene.handle_event(event)
-                for mod in self.mods :
+                for mod in self.mods:
                     mod.handle_pressed_keys(pygame.key.get_pressed())
                 for mod in self.mods:
                     mod.handle_events(event)
@@ -69,13 +68,13 @@ class Game:
 with Game() as g:
     g.load_scene(VoxelWorld)
     modss = []
-    for modf in os.listdir(os.getcwd() + "/smods"):
-        # if len(modf.split(".")) != 1:
-        #     continue
-        if modf == "__pycache__":
-            continue
-        with open(os.getcwd() + "/smods/" + modf) as f:
-            exec(f.read())
-            modss.append(eval(modf.split(".")[0]))
+    # for modf in os.listdir(os.getcwd() + "/smods"):
+    #     # if len(modf.split(".")) != 1:
+    #     #     continue
+    #     if modf == "__pycache__":
+    #         continue
+    #     with open(os.getcwd() + "/smods/" + modf) as f:
+    #         exec(f.read())
+    #         modss.append(eval(modf.split(".")[0]))
     g.load_mods(modss)
     g.run()

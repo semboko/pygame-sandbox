@@ -1,7 +1,9 @@
-from pygame.surface import Surface
-from pygame.image import load
 from typing import Dict, Type
-from scenes.components.resources import BaseResource, Stone, Wood, Ice
+
+from pygame.image import load
+from pygame.surface import Surface
+
+from scenes.components.resources import BaseResource, Ice, Stone, Wood
 
 
 class BaseBiome:
