@@ -1,9 +1,12 @@
-import pymunk
-from scenes.components.rect import Rect
-from scenes.components.terrain import Terrain
-from pygame import Vector2
 from typing import Tuple
+
+import pymunk
+from pygame import Vector2
+
+from scenes.components.invertory import Invertory
+from scenes.components.rect import Rect
 from scenes.components.resources import *
+from scenes.components.terrain import Terrain
 
 
 class Player(Rect):
@@ -11,15 +14,16 @@ class Player(Rect):
         super().__init__(*args, **kwargs)
         self.direction = 1
         self.dp = []
-        self.sf = pymunk.ShapeFilter(group = 0b0001, categories = 0b0110)
+        self.sf = pymunk.ShapeFilter(group=0b0001, categories=0b0110)
         self.shape.filter = self.sf
+        self.inv = Invertory()
 
     def move(self, direction: int):
         self.body.apply_impulse_at_local_point((direction * 20_000, 0), (0, 0))
         self.direction = direction
 
     def jump(self, space: pymunk.Space):
-        if space.segment_query(self.body.position,(self.body.position.x,self.body.position.y - 100), 0, self.sf):
+        if space.segment_query(self.body.position, (self.body.position.x, self.body.position.y - 100), 0, self.sf):
             self.body.apply_impulse_at_local_point((0, 700000), (0, 0))
 
     def mine(self, terrain: Terrain, mouse_pos: pymunk.Vec2d) -> Optional[Tuple[BaseResource]]:
@@ -40,4 +44,4 @@ class Player(Rect):
         return resources
 
     def consume_resource(self, res: BaseResource) -> None:
-        pass
+        self.inv.pickup(res)

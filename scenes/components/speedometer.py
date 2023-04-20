@@ -1,8 +1,9 @@
-import pymunk
+from math import cos, radians, sin
+
 import pygame
+import pymunk
 from pygame.surface import Surface
 from pymunk import Vec2d
-from math import sin, cos, radians
 
 
 class Speedometer:
