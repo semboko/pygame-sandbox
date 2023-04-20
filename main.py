@@ -7,6 +7,7 @@ import pygame
 from mods.basemod import BaseMod
 from scenes.abstract import AbstractScene
 from scenes.carscene import CarScene
+
 # from scenes.CMS import CMS
 from scenes.constraints import ConstraintScene
 from scenes.gravity import GravityScene
@@ -65,16 +66,20 @@ class Game:
             self.clock.tick(self.fps)
 
 
+def read_mods(local_dir: str) -> List[Type[BaseMod]]:
+    result = []
+    for modf in os.listdir(os.getcwd() + "/" + local_dir):
+        # if len(modf.split(".")) != 1:
+        #     continue
+        if modf == "__pycache__":
+            continue
+        with open(os.getcwd() + "/smods/" + modf) as f:
+            exec(f.read())
+            result.append(eval(modf.split(".")[0]))
+    return result
+
+
 with Game() as g:
     g.load_scene(VoxelWorld)
-    modss = []
-    # for modf in os.listdir(os.getcwd() + "/smods"):
-    #     # if len(modf.split(".")) != 1:
-    #     #     continue
-    #     if modf == "__pycache__":
-    #         continue
-    #     with open(os.getcwd() + "/smods/" + modf) as f:
-    #         exec(f.read())
-    #         modss.append(eval(modf.split(".")[0]))
-    g.load_mods(modss)
+    # g.load_mods(read_mods("smods"))
     g.run()
