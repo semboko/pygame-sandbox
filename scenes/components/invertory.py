@@ -22,10 +22,10 @@ class Invertory:
         pass
 
     def render(self, display: Surface):
-        H = display.get_height()
-        W = display.get_width()
-        y = H - self.previewsize * 0.5
-        x = W // 2 - (len(self.icons) * self.previewsize / 2) - self.previewsize / 2
+        h = display.get_height()
+        w = display.get_width()
+        y = h - self.previewsize * 0.5
+        x = w // 2 - (len(self.icons) * self.previewsize / 2) - self.previewsize / 2
         for it, count in self.icons.items():
             display.blit(it.icon, pygame.Vector2(x, y))
 
