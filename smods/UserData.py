@@ -1,10 +1,9 @@
-import os
-from typing import Union
-
 from mods.basemod import *
-
+from typing import Union
+import os
 
 class UserData(BaseMod):
+
     name = "UserDataMenager"
     author = "Kolya142"
 
@@ -13,29 +12,29 @@ class UserData(BaseMod):
 
     @staticmethod
     def get_files(name: str) -> tuple:
-        dirs = f"{os.getcwd()}/user_data/{name}"
+        dirs = f'{os.getcwd()}/user_data/{name}'
         if not os.path.exists(dirs):
             os.mkdir(dirs)
         return os.listdir(dirs)
 
     @staticmethod
     def set_file(dirpath: str, file: str, data: Union[str, bytes]) -> None:
-        dirs = f"{os.getcwd()}/user_data/{dirpath}/{file}"
+        dirs = f'{os.getcwd()}/user_data/{dirpath}/{file}'
 
         if isinstance(data, str):
-            with open(dirs, "w") as f:
+            with open(dirs, 'w') as f:
                 f.write(data)
         elif isinstance(data, bytes):
-            with open(dirs, "wb") as f:
+            with open(dirs, 'wb') as f:
                 f.write(data)
 
     @staticmethod
-    def get_file(dirpath: str, file: str, isbytesdata: bool) -> Union[str, bytes]:
-        dirs = f"{os.getcwd()}/user_data/{dirpath}/{file}"
+    def get_file(dirpath: str, file: str, isbytesdata: bool = False) -> Union[str, bytes]:
+        dirs = f'{os.getcwd()}/user_data/{dirpath}/{file}'
 
         if not isbytesdata:
-            with open(dirs, "r") as f:
+            with open(dirs, 'r') as f:
                 return f.read()
         else:
-            with open(dirs, "rb") as f:
+            with open(dirs, 'rb') as f:
                 return f.read()

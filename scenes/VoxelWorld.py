@@ -25,6 +25,7 @@ class VoxelWorld(AbstractPymunkScene):
         self.menu_state = 0
 
     def update(self):
+
         if 0 <= self.menu_state <= 1:
             super().update()
         self.player.body.angle = 0
