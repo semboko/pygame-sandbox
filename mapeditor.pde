@@ -4,8 +4,7 @@ int v1;
 JSONObject datas;
 PVector[] lines1, lines2, circles1;
 PVector player;
-boolean isdraw;
-boolean isdrawc;
+boolean isdraw, isdrawc, isdel;
 String last;
 int circles;
 int lines;
@@ -13,6 +12,7 @@ int lines;
 void setup() {
   lines1 = new PVector[200];
   lines2 = new PVector[200];
+  isdel = false;
   circles1 = new PVector[200];
   last = "line";
 
@@ -26,6 +26,9 @@ void setup() {
   player = new PVector(width/2, height/2);
 }
 
+void keyReleased() {
+  if (key == 'z') isdel = false;
+}
 void draw() {
 
   pg.beginDraw();
@@ -66,6 +69,7 @@ void draw() {
       circles1 = new PVector[200];
       break;
     case 'z':
+      if (!isdel)
       if (last == "line") {
         lines -= 1;
         lines1[lines] = new PVector();
@@ -75,6 +79,7 @@ void draw() {
         circles -= 1;
         circles1[lines] = new PVector();
       }
+      isdel = true;
       break;
     case 'q':
       datas = new JSONObject();
@@ -128,7 +133,7 @@ void draw() {
     println(circles1[x]);
     pg.circle(circles1[x].x, circles1[x].y, circles1[x].z);
   }
-  pg.rect(player.x, player.y, 25, 25);
+  pg.rect(player.x, player.y, 50, 50);
   pg.endDraw();
   image(pg, 0, 0);
 }

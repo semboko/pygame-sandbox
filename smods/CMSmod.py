@@ -21,7 +21,7 @@ maps = []
 player = (250, 250)
 codes = ""
 mapsc = []
-if len(UserData.get_files("CMSmod")) == 1:
+if len(UserData.get_files("CMSmod")) >= 1:
     # if i=="" :
     #     break
     # i: str
