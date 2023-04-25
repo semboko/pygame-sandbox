@@ -70,19 +70,11 @@ class Game:
 
 
 def read_mods(local_dir: str) -> List[Type[BaseMod]]:
-    result = []
-    for modf in os.listdir(os.getcwd() + "/" + local_dir):
-        # if len(modf.split(".")) != 1:
-        #     continue
-        if modf == "__pycache__":
-            continue
-        with open(os.getcwd() + "/smods/" + modf) as f:
-            exec(f.read())
-            result.append(eval(modf.split(".")[0]))
-    return result
+    from smods import mods
+    return mods
 
 
 with Game() as g:
     g.load_scene(VoxelWorld)
-    # g.load_mods(read_mods("smods"))
+    g.load_mods(read_mods("smods"))
     g.run()

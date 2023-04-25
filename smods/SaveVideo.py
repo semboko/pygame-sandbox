@@ -3,6 +3,7 @@ import threading
 import pygame
 import os
 from mods.basemod import *
+import cv2
 import asyncio
 
 class SaveVideo(BaseMod):
@@ -39,7 +40,7 @@ class SaveVideo(BaseMod):
             self.nam += 1
 
     def handle_pressed_keys(self, keys: Sequence[bool]):
-        if keys[pygame.K_KP0]:
+        if keys[pygame.K_0]:
             self.on = True
 
     def quit(self, error: str = None):
