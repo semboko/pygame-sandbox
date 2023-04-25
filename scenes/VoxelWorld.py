@@ -5,11 +5,11 @@ import pymunk
 from pygame.event import Event
 
 from scenes.abstract import AbstractPymunkScene
-from scenes.components.rect import Rect
-from scenes.components.terrain import Terrain, min_nfs, nfs, max_nfs, micro_nfs
-from scenes.components.speedometer import Speedometer
 from scenes.components.player import Player
+from scenes.components.rect import Rect
 from scenes.components.resources import *
+from scenes.components.speedometer import Speedometer
+from scenes.components.terrain import Terrain, max_nfs, micro_nfs, min_nfs, nfs
 from scenes.utils import convert
 
 pygame.init()
@@ -63,7 +63,7 @@ class VoxelWorld(AbstractPymunkScene):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == pygame.BUTTON_LEFT:
                 pos = convert(event.pos, self.size_sc[1])
-                resources = self.player.mine(self.floor,self.camera_shift + pos)
+                resources = self.player.mine(self.floor, self.camera_shift + pos)
                 if resources:
                     self.objects.extend(resources)
 

@@ -1,11 +1,13 @@
 from typing import Sequence
+
 from pygame.event import Event
 from pygame.surface import Surface
-from scenes.abstract import AbstractScene
 from pygame.time import Clock
 
-class BaseMod:
+from scenes.abstract import AbstractScene
 
+
+class BaseMod:
     name: str = "Mod"
     author: str = "Author"
 

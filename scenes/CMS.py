@@ -17,20 +17,15 @@ maps = []
 with open(map_file) as f:
     lines = f.read().split("\n")
     for i in lines:
-        i: str = i.replace("[", "").replace("]",",").replace(" ","").replace(".","").replace(",00","0")
-        i = i[:len(i)-1]
+        i: str = i.replace("[", "").replace("]", ",").replace(" ", "").replace(".", "").replace(",00", "0")
+        i = i[: len(i) - 1]
         i = i.split(",")
-        if i[0] == '':
+        if i[0] == "":
             break
         xs = 4
         ys = 70
-        maps.append(((
-                         int(i[0])/xs,
-                         500-int(i[1])/ys
-                     ),(
-                         int(i[2])/xs,
-                         500-int(i[3])/ys
-                     )))
+        maps.append(((int(i[0]) / xs, 500 - int(i[1]) / ys), (int(i[2]) / xs, 500 - int(i[3]) / ys)))
+
 
 class CMS(AbstractPymunkScene):
     def reset_scene(self):
@@ -41,7 +36,7 @@ class CMS(AbstractPymunkScene):
 
     def update(self):
         self.space.step(1 / self.fps)
-        #self.clean_up()
+        # self.clean_up()
 
     def clean_up(self):
         for i in self.objects:
@@ -49,7 +44,7 @@ class CMS(AbstractPymunkScene):
                 if i.pos[0] < 0 or i.pos[0] > self.size_sc[0] or i.pos[1] < 0 or i.pos[1] > self.size_sc[1]:
                     del i
 
-    def handle_event(self,event: Event) -> None :
+    def handle_event(self, event: Event) -> None:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
                 self.reset_scene()

@@ -1,21 +1,24 @@
-from pygame.surface import Surface
+from typing import Dict, Type
+
 from pygame.image import load
-from scenes.components.resources import BaseResource, Stone, Snow, Grass
+from pygame.surface import Surface
+
+from scenes.components.resources import BaseResource, Ice, Stone, Wood
 
 
 class BaseBiome:
     image: Surface = Surface((25, 25))
-    resource: BaseResource = BaseResource()
+    resources: Dict[Type[BaseResource], int] = {}
 
 
 class Flatland(BaseBiome):
     image: Surface = load("./assets/grass.jpg")
-    resource: Grass = Grass
+    resources: Dict[Type[BaseResource], int] = {Stone: 2, Wood: 4}
 
 
 class Swamp(BaseBiome):
     image: Surface = load("./assets/swamp.jpg")
-    resource: Stone = Stone
+    resources: Dict[Type[BaseResource], int] = {Stone: 1, Wood: 1}
 
 
 class Mine(BaseBiome):
@@ -24,4 +27,4 @@ class Mine(BaseBiome):
 
 class Mountain(BaseBiome):
     image: Surface = load("./assets/snow.jpg")
-    resource: Snow = Snow
+    resources: Dict[Type[BaseResource], int] = {Stone: 1, Wood: 1, Ice: 5}

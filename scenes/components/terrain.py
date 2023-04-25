@@ -1,17 +1,16 @@
 import random
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import pygame
 import pymunk
-
-from scenes.components.biomes import BaseBiome, Flatland, Mine, Swamp, Mountain, Stone
-from pymunk import Space, Body
+from noise.perlin import SimplexNoise
 from pygame.surface import Surface
+from pymunk import Body, Space
+
+from scenes.components.biomes import BaseBiome, Flatland, Mine, Mountain, Swamp
 from scenes.components.rect import Rect
 from scenes.components.resources import BaseResource
 from scenes.utils import convert
-
-from noise.perlin import SimplexNoise
 
 
 class TerrainBlock(Rect):
@@ -20,18 +19,22 @@ class TerrainBlock(Rect):
 
     biome: BaseBiome
 
-    def __init__(self, x: float, y: float, space: pymunk.Space, sf: pymunk.ShapeFilter, biome: BaseBiome):
+    def __init__(self, x: float, y: float, space: pymunk.Space, sf: pymunk.ShapeFilter, biome: BaseBiome = Flatland):
         super().__init__(x, y, self.width, self.height, space, (25, 255, 25))
         self.body.body_type = Body.STATIC
         self.shape.filter = sf
         self.biome = biome
 
     def get_resources(self) -> Tuple[BaseResource]:
-        return (self.biome.resource(), )
+        result = []
+        for res, quantity in self.biome.resources.items():
+            for i in range(quantity):
+                result.append(res())
+        return tuple(result)
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()
-        adj = pymunk.Vec2d(self.width/2, -self.height/2)
+        adj = pymunk.Vec2d(self.width / 2, -self.height / 2)
         pos = self.body.position - adj - camera_shift
 
         display.blit(self.biome.image, convert(pos, h))
@@ -94,26 +97,24 @@ def micro_nfs(noise, y_top, y_min, y_max):
 
 
 class Terrain:
-    def __init__(
-        self, x_min: int, x_max: int, y_min: int, y_max: int, steps: int, space: Space
-    ):
+    def __init__(self, x_min: int, x_max: int, y_min: int, y_max: int, steps: int, space: Space):
         self.space = space
         self.noise = SimplexNoise()
-        self.sf = pymunk.ShapeFilter(group=0b0010, categories = 0b1101)
+        self.sf = pymunk.ShapeFilter(group=0b0010, categories=0b1101)
         self.bricks = []
         self.x_max, self.x_min, self.y_max, self.y_min = x_max, x_min, y_max, y_min
         self.abs_min_y = -300
 
         for x in range(x_min, x_max, TerrainBlock.width):
             y_top = int(self.get_y(x))
-            for y_start in range(y_top,self.abs_min_y,-TerrainBlock.height) :
+            for y_start in range(y_top, self.abs_min_y, -TerrainBlock.height):
                 block = self.get_block(x, y_start)
                 if y_start != y_top:
                     block.biome.image = pygame.image.load("assets/stone1.png")
                 self.bricks.append(block)
 
     def get_noise(self, x: float) -> float:
-        return self.noise.noise2(x/700, 0)
+        return self.noise.noise2(x / 700, 0)
 
     def get_block(self, x: int, y: int = None) -> TerrainBlock:
         if not y:
@@ -153,7 +154,7 @@ class Terrain:
         lbx = lb.body.position.x
         if x_shift + 50 < lbx:
             y_top = int(self.get_y(lbx - TerrainBlock.width))
-            for y_start in range(y_top, self.abs_min_y, -TerrainBlock.height) :
+            for y_start in range(y_top, self.abs_min_y, -TerrainBlock.height):
                 block = self.get_block(lbx - TerrainBlock.width, y_start)
                 if y_start != y_top:
                     block.biome.image = pygame.image.load("assets/stone1.png")
@@ -162,13 +163,12 @@ class Terrain:
         rbx = rb.body.position.x
         if x_shift > rbx - 1000:
             y_top = int(self.get_y(rbx + TerrainBlock.width))
-            for y_start in range(y_top,self.abs_min_y,-TerrainBlock.height) :
+            for y_start in range(y_top, self.abs_min_y, -TerrainBlock.height):
                 block = self.get_block(rbx + TerrainBlock.width, y_start)
                 if y_start != y_top:
                     block.biome.image = pygame.image.load("assets/stone1.png")
                 self.bricks.append(block)
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
-
         for s in self.bricks:
             s.render(display, camera_shift)

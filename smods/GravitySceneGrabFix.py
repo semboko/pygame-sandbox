@@ -4,10 +4,12 @@ import pymunk
 from mods.basemod import *
 from scenes.gravity import GravityScene
 from scenes.components import Ball, Segment
+from scenes.components import Ball, Segment, rect
+from scenes.gravity import GravityScene
 from scenes.utils import *
 
-class GravitySceneGrabFix(BaseMod):
 
+class GravitySceneGrabFix(BaseMod):
     name = "GavitySceneGrabFix"
     author = "Kolya142"
     locked = True
@@ -34,7 +36,8 @@ class GravitySceneGrabFix(BaseMod):
                             break
                 else:
                     self.move_obj = None
+
     def update(self):
-        #print(self.move_obj)
+        # print(self.move_obj)
         if self.move_obj is not None and not self.locked:
             self.move_obj.body.position = convert(pygame.mouse.get_pos(), self.scene.size_sc[1])
