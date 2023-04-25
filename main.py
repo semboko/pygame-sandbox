@@ -70,7 +70,7 @@ class Game:
 
 
 with Game() as g:
-    g.load_scene(GravityScene)
+    g.load_scene(VoxelWorld)
     modss = []
     for modf in os.listdir(os.getcwd() + "/smods"):
         # if len(modf.split(".")) != 1:
