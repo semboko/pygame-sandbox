@@ -46,7 +46,7 @@ class CMSmod(BaseMod):
             self.locked = True
         self.gm = self.get_maps()
         y = 250 - len(self.gm) / 2
-        self.buttons = [pygame_button.Button((20, y + self.gm.index(i) * 50, 100, 30), (250, 150, 100), lambda : self.pop(i), text = i, **BUTTON_STYLE) for i in self.gm]
+        self.buttons = [pygame_button.Button((20, y + self.gm.index(i) * 50, 100, 30), (250, 150, 100), print(), text = i, **BUTTON_STYLE) for i in self.gm]
         # self.buttons[0].on_click(self.buttons[0].text)
         # self.get_map(self.mapr)
         # self.inits()
@@ -115,7 +115,7 @@ class CMSmod(BaseMod):
             for i in self.buttons:
                 if i.rect.collidepoint(pygame.mouse.get_pos()):
                     if pygame.mouse.get_pressed()[0]:
-                        i.function()
+                        self.pop(self.gm[self.buttons.index(i)])
                         break
         for i in self.updates:
             i(self)
