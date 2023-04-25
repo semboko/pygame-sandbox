@@ -25,6 +25,7 @@ class Game:
 
     def __enter__(self):
         pygame.init()
+        pygame.mixer.init()
         self.sc = pygame.display.set_mode(self.res)
         return self
 
@@ -32,6 +33,7 @@ class Game:
         for mod in self.mods:
             mod.quit(exc_message)
         pygame.quit()
+        pygame.mixer.quit()
 
     def load_scene(self, scene: Type[AbstractScene]):
         self.scene = scene(self.sc, self.fps, self)
