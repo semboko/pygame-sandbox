@@ -1,4 +1,9 @@
-import cv2
+try:
+    import cv2
+except ImportError:
+    import os
+    os.system("pip install opencv-python")
+    import cv2
 from mods.basemod import *
 class Animate(BaseMod):
     name = "Animate-for-sandbox"
