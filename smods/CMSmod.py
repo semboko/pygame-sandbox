@@ -67,16 +67,20 @@ class CMSmod(BaseMod):
         super(CMSmod, self).start(*args, **kwargs)
         if not maps or type(self.scene).__name__ != "VoxelWorld":
             self.locked = True
+        self.inits()
 
+    def inits(self):
         if not self.locked:
             self.scene.player.body.position = player
             self.scene: VoxelWorld
             for i in maps :
                 print(i)
                 self.objs.append(Segment(i[0],i[1],10,self.scene.space,pymunk.Body.STATIC))
+                self.scene.objects.append(self.objs[-1])
             for i in mapsc:
                 print(i)
                 self.objs.append(Ball(i[0], i[1], i[2], self.scene.space))
+                self.scene.objects.append(self.objs[-1])
             exec(codes)
 
     def update(self):
@@ -100,25 +104,4 @@ class CMSmod(BaseMod):
                 exit()
 
             if event.key == pygame.K_r:
-                self.scene.player.body.position = player
-                self.objs = []
-                if not self.locked :
-                    for i in maps :
-                        print(i)
-                        self.objs.append(Segment(i[0],i[1],10,self.scene.space,pymunk.Body.STATIC))
-                    for i in mapsc :
-                        print(i)
-                        self.objs.append(Ball(i[0], i[1], i[2], self.scene.space))
-                    exec(codes)
-
-    def onrender(self):
-        if not self.locked:
-            for obj in self.objs:
-                if isinstance(obj, Segment):
-                    obj: Segment
-                    obj.render(self.scene.display, pymunk.Vec2d(+self.scene.camera_shift.x, -self.scene.camera_shift.y))
-                else:
-                    obj: Ball
-                    #print(obj.body.position.y)
-                    if not math.isnan(obj.body.position.y):
-                        obj.render(self.scene.display,pymunk.Vec2d(+self.scene.camera_shift.x, +self.scene.camera_shift.y))
+                self.inits()

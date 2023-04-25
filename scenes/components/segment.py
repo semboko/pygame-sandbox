@@ -29,6 +29,7 @@ class Segment:
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()
+        camera_shift = pymunk.Vec2d(camera_shift.x, -camera_shift.y)
         a = convert(self.shape.a, h) - camera_shift
         b = convert(self.shape.b, h) - camera_shift
         pygame.draw.line(display, (0, 0, 0), a, b, 10)

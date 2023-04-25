@@ -7,6 +7,7 @@ from pygame.event import Event
 
 from scenes.abstract import AbstractScene
 from scenes.components import Ball, Segment
+from scenes.components.cmake import Cmake
 
 from .utils import convert
 
@@ -78,6 +79,7 @@ class GravityScene(AbstractScene):
         self.segment = Segment((0, 100), (500, 50), 5, self.space, btype=pymunk.Body.KINEMATIC)
         self.renders_objs.append(self.segment)
         self.renders_objs.append(Segment((497, 300), (497, 50), 5, self.space, btype=pymunk.Body.KINEMATIC))
+        self.renders_objs.append(Cmake(250, 250, self.space))
         self.renders_objs.append(Segment((0, 300), (0, 50), 5, self.space, btype=pymunk.Body.KINEMATIC))
 
     def update(self):
