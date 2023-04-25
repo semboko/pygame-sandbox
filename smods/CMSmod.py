@@ -4,6 +4,7 @@ from scenes.VoxelWorld import *
 from typing import Tuple
 import os
 import math
+import pygame_button
 
 import json
 import pygame.draw
@@ -16,44 +17,18 @@ from scenes.components.terrain import *
 from scenes.abstract import AbstractPymunkScene
 from scenes.components import Ball, Segment
 
+BUTTON_STYLE = {
+    "hover_color": (0, 0, 255),
+    "clicked_color": (0, 255, 0),
+    "clicked_font_color": (0,0,0),
+    "hover_font_color": (250, 180, 0),
+}
+
 lines = None
 maps = []
 player = (250, 250)
 codes = ""
 mapsc = []
-if len(UserData.get_files("CMSmod")) >= 1:
-    # if i=="" :
-    #     break
-    # i: str
-    # i = i[:len(i) - 1]
-    # i = i.split()
-    # print(i)
-    # xs = 640 / 1500
-    #
-    # ys = 1
-    # mapsc.append(((
-    #     int(float(i[0])) / xs,
-    #     500 - int(float(i[1])) / ys,
-    #     float(i[2]))
-    # ))
-    xs = 1
-    ys = 1
-    defs = f'{os.getcwd()}/user_data/{"CMSmod"}/map.json'
-    with open(defs) as f:
-        datas = json.load(f)
-        for i in datas["lines"].split("\n"):
-            j: str = i[:len(i) - 1].split(" ")
-            if j == [""]:
-                continue
-            maps.append(((float(j[0]) / xs, 500 - float(j[1]) / ys ), ( float(j[2]) / xs, 500 - float(j[3]) / ys)))
-        for i in datas["circles"].split("\n") :
-            j: str = i[:len(i) - 1].split(" ")
-            if j == [""]:
-                continue
-            mapsc.append((float(j[0]) / xs,500 - float(j[1]) / ys,float(j[2])))
-        i = datas["player"]
-        player = (float(i[:len(i) - 1].split(" ")[0]), 500 - float(i[:len(i) - 1].split(" ")[1]))
-        codes = datas["code"]
 
 class CMSmod(BaseMod):
 
@@ -61,13 +36,59 @@ class CMSmod(BaseMod):
     author = "Kolya142"
     locked = False
     objs = []
+    buttons = []
     updates = []
+    mapr = ""
 
     def start(self, *args, **kwargs):
         super(CMSmod, self).start(*args, **kwargs)
-        if not maps or type(self.scene).__name__ != "VoxelWorld":
+        if type(self.scene).__name__ != "VoxelWorld":
             self.locked = True
-        self.inits()
+        self.gm = self.get_maps()
+        y = 250 - len(self.gm) / 2
+        self.buttons = [pygame_button.Button((20, y + self.gm.index(i) * 50, 100, 30), (250, 150, 100), lambda : self.pop(i), text = i, **BUTTON_STYLE) for i in self.gm]
+        # self.buttons[0].on_click(self.buttons[0].text)
+        # self.get_map(self.mapr)
+        # self.inits()
+
+    def get_maps(self):
+        return os.listdir(f'{os.getcwd()}/user_data/CMSmod/')
+
+    def get_map(self, name: str):
+        global player, codes, maps, mapsc, lines
+        if len(UserData.get_files("CMSmod")) >= 1 :
+            # if i=="" :
+            #     break
+            # i: str
+            # i = i[:len(i) - 1]
+            # i = i.split()
+            # print(i)
+            # xs = 640 / 1500
+            #
+            # ys = 1
+            # mapsc.append(((
+            #     int(float(i[0])) / xs,
+            #     500 - int(float(i[1])) / ys,
+            #     float(i[2]))
+            # ))
+            xs = 1
+            ys = 1
+            defs = f'{os.getcwd()}/user_data/CMSmod/{name}'
+            with open(defs) as f :
+                datas = json.load(f)
+                for i in datas["lines"].split("\n") :
+                    j: str = i[:len(i) - 1].split(" ")
+                    if j==[""] :
+                        continue
+                    maps.append(((float(j[0]) / xs,500 - float(j[1]) / ys),(float(j[2]) / xs,500 - float(j[3]) / ys)))
+                for i in datas["circles"].split("\n") :
+                    j: str = i[:len(i) - 1].split(" ")
+                    if j==[""] :
+                        continue
+                    mapsc.append((float(j[0]) / xs,500 - float(j[1]) / ys,float(j[2])))
+                i = datas["player"]
+                player = (float(i[:len(i) - 1].split(" ")[0]),500 - float(i[:len(i) - 1].split(" ")[1]))
+                codes = datas["code"]
 
     def inits(self):
         if not self.locked:
@@ -83,7 +104,19 @@ class CMSmod(BaseMod):
                 self.scene.objects.append(self.objs[-1])
             exec(codes)
 
+    def pop(self, txt):
+        print(txt)
+        self.mapr = txt
+        self.get_map(self.mapr)
+        self.inits()
+
     def update(self):
+        if self.mapr == "":
+            for i in self.buttons:
+                if i.rect.collidepoint(pygame.mouse.get_pos()):
+                    if pygame.mouse.get_pressed()[0]:
+                        i.function()
+                        break
         for i in self.updates:
             i(self)
 
@@ -96,12 +129,18 @@ class CMSmod(BaseMod):
                 if options=="1" :
                     file = input("file: ")
                     with open(file) as f:
-                        with open(f'{os.getcwd()}/user_data/{"CMSmod"}/map.json') as mf:
+                        with open(f'{os.getcwd()}/user_data/{"CMSmod"}/{self.mapr}') as mf:
                             dt = json.load(mf)
                         dt["code"] = f.read()
-                        with open(f'{os.getcwd()}/user_data/{"CMSmod"}/map.json', 'w') as mf:
+                        with open(f'{os.getcwd()}/user_data/{"CMSmod"}/{self.mapr}', 'w') as mf:
                             json.dump(dt, mf)
                 exit()
 
             if event.key == pygame.K_r:
                 self.inits()
+
+    def onrender(self):
+        if self.mapr == "":
+            for but in self.buttons:
+                #print(but.text)
+                but.update(self.disp)
