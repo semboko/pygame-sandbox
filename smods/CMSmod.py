@@ -4,7 +4,6 @@ from scenes.VoxelWorld import *
 from typing import Tuple
 import os
 import math
-import pygame_button
 
 import json
 import pygame.draw
@@ -46,7 +45,7 @@ class CMSmod(BaseMod):
             self.locked = True
         self.gm = self.get_maps()
         y = 250 - len(self.gm) / 2
-        self.buttons = [pygame_button.Button((20, y + self.gm.index(i) * 50, 100, 30), (250, 150, 100), print(), text = i, **BUTTON_STYLE) for i in self.gm]
+        self.buttons = [pygame.rect.Rect((20, y + i * 50, 100, 30)) for i in range(len(self.gm))]
         # self.buttons[0].on_click(self.buttons[0].text)
         # self.get_map(self.mapr)
         # self.inits()
@@ -113,7 +112,7 @@ class CMSmod(BaseMod):
     def update(self):
         if self.mapr == "":
             for i in self.buttons:
-                if i.rect.collidepoint(pygame.mouse.get_pos()):
+                if i.collidepoint(pygame.mouse.get_pos()):
                     if pygame.mouse.get_pressed()[0]:
                         self.pop(self.gm[self.buttons.index(i)])
                         break
@@ -141,6 +140,9 @@ class CMSmod(BaseMod):
 
     def onrender(self):
         if self.mapr == "":
-            for but in self.buttons:
+            for but in range(len(self.gm)):
                 #print(but.text)
-                but.update(self.disp)
+                font = pygame.font.SysFont("Comic Sans MS", 20)
+                text = self.gm[but]
+                pygame.draw.rect(self.disp, (250, 180, 100), self.buttons[but])
+                self.disp.blit(font.render(text, True, (0,0,0)), self.buttons[but][:2])
