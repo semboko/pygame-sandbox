@@ -20,13 +20,6 @@ from scenes.abstract import AbstractPymunkScene
 from scenes.components import Ball, Segment
 from smods.UserData import *
 
-BUTTON_STYLE = {
-    "hover_color": (0, 0, 255),
-    "clicked_color": (0, 255, 0),
-    "clicked_font_color": (0,0,0),
-    "hover_font_color": (250, 180, 0),
-}
-
 lines = None
 maps = []
 player = (250, 250)
@@ -49,7 +42,7 @@ class CMSmod(BaseMod):
             self.locked = True
         self.gm = self.get_maps()
         y = 250 - len(self.gm) / 2
-        self.buttons = [pygame.rect.Rect((20, y + i * 50, 100, 30)) for i in range(len(self.gm))]
+        self.buttons = [pygame.rect.Rect((20, y + i * 50, 150, 30)) for i in range(len(self.gm))]
         # self.buttons[0].on_click(self.buttons[0].text)
         # self.get_map(self.mapr)
         # self.inits()

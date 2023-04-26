@@ -16,6 +16,13 @@ class Animate(BaseMod):
         cv2.imwrite(filename, data)
 
     @staticmethod
+    def remove_img(filename) :
+        try:
+            os.remove(filename)
+        except:
+            ...
+
+    @staticmethod
     def Video(filename, imgs: tuple, fps=60, size=(1500, 500), typew=cv2.VideoWriter_fourcc(*'DIVX')):
         out = cv2.VideoWriter(filename, typew, fps, size)
         for img in imgs:

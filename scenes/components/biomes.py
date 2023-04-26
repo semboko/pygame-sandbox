@@ -27,4 +27,4 @@ class Mine(BaseBiome):
 
 class Mountain(BaseBiome):
     image: Surface = load("./assets/snow.jpg")
-    resources: Dict[Type[BaseResource], int] = {Stone: 1, Wood: 1, Ice: 5}
+    resources: Dict[Type[BaseResource], int] = {Stone: 1, Ice: 5}
