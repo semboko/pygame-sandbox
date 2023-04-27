@@ -10,28 +10,33 @@ class Tas(BaseMod):
     author = "Kolya142"
     Poses = []
     names = []
+    on = False
 
     def start(self, *args, **kwargs):
         super(Tas, self).start(*args, **kwargs)
 
     def update(self):
         self.get_mod("SaveVideo").active = (self.scene.menu_state != 2)
-        if not pygame.key.get_pressed()[pygame.K_KP4] and self.scene.menu_state != 2:
-            self.names.append(self.get_mod("SaveVideo").nam)
-            self.Poses.append(convert(self.scene.player.body.position, self.scene.size_sc[1]))
-        if pygame.key.get_pressed()[pygame.K_KP6] :
-            self.names = []
-            self.Poses = []
-        if pygame.key.get_pressed()[pygame.K_KP5] :
-            self.clock.tick(25)
-        if pygame.key.get_pressed()[pygame.K_KP4] :
-            self.clock.tick(46)
-            if self.get_mod("SaveVideo").nam != 0 and len(self.names) != 0:
-                pr = self.names.pop()
-                self.get_mod("SaveVideo").nam = self.names[-1]
-                self.get_mod("SaveVideo").remover(pr)
-            if len(self.Poses) != 0:
-                self.scene.player.body.position = convert(self.Poses.pop(), self.scene.size_sc[1])
+        if self.on:
+            if not pygame.key.get_pressed()[pygame.K_KP4] and self.scene.menu_state != 2:
+                self.names.append(self.get_mod("SaveVideo").nam)
+                self.Poses.append(convert(self.scene.player.body.position, self.scene.size_sc[1]))
+            if pygame.key.get_pressed()[pygame.K_KP6] :
+                self.on = False
+                self.names = []
+                self.Poses = []
+            if pygame.key.get_pressed()[pygame.K_KP5] :
+                self.clock.tick(25)
+            if pygame.key.get_pressed()[pygame.K_KP4] :
+                self.clock.tick(46)
+                if self.get_mod("SaveVideo").nam != 0 and len(self.names) != 0:
+                    pr = self.names.pop()
+                    self.get_mod("SaveVideo").nam = self.names[-1]
+                    self.get_mod("SaveVideo").remover(pr)
+                if len(self.Poses) != 0:
+                    self.scene.player.body.position = convert(self.Poses.pop(), self.scene.size_sc[1])
+        if pygame.key.get_pressed()[pygame.K_KP3] :
+            self.on = True
 
     def onrender(self):
 
