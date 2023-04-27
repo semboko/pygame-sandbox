@@ -22,7 +22,7 @@ class SaveVideo(BaseMod):
         self.p = threading.Thread(target = self.saver)
 
     def onrender(self):
-        print(self.active)
+        #print(self.active)
         if self.active:
             if not self.p.is_alive():
                 self.p = threading.Thread(target = self.saver)

@@ -11,3 +11,10 @@ mods = [
     UserData.UserData,
     Tas.Tas,
 ]
+# mods = [
+#     Animate.Animate,
+#     AudioLib.AudioLib,
+#     SaveVideo.SaveVideo,
+#     DebugMod.DebugMod,
+#     GravitySceneGrabFix.GravitySceneGrabFix,
+# ]
