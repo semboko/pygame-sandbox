@@ -42,7 +42,7 @@ class CMSmod(BaseMod):
             self.locked = True
         self.gm = self.get_maps()
         y = 250 - len(self.gm) / 2
-        self.buttons = [pygame.rect.Rect((20, y + i * 50, 150, 30)) for i in range(len(self.gm))]
+        self.buttons = [pygame.rect.Rect((20, y + i * 30, 80, 20)) for i in range(len(self.gm))]
         # self.buttons[0].on_click(self.buttons[0].text)
         # self.get_map(self.mapr)
         # self.inits()
@@ -139,7 +139,7 @@ class CMSmod(BaseMod):
         if self.mapr == "":
             for but in range(len(self.gm)):
                 #print(but.text)
-                font = pygame.font.SysFont("Comic Sans MS", 20)
+                font = pygame.font.SysFont("Comic Sans MS", 10)
                 text = self.gm[but]
                 pygame.draw.rect(self.disp, (250, 180, 100), self.buttons[but])
                 self.disp.blit(font.render(text, True, (0,0,0)), self.buttons[but][:2])
