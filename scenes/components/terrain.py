@@ -40,60 +40,25 @@ class TerrainBlock(Rect):
         display.blit(self.biome.image, convert(pos, h))
 
 
-def max_nfs(noise, y_top, y_min, y_max):
-    if noise < 0.4 and y_top < y_max:
-        y_top += random.randint(1, 6) * TerrainBlock.height
-    elif noise < 0.5 and y_top < y_max:
-        y_top += random.randint(1, 3) * TerrainBlock.height
-    elif noise == 0.5:
-        y_top = y_top
-    elif noise > 0.5 and y_top > y_min:
-        y_top -= random.randint(1, 4) * TerrainBlock.height
-    elif noise > 0.6 and y_top > y_max:
-        y_top -= random.randint(1, 7) * TerrainBlock.height
-    return y_top
+class FalseTerrain:
+    def __init__(self, *args, **kwargs): pass
 
+    def get_noise(self, *args, **kwargs): pass
 
-def nfs(noise, y_top, y_min, y_max):
-    if noise < 0.3 and y_top < y_max:
-        y_top += random.randint(1, 3) * TerrainBlock.height
-    elif noise < 0.5 and y_top < y_max:
-        y_top += random.randint(1, 2) * TerrainBlock.height
-    elif noise == 0.5:
-        y_top = y_top
-    elif noise > 0.5 and y_top > y_min:
-        y_top -= random.randint(1, 2) * TerrainBlock.height
-    elif noise > 0.9 and y_top > y_max:
-        y_top -= random.randint(1, 3) * TerrainBlock.height
-    return y_top
+    def get_block(self, *args, **kwargs): pass
 
+    def get_y(self, *args, **kwargs): pass
 
-def min_nfs(noise, y_top, y_min, y_max):
-    if noise < 0.01 and y_top < y_max:
-        y_top += random.randint(1, 3) * TerrainBlock.height
-    elif noise < 0.5 and y_top < y_max:
-        y_top += random.randint(1, 2) * TerrainBlock.height
-    elif noise == 0.5:
-        y_top = y_top
-    elif noise > 0.5 and y_top > y_min:
-        y_top -= random.randint(1, 2) * TerrainBlock.height
-    elif noise > 0.99 and y_top > y_max:
-        y_top -= random.randint(1, 3) * TerrainBlock.height
-    return y_top
+    def get_biome(self, *args, **kwargs): pass
 
+    def get_brick_by_body(self, *args, **kwargs): pass
 
-def micro_nfs(noise, y_top, y_min, y_max):
-    if noise < 0.000000001 and y_top < y_max:
-        y_top += random.randint(1, 3) * TerrainBlock.height
-    elif noise < 0.1 and y_top < y_max:
-        y_top += random.randint(1, 2) * TerrainBlock.height
-    elif noise == 0.5:
-        y_top = y_top
-    elif noise > 0.9 and y_top > y_min:
-        y_top -= random.randint(1, 2) * TerrainBlock.height
-    elif noise > 0.999999 and y_top > y_max:
-        y_top -= random.randint(1, 3) * TerrainBlock.height
-    return y_top
+    def delete_block(self, *args, **kwargs): pass
+
+    def update(self, *args, **kwargs): pass
+
+    def render(self, *args, **kwargs): pass
+
 
 
 class Terrain:
