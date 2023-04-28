@@ -26,6 +26,7 @@ lines = None
 codes = ""
 blocks = []
 player = (250, 250)
+finish = (0, 0)
 
 class CMSmod(BaseMod):
 
@@ -44,6 +45,7 @@ class CMSmod(BaseMod):
         self.gm = self.get_maps()
         y = 250 - len(self.gm) / 2
         self.buttons = [pygame.rect.Rect((20, y + i * 30, 80, 20)) for i in range(len(self.gm))]
+        self.scene: VoxelWorld
         # self.buttons[0].on_click(self.buttons[0].text)
         # self.get_map(self.mapr)
         # self.inits()
@@ -53,7 +55,7 @@ class CMSmod(BaseMod):
         return os.listdir(f'{os.getcwd()}/user_data/CMSmod/')
 
     def get_map(self, name: str):
-        global player, codes, maps, mapsc, lines, blocks
+        global player, codes, maps, mapsc, lines, blocks, finish
         maps = []
         mapsc = []
         lines = None
@@ -97,6 +99,10 @@ class CMSmod(BaseMod):
                     blocks.append((float(j[0]) / xs,500 - float(j[1]) / ys))
                 i = datas["player"]
                 player = (float(i[:len(i) - 1].split(" ")[0]),500 - float(i[:len(i) - 1].split(" ")[1]))
+                finish = (20, 520)
+                if "finish" in datas:
+                    i = datas["finish"]
+                    finish = (float(i[:len(i) - 1].split(" ")[0]) + 20,500 - float(i[:len(i) - 1].split(" ")[1]) + 20)
                 codes = datas["code"]
                 self.terrains = datas["terrain"]
 
@@ -136,6 +142,9 @@ class CMSmod(BaseMod):
         self.inits()
 
     def update(self):
+        if finish != (20, 520) :
+            if self.scene.player.body.position.get_distance(finish) < 35:
+                self.pop("main.json")
         if self.mapr == "main.json":
             for i in self.buttons:
                 if i.collidepoint(pygame.mouse.get_pos()):
@@ -165,6 +174,9 @@ class CMSmod(BaseMod):
                 self.inits()
 
     def onrender(self):
+        if finish!=(20, 520) :
+            print(finish)
+            pygame.draw.circle(self.disp, (100, 255, 0), (finish[0]-self.scene.camera_shift.x, (500-finish[1])+self.scene.camera_shift.y), 15)
         if self.mapr == "main.json":
             for but in range(len(self.gm)):
                 #print(but.text)
