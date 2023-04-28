@@ -16,6 +16,7 @@ from scenes.utils import convert
 class TerrainBlock(Rect):
     width: int = 25
     height: int = 25
+    underlying_block_height: int = 200
 
     biome: BaseBiome
 
@@ -24,6 +25,16 @@ class TerrainBlock(Rect):
         self.body.body_type = Body.STATIC
         self.shape.filter = sf
         self.biome = biome
+        self.underlying_block: Optional[Rect] = None
+        self.space = space
+
+    def set_underlying_block(self) -> None:
+        x, top_block_y = self.body.position
+        top_y = top_block_y - self.width/2
+        bottom_y = top_y - self.underlying_block_height
+        y = (top_y + bottom_y) / 2
+        self.underlying_block = Rect(x, y, self.width, self.underlying_block_height, self.space)
+        self.underlying_block.body.body_type = Body.STATIC
 
     def get_resources(self) -> Tuple[BaseResource]:
         result = []
@@ -39,61 +50,8 @@ class TerrainBlock(Rect):
 
         display.blit(self.biome.image, convert(pos, h))
 
-
-def max_nfs(noise, y_top, y_min, y_max):
-    if noise < 0.4 and y_top < y_max:
-        y_top += random.randint(1, 6) * TerrainBlock.height
-    elif noise < 0.5 and y_top < y_max:
-        y_top += random.randint(1, 3) * TerrainBlock.height
-    elif noise == 0.5:
-        y_top = y_top
-    elif noise > 0.5 and y_top > y_min:
-        y_top -= random.randint(1, 4) * TerrainBlock.height
-    elif noise > 0.6 and y_top > y_max:
-        y_top -= random.randint(1, 7) * TerrainBlock.height
-    return y_top
-
-
-def nfs(noise, y_top, y_min, y_max):
-    if noise < 0.3 and y_top < y_max:
-        y_top += random.randint(1, 3) * TerrainBlock.height
-    elif noise < 0.5 and y_top < y_max:
-        y_top += random.randint(1, 2) * TerrainBlock.height
-    elif noise == 0.5:
-        y_top = y_top
-    elif noise > 0.5 and y_top > y_min:
-        y_top -= random.randint(1, 2) * TerrainBlock.height
-    elif noise > 0.9 and y_top > y_max:
-        y_top -= random.randint(1, 3) * TerrainBlock.height
-    return y_top
-
-
-def min_nfs(noise, y_top, y_min, y_max):
-    if noise < 0.01 and y_top < y_max:
-        y_top += random.randint(1, 3) * TerrainBlock.height
-    elif noise < 0.5 and y_top < y_max:
-        y_top += random.randint(1, 2) * TerrainBlock.height
-    elif noise == 0.5:
-        y_top = y_top
-    elif noise > 0.5 and y_top > y_min:
-        y_top -= random.randint(1, 2) * TerrainBlock.height
-    elif noise > 0.99 and y_top > y_max:
-        y_top -= random.randint(1, 3) * TerrainBlock.height
-    return y_top
-
-
-def micro_nfs(noise, y_top, y_min, y_max):
-    if noise < 0.000000001 and y_top < y_max:
-        y_top += random.randint(1, 3) * TerrainBlock.height
-    elif noise < 0.1 and y_top < y_max:
-        y_top += random.randint(1, 2) * TerrainBlock.height
-    elif noise == 0.5:
-        y_top = y_top
-    elif noise > 0.9 and y_top > y_min:
-        y_top -= random.randint(1, 2) * TerrainBlock.height
-    elif noise > 0.999999 and y_top > y_max:
-        y_top -= random.randint(1, 3) * TerrainBlock.height
-    return y_top
+        if self.underlying_block:
+            self.underlying_block.render(display, camera_shift)
 
 
 class Terrain:
@@ -107,11 +65,8 @@ class Terrain:
 
         for x in range(x_min, x_max, TerrainBlock.width):
             y_top = int(self.get_y(x))
-            for y_start in range(y_top, self.abs_min_y, -TerrainBlock.height):
-                block = self.get_block(x, y_start)
-                if y_start != y_top:
-                    block.biome.image = pygame.image.load("assets/stone1.png")
-                self.bricks.append(block)
+            block = self.get_block(x, y_top)
+            self.bricks.append(block)
 
     def get_noise(self, x: float) -> float:
         return self.noise.noise2(x / 700, 0)
@@ -124,6 +79,7 @@ class Terrain:
         else:
             biome = self.get_biome(y)
         block = TerrainBlock(x, y, self.space, self.sf, biome)
+        block.set_underlying_block()
         return block
 
     def get_y(self, x: float) -> float:
@@ -144,8 +100,11 @@ class Terrain:
                 return b
 
     def delete_block(self, brick: TerrainBlock) -> None:
-        self.bricks.remove(brick)
-        self.space.remove(brick.body, brick.shape)
+        old_x, old_y = brick.body.position
+        brick_idx = self.bricks.index(brick)
+        self.space.remove(brick.body, brick.shape, brick.underlying_block.body, brick.underlying_block.shape)
+        new_brick = self.get_block(old_x, old_y - brick.height)
+        self.bricks[brick_idx] = new_brick
 
     def update(self, x_shift: float) -> None:
         lb = self.bricks[0]
@@ -154,20 +113,14 @@ class Terrain:
         lbx = lb.body.position.x
         if x_shift + 50 < lbx:
             y_top = int(self.get_y(lbx - TerrainBlock.width))
-            for y_start in range(y_top, self.abs_min_y, -TerrainBlock.height):
-                block = self.get_block(lbx - TerrainBlock.width, y_start)
-                if y_start != y_top:
-                    block.biome.image = pygame.image.load("assets/stone1.png")
-                self.bricks.insert(0, block)
+            block = self.get_block(lbx - TerrainBlock.width, y_top)
+            self.bricks.insert(0, block)
 
         rbx = rb.body.position.x
         if x_shift > rbx - 1000:
             y_top = int(self.get_y(rbx + TerrainBlock.width))
-            for y_start in range(y_top, self.abs_min_y, -TerrainBlock.height):
-                block = self.get_block(rbx + TerrainBlock.width, y_start)
-                if y_start != y_top:
-                    block.biome.image = pygame.image.load("assets/stone1.png")
-                self.bricks.append(block)
+            block = self.get_block(rbx + TerrainBlock.width, y_top)
+            self.bricks.append(block)
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         for s in self.bricks:
