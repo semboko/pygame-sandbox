@@ -9,7 +9,7 @@ from scenes.components.player import Player
 from scenes.components.rect import Rect
 from scenes.components.resources import *
 from scenes.components.speedometer import Speedometer
-from scenes.components.terrain import Terrain
+from scenes.components.terrain import Terrain, max_nfs, micro_nfs, min_nfs, nfs
 from scenes.utils import convert
 
 pygame.init()
