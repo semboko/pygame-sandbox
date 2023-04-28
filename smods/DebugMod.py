@@ -6,10 +6,13 @@ from mods.basemod import *
 class DebugMod(BaseMod):
     name = "DebugMod"
     author = "Kolya142"
+    scenet = ""
 
     def start(self, *args, **kwargs):
         super(DebugMod, self).start(*args, **kwargs)
         print("OnSetup")
+        self.scenet = type(self.scene).__name__
+        print(self.scenet)
 
     #     def update(self) :
     #         print("OnUpdate")

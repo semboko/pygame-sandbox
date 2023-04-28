@@ -7,6 +7,7 @@ from pygame.event import Event
 
 from scenes.abstract import AbstractScene
 from scenes.components import Ball, Segment
+from scenes.components.pj import PJ
 from .utils import convert
 
 log = getLogger()
@@ -20,6 +21,9 @@ class GravityScene(AbstractScene):
     renders_objs: list
     move_old: tuple
     movement: bool
+    co1: Ball
+    co2: Ball
+    mode: bool
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -38,7 +42,19 @@ class GravityScene(AbstractScene):
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.dict["button"] == 1:
-                self.renders_objs.append(Ball(*convert(event.pos, self.size_sc[1]), 15, self.space))
+                if not self.mode:
+                    self.renders_objs.append(Ball(*convert(event.pos, self.size_sc[1]), 15, self.space))
+                else:
+                    self.co1 = pymunk.Vec2d(*event.pos)
+            if event.dict["button"] == 2:
+                for obj in self.renders_objs:
+                    if isinstance(obj,Ball) :
+                        if obj.body.position.get_distance(convert(event.pos,self.size_sc[1])) <= obj.shape.radius :
+                            self.co1 = obj
+            if event.dict["button"] == 4:
+                self.mode = False
+            if event.dict["button"] == 5:
+                self.mode = True
             # elif event.dict["button"] == 3:
             # for obj in self.renders_objs:
             #     if isinstance(obj, Ball):
@@ -65,6 +81,26 @@ class GravityScene(AbstractScene):
         #         self.moving_obj.pos = new_pos
         #     self.move_old = mouse
 
+        if event.type == pygame.MOUSEBUTTONUP:
+            if event.dict["button"] == 1:
+                if self.mode:
+                    self.co2 = pymunk.Vec2d(*event.pos)
+                    seg = Segment(convert(self.co1, self.size_sc[1]), convert(self.co2, self.size_sc[1]), 5, self.space, btype=pymunk.Body.KINEMATIC)
+                    #self.space.add(seg.body, seg.shape)
+                    self.renders_objs.append(seg)
+            if event.dict["button"] == 2:
+                self.co2 = None
+                for obj in self.renders_objs :
+                    if isinstance(obj, Ball):
+                        if obj.body.position.get_distance(convert(event.pos,self.size_sc[1])) <= obj.shape.radius :
+                            if event.dict["button"] == 2:
+                                self.co2 = obj
+                                break
+                if self.co2 and self.co1 and self.co1 != self.co2:
+                    join = pymunk.DampedSpring(self.co1.body, self.co2.body, (0,0), (0,0), self.co1.body.position.get_distance(self.co2.body.position)/10, 600, 0.3)
+                    self.renders_objs.append(PJ(join))
+                    self.space.add(join)
+
     def reset_scene(self):
         # Reset the objects in the scene to their initial positions
         self.renders_objs = []
@@ -75,6 +111,9 @@ class GravityScene(AbstractScene):
         self.space.damping = 0.5  # Set the friction coefficient of the space object
         self.pause = False
         self.segment = Segment((0, 100), (500, 50), 5, self.space, btype=pymunk.Body.KINEMATIC)
+        self.co2 = None
+        self.co1 = None
+        self.mode = False
         self.renders_objs.append(self.segment)
         self.renders_objs.append(Segment((497, 300), (497, 50), 5, self.space, btype=pymunk.Body.KINEMATIC))
         self.renders_objs.append(Segment((0, 300), (0, 50), 5, self.space, btype=pymunk.Body.KINEMATIC))

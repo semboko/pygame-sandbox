@@ -1,9 +1,10 @@
 
 PGraphics pg;
 int v1;
+float speed;
 JSONObject datas;
 PVector[] lines1, lines2, circles1;
-PVector player;
+PVector player, offset;
 boolean isdraw, isdrawc, isdel;
 String last;
 int circles;
@@ -15,6 +16,7 @@ void setup() {
   isdel = false;
   circles1 = new PVector[200];
   last = "line";
+  speed = 3;
 
   circles = 0;
   isdraw = false;
@@ -24,6 +26,7 @@ void setup() {
   noStroke();
   pg = createGraphics(width, height);
   player = new PVector(width/2, height/2);
+  offset = new PVector();
 }
 
 void keyReleased() {
@@ -38,10 +41,10 @@ void draw() {
     case 'e':
       datas = loadJSONObject("map.json");
       lines = 0;
-      lines1 = new PVector[200];
-      lines2 = new PVector[200];
+      lines1 = new PVector[500];
+      lines2 = new PVector[500];
       circles = 0;
-      circles1 = new PVector[200];
+      circles1 = new PVector[500];
       for (int i = 0; i < datas.getString("lines").split("\n").length; i += 1) {
         String strs = datas.getString("lines").split("\n")[i];
         String[] l = strs.split(" ");
@@ -59,7 +62,7 @@ void draw() {
       player = new PVector(float(d[0]), float(d[1]));
       break;
     case 'p':
-      player = new PVector(mouseX, mouseY);
+      player = new PVector(mouseX - offset.x, mouseY - offset.y);
       break;
     case 'r':
       lines = 0;
@@ -70,11 +73,11 @@ void draw() {
       break;
     case 'z':
       if (!isdel)
-      if (last == "line") {
-        lines -= 1;
-        lines1[lines] = new PVector();
-        lines2[lines] = new PVector();
-      }
+        if (last == "line") {
+          lines -= 1;
+          lines1[lines] = new PVector();
+          lines2[lines] = new PVector();
+        }
       if (last == "circle") {
         circles -= 1;
         circles1[lines] = new PVector();
@@ -97,19 +100,38 @@ void draw() {
       datas.setString("code", "");
       saveJSONObject(datas, "map.json");
       break;
+    case 'w':
+      offset.y += speed;
+      break;
+    case 'a':
+      offset.x += speed;
+      break;
+    case 's':
+      offset.y -= speed;
+      break;
+    case 'd':
+      offset.x -= speed;
+      break;
+    case 'x':
+      if (speed > 0)
+      speed -= 1;
+      break;
+    case 'c':
+      speed += 1;
+      break;
     }
   }
   if (mouseButton == LEFT && !isdraw) {
     last = "line";
-    lines1[lines] = new PVector(mouseX, mouseY);
-    lines2[lines] = new PVector(mouseX, mouseY);
+    lines1[lines] = new PVector(mouseX - offset.x, mouseY - offset.y);
+    lines2[lines] = new PVector(mouseX - offset.x, mouseY - offset.y);
     lines += 1;
     isdraw = true;
   }
   if (mouseButton == LEFT && isdraw) {
     println(lines);
     // pg.line(lines1[lines-1].x, lines1[lines-1].y, lines2[lines-1].x, lines2[lines-1].y);
-    lines2[lines-1] = new PVector(mouseX, mouseY);
+    lines2[lines-1] = new PVector(mouseX - offset.x, mouseY - offset.y);
   }
   if (!(mouseButton == LEFT) && isdraw) {
     isdraw = false;
@@ -119,21 +141,21 @@ void draw() {
     last = "circle";
   }
   if (!(mouseButton == RIGHT) && isdrawc) {
-    circles1[circles] = new PVector(mouseX, mouseY, 15);
+    circles1[circles] = new PVector(mouseX - offset.x, mouseY - offset.y, 15);
     circles += 1;
     isdrawc = false;
   }
   for (int x = 0; x < lines; x += 1) {
     pg.stroke(0);
-    println(lines1[x].x, lines1[x].y, lines2[x].x, lines2[x].y);
-    pg.line(lines1[x].x, lines1[x].y, lines2[x].x, lines2[x].y);
+    // println(lines1[x].x, lines1[x].y, lines2[x].x, lines2[x].y);
+    pg.line(lines1[x].x + offset.x, lines1[x].y + offset.y, lines2[x].x + offset.x, lines2[x].y + offset.y);
   }
   for (int x = 0; x < circles; x += 1) {
     pg.stroke(255, 0, 0);
     println(circles1[x]);
-    pg.circle(circles1[x].x, circles1[x].y, circles1[x].z);
+    pg.circle(circles1[x].x + offset.x, circles1[x].y + offset.y, circles1[x].z);
   }
-  pg.rect(player.x, player.y, 50, 50);
+  pg.rect(player.x + offset.x, player.y + offset.y, 50, 50);
   pg.endDraw();
   image(pg, 0, 0);
 }

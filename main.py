@@ -25,6 +25,7 @@ class Game:
 
     def __enter__(self):
         pygame.init()
+        pygame.mixer.init()
         self.sc = pygame.display.set_mode(self.res)
         return self
 
@@ -32,6 +33,7 @@ class Game:
         for mod in self.mods:
             mod.quit(exc_message)
         pygame.quit()
+        pygame.mixer.quit()
 
     def load_scene(self, scene: Type[AbstractScene]):
         self.scene = scene(self.sc, self.fps, self)
@@ -70,19 +72,11 @@ class Game:
 
 
 def read_mods(local_dir: str) -> List[Type[BaseMod]]:
-    result = []
-    for modf in os.listdir(os.getcwd() + "/" + local_dir):
-        # if len(modf.split(".")) != 1:
-        #     continue
-        if modf == "__pycache__":
-            continue
-        with open(os.getcwd() + "/smods/" + modf) as f:
-            exec(f.read())
-            result.append(eval(modf.split(".")[0]))
-    return result
+    from smods import mods
+    return mods
 
 
 with Game() as g:
     g.load_scene(VoxelWorld)
-    # g.load_mods(read_mods("smods"))
+    g.load_mods(read_mods("smods"))
     g.run()

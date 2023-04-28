@@ -5,8 +5,8 @@ self.scene.objects.append(self.scene.floor)
 
 for x in range(20):
     res1 = Stone()
-    res2 = Grass()
-    res3 = Snow()
+    res2 = Wood()
+    res3 = Ice()
     res1.materialize(pymunk.Vec2d(78.91, 109.04+x), self.scene.space)
     res2.materialize(pymunk.Vec2d(171.51, 109.69+x), self.scene.space)
     res3.materialize(pymunk.Vec2d(268.06, 110.21+x), self.scene.space)
