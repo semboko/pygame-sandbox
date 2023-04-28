@@ -1,3 +1,4 @@
+import pymunk
 
 self.scene.objects.remove(self.scene.floor)
 self.scene.floor = Terrain(0, self.scene.display.get_width(), 100, 500, 400, self.scene.space)
@@ -25,11 +26,15 @@ for x in range(20):
         TerrainBlock(xs - xs % TerrainBlock.width - TerrainBlock.width*3,y - y % TerrainBlock.height + TerrainBlock.width*x,self.scene.space,
                      self.scene.floor.sf, Flatland))
 
+def qdm(cms_mod):
+    if self.scene.player.body.position.get_distance((387.83, 1485.39)) < 10:
+        cms_mod.pop("main.json")
+
 def udm(cms_mod):
     # cms_mod.get_mod("AudioLoadLib").play("DebugMod", "jump.wav", 1)
     cms_mod.get_mod("InfJump").locked = False
-    cms_mod.updates = []
+    cms_mod.updates = [cms_mod.updates[-1]]
 
-self.updates = [udm]
+self.updates = [udm, qdm]
 
 # 285.02, 297.9

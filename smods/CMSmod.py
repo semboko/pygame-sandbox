@@ -20,11 +20,12 @@ from scenes.abstract import AbstractPymunkScene
 from scenes.components import Ball, Segment
 from smods.UserData import *
 
-lines = None
 maps = []
-player = (250, 250)
-codes = ""
 mapsc = []
+lines = None
+codes = ""
+blocks = []
+player = (250, 250)
 
 class CMSmod(BaseMod):
 
@@ -46,12 +47,19 @@ class CMSmod(BaseMod):
         # self.buttons[0].on_click(self.buttons[0].text)
         # self.get_map(self.mapr)
         # self.inits()
+        self.pop("main.json")
 
     def get_maps(self):
         return os.listdir(f'{os.getcwd()}/user_data/CMSmod/')
 
     def get_map(self, name: str):
-        global player, codes, maps, mapsc, lines
+        global player, codes, maps, mapsc, lines, blocks
+        maps = []
+        mapsc = []
+        lines = None
+        codes = ""
+        blocks = []
+        player = (250, 250)
         if len(UserData.get_files("CMSmod")) >= 1 :
             # if i=="" :
             #     break
@@ -82,9 +90,15 @@ class CMSmod(BaseMod):
                     if j==[""] :
                         continue
                     mapsc.append((float(j[0]) / xs,500 - float(j[1]) / ys,float(j[2])))
+                for i in datas["blocks"].split("\n") :
+                    j: str = i[:len(i) - 1].split(" ")
+                    if j==[""] :
+                        continue
+                    blocks.append((float(j[0]) / xs,500 - float(j[1]) / ys))
                 i = datas["player"]
                 player = (float(i[:len(i) - 1].split(" ")[0]),500 - float(i[:len(i) - 1].split(" ")[1]))
                 codes = datas["code"]
+                self.terrains = datas["terrain"]
 
     def inits(self):
         if not self.locked:
@@ -98,16 +112,31 @@ class CMSmod(BaseMod):
                 print(i)
                 self.objs.append(Ball(i[0], i[1], i[2], self.scene.space))
                 self.scene.objects.append(self.objs[-1])
+            for i in blocks:
+                print(i)
+                self.scene.floor.bricks.append(TerrainBlock(i[0], i[1], self.scene.space, self.scene.floor.sf))
             exec(codes)
+            if not self.terrains :
+                for i in self.scene.floor.bricks :
+                    if i in self.scene.objects :
+                        self.scene.objects.remove(i)
+                    self.scene.space.remove(i.body, i.shape)
+                self.scene.objects.remove(self.scene.floor)
+                self.scene.floor = FalseTerrain()
+                self.scene.floor.space = self.scene.space
 
     def pop(self, txt):
         print(txt)
         self.mapr = txt
+        self.scene.objects = []
+        self.scene.space = pymunk.Space()
+        self.scene.reset_scene()
+        self.objs = []
         self.get_map(self.mapr)
         self.inits()
 
     def update(self):
-        if self.mapr == "":
+        if self.mapr == "main.json":
             for i in self.buttons:
                 if i.collidepoint(pygame.mouse.get_pos()):
                     if pygame.mouse.get_pressed()[0]:
@@ -136,7 +165,7 @@ class CMSmod(BaseMod):
                 self.inits()
 
     def onrender(self):
-        if self.mapr == "":
+        if self.mapr == "main.json":
             for but in range(len(self.gm)):
                 #print(but.text)
                 font = pygame.font.SysFont("Comic Sans MS", 10)

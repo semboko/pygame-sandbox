@@ -19,6 +19,7 @@ class Player(Rect):
         self.shape.filter = self.sf
         self.inv = Invertory()
         self.mine_sound = mixer.Sound("./assets/sounds/noise_01.ogg")
+        self.mine_sound.set_volume(0.1)
 
     def move(self, direction: int):
         self.body.apply_impulse_at_local_point((direction * 20_000, 0), (0, 0))
@@ -29,7 +30,6 @@ class Player(Rect):
             self.body.apply_impulse_at_local_point((0, 700000), (0, 0))
 
     def mine(self, terrain: Terrain, mouse_pos: pymunk.Vec2d) -> Optional[Tuple[BaseResource]]:
-        self.mine_sound.play()
         space = terrain.space
         distance = self.body.position.get_distance(mouse_pos)
         if distance > 150:
@@ -40,6 +40,7 @@ class Player(Rect):
         brick = terrain.get_brick_by_body(query[0].shape.body)
         if not brick:
             return
+        self.mine_sound.play()
         resources = brick.get_resources()
         for r in resources:
             r.materialize(mouse_pos, space)

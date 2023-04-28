@@ -1,5 +1,6 @@
 import pygame
 
+import random
 from mods.basemod import *
 
 
@@ -14,11 +15,11 @@ class DebugMod(BaseMod):
         self.scenet = type(self.scene).__name__
         print(self.scenet)
 
-    #     def update(self) :
-    #         print("OnUpdate")
-
-    #     def onrender(self) :
-    #         print("OnRender")
+    # def update(self) :
+    #     print("Update")
+    #
+    # def onrender(self) :
+    #     print("OnRender")
 
     #     def handle_pressed_keys(self, keys: Sequence[bool]):
     #         print(keys[pygame.K_a], keys[pygame.K_SPACE], keys[pygame.K_d])
