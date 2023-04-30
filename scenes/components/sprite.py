@@ -5,6 +5,7 @@ from typing import Tuple
 class Sprite:
     imgs = {}
     active_sprite = ""
+
     def add_sprite(self, name, img):
         self.imgs[name] = pygame.image.load(img)
         self.active_sprite = ""

@@ -1,3 +1,4 @@
+import time
 from typing import Tuple
 
 import pygame
@@ -25,11 +26,14 @@ class Player(Rect, Sprite):
         self.add_sprite("idle", "./assets/player.png")
         self.add_sprite("run","./assets/player_run.png")
         self.add_sprite("fall","./assets/player_fall.png")
+        self.add_sprite("mine", "./assets/player_mine.png")
         for img in self.imgs:
             self.imgs[img] = pygame.transform.scale(self.imgs[img], (self.wigth, self.height))
         self.is_run = False
         self.is_fall = False
+        self.is_mine = False
         self.is_run_frame = False
+        self.mine_time = 0
         self.moves = 1
 
     def move(self, direction: int):
@@ -48,8 +52,13 @@ class Player(Rect, Sprite):
             self.active_sprite = "run"
         elif self.is_fall:
             self.active_sprite = "fall"
+        elif self.is_mine:
+            self.active_sprite = "mine"
         else:
             self.active_sprite = "idle"
+        if time.time() - self.mine_time > 0.9:
+            self.is_mine = False
+            self.mine_time = time.time()
         if not space.segment_query(self.body.position, (self.body.position.x, self.body.position.y - 170), 0, self.sf):
             self.is_run = False
             self.is_fall = True
@@ -69,12 +78,19 @@ class Player(Rect, Sprite):
         distance = self.body.position.get_distance(mouse_pos)
         if distance > 150:
             return
+        if self.moves > 0:
+            if self.body.position.x > mouse_pos.x:
+                return
+        else:
+            if self.body.position.x < mouse_pos.x:
+                return
         query = space.point_query(mouse_pos, 0, self.sf)
         if not query:
             return
         brick = terrain.get_brick_by_body(query[0].shape.body)
         if not brick:
             return
+        self.is_mine = True
         self.mine_sound.play()
         resources = brick.get_resources()
         for r in resources:
