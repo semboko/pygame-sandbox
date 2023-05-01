@@ -28,7 +28,7 @@ class VoxelWorld(AbstractPymunkScene):
 
         if 0 <= self.menu_state <= 1:
             super().update()
-        self.player.body.angle = 0
+        # self.player.body.angle = 0
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
             self.player.move(-1)
