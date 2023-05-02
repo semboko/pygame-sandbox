@@ -22,6 +22,8 @@ class Rect:
         self.debug = debug
         self.body = pymunk.Body()
         self.body.position = x, y
+        self.wigth = width
+        self.height = height
         verts = (
             (-width // 2, -height // 2),
             (width // 2, -height // 2),

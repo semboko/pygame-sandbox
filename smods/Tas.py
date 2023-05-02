@@ -16,7 +16,7 @@ class Tas(BaseMod):
         super(Tas, self).start(*args, **kwargs)
 
     def update(self):
-        self.get_mod("SaveVideo").active = (self.scene.menu_state != 2)
+        self.get_mod("SaveVideo").active_sprite = (self.scene.menu_state!=2)
         if self.on:
             if not pygame.key.get_pressed()[pygame.K_KP4] and self.scene.menu_state != 2:
                 self.names.append(self.get_mod("SaveVideo").nam)

@@ -1,3 +1,4 @@
+import pymunk
 
 self.scene.objects.remove(self.scene.floor)
 self.scene.floor = Terrain(0, self.scene.display.get_width(), 100, 500, 400, self.scene.space)
