@@ -2,8 +2,6 @@
 
 ## Contol
 
-### Keys:
-
 **Q**: save\
 **E**: load\
 **W**: up\
@@ -12,10 +10,3 @@
 **D**: right\
 **Z**: slower\
 **X**: faster
-
-### Mouse
-
-**LMB**: line\
-**RMB**: circle\
-**MOUSEWHEELUP**: increase\
-**MOUSEWHEELDOWN**: decrease

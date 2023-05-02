@@ -53,6 +53,26 @@ class TerrainBlock(Rect):
         if self.underlying_block:
             self.underlying_block.render(display, camera_shift)
 
+class FalseTerrain:
+    def __init__(self, *args, **kwargs): pass
+
+    def get_noise(self, *args, **kwargs): pass
+
+    def get_block(self, *args, **kwargs): pass
+
+    def get_y(self, *args, **kwargs): pass
+
+    def get_biome(self, *args, **kwargs): pass
+
+    def get_brick_by_body(self, *args, **kwargs): pass
+
+    def delete_block(self, *args, **kwargs): pass
+
+    def update(self, *args, **kwargs): pass
+
+    def render(self, *args, **kwargs): pass
+
+
 
 class Terrain:
     def __init__(self, x_min: int, x_max: int, y_min: int, y_max: int, steps: int, space: Space):

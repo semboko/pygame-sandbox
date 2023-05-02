@@ -1,3 +1,5 @@
+import random
+
 import pygame
 import pymunk
 from pygame.event import Event
@@ -5,6 +7,8 @@ from pygame.event import Event
 from scenes.abstract import AbstractPymunkScene
 from scenes.components.player import Player
 from scenes.components.resources import *
+from scenes.components.terrain import Terrain
+from scenes.components.speedometer import Speedometer
 from scenes.components.terrain import Terrain
 from scenes.utils import convert
 
@@ -15,7 +19,7 @@ pygame.font.init()
 class VoxelWorld(AbstractPymunkScene):
     def reset_scene(self):
         super().reset_scene()
-        self.player = Player(250, 250, 50, 50, self.space, (25, 25, 25), True)
+        self.player = Player(250, 250, 50, 60, self.space, (25, 25, 25), True)
         self.floor = Terrain(0, self.display.get_width(), 10, 200, 400, self.space)
         self.objects.extend((self.player, self.floor))
         self.menu_state = 0
@@ -28,8 +32,13 @@ class VoxelWorld(AbstractPymunkScene):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
             self.player.move(-1)
+            self.player.is_run = True
         elif keys[pygame.K_d]:
             self.player.move(1)
+            self.player.is_run = True
+        else:
+            self.player.is_run = False
+        self.player.update(self.space)
 
         self.camera_shift = pymunk.Vec2d(self.player.body.position.x - 250, self.player.body.position.y - 250)
         self.floor.update(self.camera_shift.x)
