@@ -18,4 +18,4 @@ class Sprite:
 
     def render_sprite(self, pos: Tuple[int, int], disp: pygame.Surface):
         if self.active_sprite:
-            disp.blit(self.imgs[self.active_sprite],pos)
+            disp.blit(self.imgs[self.active_sprite], pos)

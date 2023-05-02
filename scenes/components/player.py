@@ -11,6 +11,14 @@ from scenes.components.rect import Rect
 from scenes.components.resources import *
 from scenes.components.terrain import Terrain
 from scenes.components.sprite import Sprite
+from enum import Enum
+
+
+class PlayerState(Enum):
+    IDLE = "idle"
+    RUN = "run"
+    FALL = "fall"
+    MINE = "mine"
 
 
 class Player(Rect, Sprite):
@@ -23,47 +31,38 @@ class Player(Rect, Sprite):
         self.inv = Invertory()
         self.mine_sound = mixer.Sound("./assets/sounds/noise_01.ogg")
         self.mine_sound.set_volume(0.1)
-        self.add_sprite("idle", "./assets/player.png")
-        self.add_sprite("run","./assets/player_run.png")
-        self.add_sprite("fall","./assets/player_fall.png")
-        self.add_sprite("mine", "./assets/player_mine.png")
+        self.add_sprite(PlayerState.IDLE.value, "./assets/player.png")
+        self.add_sprite(PlayerState.RUN.value, "./assets/player_run.png")
+        self.add_sprite(PlayerState.FALL.value, "./assets/player_fall.png")
+        self.add_sprite(PlayerState.MINE.value, "./assets/player_mine.png")
         for img in self.imgs:
             self.imgs[img] = pygame.transform.scale(self.imgs[img], (self.wigth, self.height))
-        self.is_run = False
-        self.is_fall = False
-        self.is_mine = False
-        self.is_run_frame = False
-        self.mine_time = 0
+
+        self.state = PlayerState.IDLE
+        self.animation_time = 0
         self.moves = 1
 
     def move(self, direction: int):
         if direction != self.moves:
             for img in self.imgs:
                 self.imgs[img] = pygame.transform.flip(self.imgs[img], True, False)
-        # self.is_run = True
-        self.is_run_frame = not self.is_run_frame
+
+        self.state = PlayerState.RUN if self.state == PlayerState.IDLE else PlayerState.IDLE
+        self.animation_time = 2
+
         self.moves = direction
         self.body.apply_impulse_at_local_point((direction * 20_000, 0), (0, 0))
         self.direction = direction
 
     def update(self, space: pymunk.Space):
-        if self.is_run and self.is_run_frame and not self.is_fall and abs(self.body.velocity.x) > 20:
-            # print(abs(self.body.velocity.x))
-            self.active_sprite = "run"
-        elif self.is_fall:
-            self.active_sprite = "fall"
-        elif self.is_mine:
-            self.active_sprite = "mine"
-        else:
-            self.active_sprite = "idle"
-        if time.time() - self.mine_time > 0.9:
-            self.is_mine = False
-            self.mine_time = time.time()
-        if not space.segment_query(self.body.position, (self.body.position.x, self.body.position.y - 170), 0, self.sf):
-            self.is_run = False
-            self.is_fall = True
-        else:
-            self.is_fall = False
+        self.animation_time -= 1
+        if self.animation_time <= 0:
+            self.state = PlayerState.IDLE
+
+        if self.body.velocity.y < -1:
+            self.state = PlayerState.FALL
+
+        self.active_sprite = self.state.value
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         # super(Player, self).render(display, camera_shift)
@@ -74,6 +73,8 @@ class Player(Rect, Sprite):
             self.body.apply_impulse_at_local_point((0, 700000), (0, 0))
 
     def mine(self, terrain: Terrain, mouse_pos: pymunk.Vec2d) -> Optional[Tuple[BaseResource]]:
+        self.state = PlayerState.MINE
+        self.animation_time = 20
         space = terrain.space
         distance = self.body.position.get_distance(mouse_pos)
         if distance > 150:
@@ -90,7 +91,6 @@ class Player(Rect, Sprite):
         brick = terrain.get_brick_by_body(query[0].shape.body)
         if not brick:
             return
-        self.is_mine = True
         self.mine_sound.play()
         resources = brick.get_resources()
         for r in resources:
