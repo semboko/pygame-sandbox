@@ -121,6 +121,10 @@ class Terrain:
 
     def delete_block(self, brick: TerrainBlock) -> None:
         old_x, old_y = brick.body.position
+        if old_y > self.get_y(old_x):
+            self.space.remove(brick.body,brick.shape)
+            self.bricks.remove(brick)
+            return
         brick_idx = self.bricks.index(brick)
         self.space.remove(brick.body, brick.shape, brick.underlying_block.body, brick.underlying_block.shape)
         new_brick = self.get_block(old_x, old_y - brick.height)

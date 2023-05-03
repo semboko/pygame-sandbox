@@ -73,7 +73,6 @@ class Player(Rect, Sprite):
             self.body.apply_impulse_at_local_point((0, 700000), (0, 0))
 
     def mine(self, terrain: Terrain, mouse_pos: pymunk.Vec2d) -> Optional[Tuple[BaseResource]]:
-        self.state = PlayerState.MINE
         self.animation_time = 20
         space = terrain.space
         distance = self.body.position.get_distance(mouse_pos)
@@ -91,6 +90,7 @@ class Player(Rect, Sprite):
         brick = terrain.get_brick_by_body(query[0].shape.body)
         if not brick:
             return
+        self.state = PlayerState.MINE
         self.mine_sound.play()
         resources = brick.get_resources()
         for r in resources:
