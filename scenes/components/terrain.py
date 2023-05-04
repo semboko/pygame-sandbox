@@ -1,6 +1,8 @@
+import os
 import random
 from typing import Optional,Tuple
 
+import pygame
 import pymunk
 from noise.perlin import SimplexNoise
 from pygame.surface import Surface
@@ -108,6 +110,12 @@ class Terrain :
             sprite.add_sprite("flower","assets/flower.png")
             sprite.active_sprite = "flower"
             sprite.pos = convert((x,y + 50),500)
+            self.other.append(sprite)
+        if random.randint(-10,10) == 2 :
+            sprite = Sprite()
+            sprite.add_sprite("tree",random.choice([os.getcwd() + "/assets/tree/" + i for i in os.listdir(os.getcwd() + "/assets/tree")]))
+            sprite.active_sprite = "tree"
+            sprite.pos = (x,(500-y) - 608)
             self.other.append(sprite)
         return block
 
