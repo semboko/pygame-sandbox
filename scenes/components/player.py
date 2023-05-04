@@ -21,7 +21,7 @@ class PlayerState(Enum):
     MINE = "mine"
 
 
-class Player(Rect, Sprite):
+class Player(Rect):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.direction = 1
@@ -31,12 +31,13 @@ class Player(Rect, Sprite):
         self.inv = Invertory()
         self.mine_sound = mixer.Sound("./assets/sounds/noise_01.ogg")
         self.mine_sound.set_volume(0.1)
-        self.add_sprite(PlayerState.IDLE.value, "./assets/player.png")
-        self.add_sprite(PlayerState.RUN.value, "./assets/player_run.png")
-        self.add_sprite(PlayerState.FALL.value, "./assets/player_fall.png")
-        self.add_sprite(PlayerState.MINE.value, "./assets/player_mine.png")
-        for img in self.imgs:
-            self.imgs[img] = pygame.transform.scale(self.imgs[img], (self.wigth, self.height))
+        self.sprite = Sprite()
+        self.sprite.add_sprite(PlayerState.IDLE.value, "./assets/player.png")
+        self.sprite.add_sprite(PlayerState.RUN.value, "./assets/player_run.png")
+        self.sprite.add_sprite(PlayerState.FALL.value, "./assets/player_fall.png")
+        self.sprite.add_sprite(PlayerState.MINE.value, "./assets/player_mine.png")
+        for img in self.sprite.imgs:
+            self.sprite.imgs[img] = pygame.transform.scale(self.sprite.imgs[img], (self.wigth, self.height))
 
         self.state = PlayerState.IDLE
         self.animation_time = 0
@@ -44,8 +45,8 @@ class Player(Rect, Sprite):
 
     def move(self, direction: int):
         if direction != self.moves:
-            for img in self.imgs:
-                self.imgs[img] = pygame.transform.flip(self.imgs[img], True, False)
+            for img in self.sprite.imgs:
+                self.sprite.imgs[img] = pygame.transform.flip(self.sprite.imgs[img], True, False)
 
         self.state = PlayerState.RUN if self.state == PlayerState.IDLE else PlayerState.IDLE
         self.animation_time = 2
@@ -62,11 +63,11 @@ class Player(Rect, Sprite):
         if self.body.velocity.y < -1:
             self.state = PlayerState.FALL
 
-        self.active_sprite = self.state.value
+        self.sprite.active_sprite = self.state.value
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         # super(Player, self).render(display, camera_shift)
-        self.render_sprite(self.body.position - (25, 25) - camera_shift, display)
+        self.sprite.render_sprite(self.body.position - (25, 25) - camera_shift, display)
 
     def jump(self, space: pymunk.Space):
         if space.segment_query(self.body.position, (self.body.position.x, self.body.position.y - 100), 0, self.sf):
