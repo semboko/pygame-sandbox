@@ -22,7 +22,9 @@ class Sprite:
 
     def rotate_sprite(self, angle):
         if self.active_sprite and abs(angle) > 10:
-            self.imgs[self.active_sprite] = pygame.transform.rotate(self.imgs[self.active_sprite], self.sprite_angle - angle)
+            self.imgs[self.active_sprite] = pygame.transform.rotate(
+                self.imgs[self.active_sprite], self.sprite_angle - angle
+            )
             self.sprite_angle = angle
 
     def render_sprite(self, pos: Tuple[int, int], disp: pygame.Surface):

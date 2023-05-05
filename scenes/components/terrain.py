@@ -1,6 +1,6 @@
 import os
 import random
-from typing import Optional,Tuple, List
+from typing import Optional,Tuple
 
 import pygame
 import pymunk
@@ -14,11 +14,6 @@ from scenes.components.resources import BaseResource
 from scenes.components.sprite import Sprite
 from scenes.utils import convert
 
-tree_imgs: List[Surface] = []
-tree_folder = os.getcwd() + "/assets/tree/"
-for i, tree_img in enumerate(os.listdir(tree_folder)):
-    tree_imgs.append(pygame.image.load(tree_folder+tree_img))
-    tree_imgs[i] = pygame.transform.scale(tree_imgs[i], (460, 500))
 
 class TerrainBlock(Rect) :
     width: int = 25
@@ -34,7 +29,6 @@ class TerrainBlock(Rect) :
         self.biome = biome
         self.underlying_block: Optional[Rect] = None
         self.space = space
-        self.topobjs: List[Sprite] = []
 
     def set_underlying_block(self) -> None :
         x,top_block_y = self.body.position
@@ -44,18 +38,14 @@ class TerrainBlock(Rect) :
         self.underlying_block = Rect(x,y,self.width,self.underlying_block_height,self.space)
         self.underlying_block.body.body_type = Body.STATIC
 
-    def add_top_object(self, obj):
-        self.topobjs.append(obj)
-
     def get_resources(self) -> Tuple[BaseResource] :
         result = []
         for res,quantity in self.biome.resources.items() :
             for i in range(quantity) :
                 result.append(res())
-        self.topobjs = []
         return tuple(result)
 
-    def render(self,display: Surface, camera_shift: pymunk.Vec2d) -> None :
+    def render(self,display: Surface,camera_shift: pymunk.Vec2d) -> None :
         h = display.get_height()
         adj = pymunk.Vec2d(self.width / 2,-self.height / 2)
         pos = self.body.position - adj - camera_shift
@@ -64,9 +54,6 @@ class TerrainBlock(Rect) :
 
         if self.underlying_block :
             self.underlying_block.render(display,camera_shift)
-
-        for obj in self.topobjs:
-            obj.render(display, camera_shift)
 
 
 class FalseTerrain :
@@ -94,7 +81,7 @@ class Terrain :
         self.space = space
         self.noise = SimplexNoise()
         self.sf = pymunk.ShapeFilter(group = 0b0010,categories = 0b1101)
-        self.objects = []
+        self.other = []
         self.bricks = []
         self.x_max,self.x_min,self.y_max,self.y_min = x_max,x_min,y_max,y_min
         self.abs_min_y = -300
@@ -104,8 +91,8 @@ class Terrain :
             block = self.get_block(x,y_top)
             self.bricks.append(block)
 
-    def get_noise(self,x: float, noise=700) -> float :
-        return self.noise.noise2(x / noise,0)
+    def get_noise(self,x: float) -> float :
+        return self.noise.noise2(x / 700,0)
 
     def get_block(self,x: int,y: int = None) -> TerrainBlock :
         if not y :
@@ -118,21 +105,18 @@ class Terrain :
         if len(self.space.point_query((x,y),1,pymunk.ShapeFilter())) > 1 :
             block.body.body_type = pymunk.Body.STATIC
         block.set_underlying_block()
-        nv = abs(self.get_noise(x, 650))
-        nv1 = abs(self.get_noise(x+TerrainBlock.width,650))
-        print(nv)
-        if 0.5 < nv < 0.8:
+        if random.randint(0,10) < 2 :
             sprite = Sprite()
             sprite.add_sprite("flower","assets/flower.png")
             sprite.active_sprite = "flower"
             sprite.pos = convert((x,y + 50),500)
-            block.add_top_object(sprite)
-        if 0.4 < nv < 0.6 and not 0.4 < nv1 < 0.6 and not nv - 0.1 < nv1 < nv + 0.1:
+            self.other.append(sprite)
+        if random.randint(-10,10) == 2 :
             sprite = Sprite()
-            sprite.imgs["tree"] = tree_imgs[int(nv*(len(tree_imgs)-1))]
+            sprite.add_sprite("tree",random.choice([os.getcwd() + "/assets/tree/" + i for i in os.listdir(os.getcwd() + "/assets/tree")]))
             sprite.active_sprite = "tree"
-            sprite.pos = (x-sprite.imgs["tree"].get_width()/2,(500-block.body.position.y) - sprite.imgs["tree"].get_height())
-            block.add_top_object(sprite)
+            sprite.pos = (x,(500-y) - 608)
+            self.other.append(sprite)
         return block
 
     def get_y(self,x: float) -> float :
@@ -184,7 +168,7 @@ class Terrain :
     def render(self,display: Surface,camera_shift: pymunk.Vec2d) -> None :
         for s in self.bricks :
             s.render(display,camera_shift)
-        for o in self.objects :
+        for o in self.other :
             o.render(display,camera_shift)
         # for i in range(self.x_min, self.x_max):
         #     col = max(min(int(self.get_noise(i) * 255), 255), 0)
