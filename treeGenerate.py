@@ -1,7 +1,10 @@
 import random
+import time
+
 import pygame
 from PIL import Image, EpsImagePlugin
 from turtle import Turtle, Screen, tracer, getcanvas
+from math import sin, cos
 import os
 import keyboard
 
@@ -28,6 +31,7 @@ fc = 50
 run = True
 mode = "fast" # norm, fast
 def save_as_png(canvas,fileName):
+    fileName = "assets/tree/" + fileName
     canvas.postscript(file = fileName + '.eps')
     img = Image.open(fileName + '.eps')
     img = img.convert("RGBA")
@@ -38,17 +42,21 @@ def save_as_png(canvas,fileName):
                 pixarr[x, y] = (0, 0, 0, 0)
     #img = Image.fromarray(pixarr)
     img.save(fileName + '.png', 'png')
-def draw(recusion, pen):
+clamp = lambda mn, v, mx : max(min(v, mx), mn)
+def draw(recusion, pen, color):
     stack = []
     for r in recusion:
+        r1 = random.randint(0, 3000)
+        if r1 < 3:
+            pen.pensize(r1)
         if r == "[":
             stack.extend((pen.pos(), pen.heading()))
-            pen.left(random.randint(-10, 35))
+            pen.left(random.randint(-20, 35))
         if r == "]":
             pen.penup()
             pen.setheading(stack.pop())
             pen.setpos(stack.pop())
-            pen.right(random.randint(-10, 35))
+            pen.right(random.randint(-20, 35))
             pen.pendown()
         if r == "1":
             pen.forward(20)
@@ -60,18 +68,30 @@ def draw(recusion, pen):
             pen.pensize(1)
         if r == "0":
             pen.pensize(5)
-            pen.color("green")
+            pen.color(color)
             pen.forward(5)
             pen.color("black")
             pen.pensize(1)
 while run:
+    # https://www.shadertoy.com/view/dtt3WS
+    # col.x = 0.2 + abs(0.3 + sin(x) - cos(x) + (0.01 * 21. * sin(x)));
+    # col.y = 0.4 + cos(x) * sin(x) + (0.1 * cos(x));
+    # col.z = 0.5 * sin(x) + (0.3 * cos(x));
+    # col.x = pow(col.x,1. / 2.2);
+    # col.y = pow(col.y,1. / 2.2);
+    # col.z = pow(col.z,1. / 2.2);
+    gamma = 1/2.2
+    x = time.time()
+    treecolor = (clamp(0, int(abs(0.2 + abs(0.3 + sin(x) - cos(x) + (0.01 * 21. * sin(x))) ** gamma)*1), 1),
+                 clamp(0, int(abs(0.4 + cos(x) * sin(x) + (0.1 * cos(x)) ** gamma)*1), 1),
+                 clamp(0, int(abs(0.5 * sin(x) + (0.3 * cos(x)) ** gamma)*1), 1))
     pen.speed(0)
     tracer(0, 0)
     pen.penup()
     pen.setpos(0,-500)
     pen.setheading(90)
     pen.pendown()
-    draw(tree, pen)
+    draw(tree, pen, treecolor)
     if mode == "fast":
         fc -= 1
         if fc == 0:
@@ -92,7 +112,7 @@ while run:
         if keyboard.is_pressed('r'):
             window.clear()
             break
-files = os.listdir(os.getcwd())
+files = os.listdir(os.getcwd() + "assets/tree")
 for file in files:
     if file.endswith(".eps"):
-        os.remove(file)
+        os.remove(os.getcwd() + "assets/tree/" + file)
