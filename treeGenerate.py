@@ -25,9 +25,12 @@ def get(iters: int = 7):
 pen = Turtle()
 window = Screen()
 tree = get(10)
+# window.screensize(1000, 1000)
+# window.setup(1000, 1000, 0, 0)
 print(tree)
 EpsImagePlugin.gs_windows_binary = "C:/Program Files/gs/gs10.01.1/bin/gswin64c.exe"
-fc = 50
+fc = 80
+mfc = fc
 run = True
 mode = "fast" # norm, fast
 def save_as_png(canvas,fileName):
@@ -43,8 +46,9 @@ def save_as_png(canvas,fileName):
     #img = Image.fromarray(pixarr)
     img.save(fileName + '.png', 'png')
 clamp = lambda mn, v, mx : max(min(v, mx), mn)
-def draw(recusion, pen, color):
+def draw(recusion, pen, color, color2):
     stack = []
+    pen.color(color2)
     for r in recusion:
         r1 = random.randint(0, 3000)
         if r1 < 3:
@@ -70,7 +74,7 @@ def draw(recusion, pen, color):
             pen.pensize(5)
             pen.color(color)
             pen.forward(5)
-            pen.color("black")
+            pen.color(color2)
             pen.pensize(1)
 while run:
     # https://www.shadertoy.com/view/dtt3WS
@@ -85,20 +89,24 @@ while run:
     treecolor = (clamp(0, int(abs(0.2 + abs(0.3 + sin(x) - cos(x) + (0.01 * 21. * sin(x))) ** gamma)*1), 1),
                  clamp(0, int(abs(0.4 + cos(x) * sin(x) + (0.1 * cos(x)) ** gamma)*1), 1),
                  clamp(0, int(abs(0.5 * sin(x) + (0.3 * cos(x)) ** gamma)*1), 1))
+    x = time.time()*100
+    treecolor2 = (clamp(0,int(abs(abs(sin(x) - cos(x) + (0.01 * 0.21 * cos(x))) ** gamma) * 0.94),1),
+                 clamp(0,int(abs(0.1 + cos(x) * sin(x) + (0.7 * cos(x)) ** gamma) * 0.94),1),
+                 clamp(0,int(abs(0.2 * sin(x) + (0.3 * cos(x)) ** gamma) * 0.94),1))
     pen.speed(0)
     tracer(0, 0)
     pen.penup()
     pen.setpos(0,-500)
     pen.setheading(90)
     pen.pendown()
-    draw(tree, pen, treecolor)
+    draw(tree, pen, treecolor, treecolor2)
     if mode == "fast":
         fc -= 1
         if fc == 0:
             run = False
         window.update()
-        save_as_png(getcanvas(), f'tree-{50-fc}')
-        print(f'generate tree {50-fc}-50')
+        save_as_png(getcanvas(), f'tree-{mfc-fc}')
+        print(f'generate tree {mfc-fc}-{mfc}')
         window.clear()
         continue
     while True:
