@@ -20,6 +20,12 @@ for i, tree_img in enumerate(os.listdir(tree_folder)):
     tree_imgs.append(pygame.image.load(tree_folder+tree_img))
     tree_imgs[i] = pygame.transform.scale(tree_imgs[i], (460, 500))
 
+plant_imgs: List[Surface] = []
+plant_folder = os.getcwd() + "/assets/plant/"
+for i, plant_img in enumerate(os.listdir(plant_folder)):
+    plant_imgs.append(pygame.image.load(plant_folder+plant_img))
+    plant_imgs[i] = pygame.transform.scale(plant_imgs[i], (70, 40))
+
 class TerrainBlock(Rect) :
     width: int = 25
     height: int = 25
@@ -127,11 +133,24 @@ class Terrain :
             sprite.active_sprite = "flower"
             sprite.pos = convert((x,y + 50),500)
             block.add_top_object(sprite)
+        elif 0.4 < nv < 0.6:
+            sprite = Sprite()
+            sprite.add_sprite("rock","assets/rock.png")
+            sprite.active_sprite = "rock"
+            sprite.pos = convert((x-10,y + 20),500)
+            block.add_top_object(sprite)
         if 0.4 < nv < 0.6 and not 0.4 < nv1 < 0.6 and not nv - 0.1 < nv1 < nv + 0.1:
             sprite = Sprite()
             sprite.imgs["tree"] = tree_imgs[int(nv*(len(tree_imgs)-1))]
             sprite.active_sprite = "tree"
             sprite.pos = (x-sprite.imgs["tree"].get_width()/2,(500-block.body.position.y) - sprite.imgs["tree"].get_height())
+            block.add_top_object(sprite)
+        if 0.4 < nv:
+            sprite = Sprite()
+            sprite.imgs["plant"] = plant_imgs[int(nv * (len(plant_imgs) - 1))]
+            sprite.active_sprite = "plant"
+            sprite.pos = (x - sprite.imgs["plant"].get_width() / 2,
+                          (500 - block.body.position.y) - sprite.imgs["plant"].get_height())
             block.add_top_object(sprite)
         return block
 
@@ -142,7 +161,7 @@ class Terrain :
     def get_biome(self,noise_value: float) -> BaseBiome :
         if noise_value > 0.8 :
             return Mountain()
-        elif noise_value < -0.8 :
+        elif noise_value < -90 :
             return Swamp()
         else :
             return Flatland()
