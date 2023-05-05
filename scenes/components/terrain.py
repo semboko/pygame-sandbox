@@ -1,6 +1,6 @@
 import os
 import random
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 import pygame
 import pymunk
@@ -13,6 +13,19 @@ from scenes.components.rect import Rect
 from scenes.components.resources import BaseResource
 from scenes.components.sprite import Sprite
 from scenes.utils import convert
+
+from random import Random
+
+rand = Random()
+rand.seed(1)
+
+tree_imgs: List[Surface] = []
+tree_folder = os.getcwd() + "/assets/tree/"
+
+for img_path in os.listdir(tree_folder):
+    full_path = tree_folder + img_path
+    img = pygame.image.load(full_path)
+    tree_imgs.append(pygame.transform.scale(img, (450, 500)))
 
 
 class TerrainBlock(Rect):
@@ -29,6 +42,7 @@ class TerrainBlock(Rect):
         self.biome = biome
         self.underlying_block: Optional[Rect] = None
         self.space = space
+        self.top_objects: List[Sprite] = []
 
     def set_underlying_block(self) -> None:
         x, top_block_y = self.body.position
@@ -38,11 +52,29 @@ class TerrainBlock(Rect):
         self.underlying_block = Rect(x, y, self.width, self.underlying_block_height, self.space)
         self.underlying_block.body.body_type = Body.STATIC
 
+    def set_top_object(self) -> None:
+        if rand.randint(0, 10) < 1:
+            sprite = Sprite()
+            img = random.choice(tree_imgs)
+            sprite.imgs[1] = img
+            sprite.active_sprite = 1
+            sprite.pos = -pygame.Vector2(img.get_width()/2, img.get_height()) + convert(self.body.position, 500)
+            self.top_objects.append(sprite)
+
+        if random.randint(0, 10) < 2:
+            sprite = Sprite()
+            sprite.add_sprite("flower", "assets/flower.png")
+            sprite.active_sprite = "flower"
+            img = sprite.imgs["flower"]
+            sprite.pos = -pygame.Vector2(img.get_width()/2, img.get_height()) + convert(self.body.position, 500)
+            self.top_objects.append(sprite)
+
     def get_resources(self) -> Tuple[BaseResource]:
         result = []
         for res, quantity in self.biome.resources.items():
             for i in range(quantity):
                 result.append(res())
+        self.top_objects = []
         return tuple(result)
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
@@ -54,6 +86,9 @@ class TerrainBlock(Rect):
 
         if self.underlying_block:
             self.underlying_block.render(display, camera_shift)
+
+        for obj in self.top_objects:
+            obj.render(display, camera_shift)
 
 
 class FalseTerrain:
@@ -90,7 +125,7 @@ class Terrain:
         self.space = space
         self.noise = SimplexNoise()
         self.sf = pymunk.ShapeFilter(group=0b0010, categories=0b1101)
-        self.other = []
+        self.objects = []
         self.bricks = []
         self.x_max, self.x_min, self.y_max, self.y_min = x_max, x_min, y_max, y_min
         self.abs_min_y = -300
@@ -114,21 +149,7 @@ class Terrain:
         if len(self.space.point_query((x, y), 1, pymunk.ShapeFilter())) > 1:
             block.body.body_type = pymunk.Body.STATIC
         block.set_underlying_block()
-        if random.randint(0, 10) < 2:
-            sprite = Sprite()
-            sprite.add_sprite("flower", "assets/flower.png")
-            sprite.active_sprite = "flower"
-            sprite.pos = convert((x, y + 50), 500)
-            self.other.append(sprite)
-        if random.randint(-10, 10) == 2:
-            sprite = Sprite()
-            sprite.add_sprite(
-                "tree",
-                random.choice([os.getcwd() + "/assets/tree/" + i for i in os.listdir(os.getcwd() + "/assets/tree")]),
-            )
-            sprite.active_sprite = "tree"
-            sprite.pos = (x, (500 - y) - 608)
-            self.other.append(sprite)
+        block.set_top_object()
         return block
 
     def get_y(self, x: float) -> float:
@@ -180,7 +201,7 @@ class Terrain:
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         for s in self.bricks:
             s.render(display, camera_shift)
-        for o in self.other:
+        for o in self.objects:
             o.render(display, camera_shift)
         # for i in range(self.x_min, self.x_max):
         #     col = max(min(int(self.get_noise(i) * 255), 255), 0)

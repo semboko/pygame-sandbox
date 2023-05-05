@@ -2,7 +2,7 @@ from smods import Animate, AudioLib, CMSmod, DebugMod, GravitySceneGrabFix, InfJ
 mods = [
     Animate.Animate,
     AudioLib.AudioLib,
-    CMSmod.CMSmod,
+    # CMSmod.CMSmod,
     DebugMod.DebugMod,
     GravitySceneGrabFix.GravitySceneGrabFix,
     InfJump.InfJump,
