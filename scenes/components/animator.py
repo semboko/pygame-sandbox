@@ -1,6 +1,6 @@
-import pygame
 from typing import Tuple
 
+import pygame
 import pymunk
 
 
