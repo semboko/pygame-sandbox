@@ -6,9 +6,9 @@ int v1;
 float speed;
 JSONObject datas;
 PVector[] lines1, lines2, circles1, blocks, pj1, pj2;
-PVector player, offset, maplv;
-boolean isdraw, isdrawc, isdel, terrain, b1, b2, b3, isdrawb, isdrawp;
-String last, mode, mapl;
+PVector player, offset, maplv, mousemovedpos, mousemovedposstart;
+boolean isdraw, isdrawc, isdel, terrain, b1, b2, b3, b4, isdrawb, isdrawp, ismoved;
+String last, mode, mapl, omode;
 String[] modes;
 int circles, modr, blockr;
 int lines, pj;
@@ -17,9 +17,12 @@ void setup() {
   isdel = false;
   last = "line";
   mode = "line";
+  omode = mode;
   isdrawb = false;
   isdrawp = false;
+  ismoved = false;
   modes = new String[6];
+  mousemovedposstart = new PVector(0, 0);
   modes[0] = "line";
   modes[1] = "circle";
   modes[2] = "player";
@@ -29,6 +32,7 @@ void setup() {
   b1 = false;
   b2 = false;
   b3 = false;
+  b4 = false;
 
   modr = 0;
   speed = 3;
@@ -46,6 +50,10 @@ void setup() {
   cp5.addButton("terrain")
     .setValue(1)
     .setSize(50, 19)
+    ;
+  cp5.addButton("move")
+    .setValue(1)
+    .setSize(30, 19)
     ;
   cp5.addTextlabel("ttt")
     .setText("Terrain ON")
@@ -108,6 +116,14 @@ void draw() {
   terrain = cp5.get(Button.class, "terrain").isOn();
   if (cp5.get(Button.class, "restart").isOn() != b3) {
     restart();
+  }
+  if (cp5.get(Button.class, "move").isOn() != b4) {
+    b4 = !b4;
+    if (mode != "move") {
+      omode = mode;
+      mode = "move";
+    }
+    else mode = omode;
   }
   if (cp5.get(Button.class, "up").isOn() != b1) {
     b1 = !b1;
@@ -299,6 +315,19 @@ void draw() {
       if (mouseButton == LEFT) {
         mapl = cp5.get(Textfield.class, "mapload").getText();
         maplv = new PVector(mouseX - offset.x, mouseY - offset.y);
+      }
+      break;
+    case "move":
+      if (mouseButton == LEFT) {
+        if (!ismoved) {
+          mousemovedpos = new PVector(mouseX, mouseY);
+          mousemovedposstart = offset;
+        }
+
+        offset = new PVector(mousemovedposstart.x+mouseX-mousemovedpos.x, mousemovedposstart.y+mouseY-mousemovedpos.y);
+        ismoved = true;
+      } else {
+        ismoved = false;
       }
       break;
     }

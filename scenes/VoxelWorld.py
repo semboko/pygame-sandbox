@@ -7,7 +7,6 @@ from pygame.event import Event
 from scenes.abstract import AbstractPymunkScene
 from scenes.components.player import Player
 from scenes.components.resources import *
-from scenes.components.terrain import Terrain
 from scenes.components.speedometer import Speedometer
 from scenes.components.terrain import Terrain
 from scenes.utils import convert
@@ -25,7 +24,6 @@ class VoxelWorld(AbstractPymunkScene):
         self.menu_state = 0
 
     def update(self):
-
         if 0 <= self.menu_state <= 1:
             super().update()
         self.player.body.angle = 0

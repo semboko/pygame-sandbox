@@ -8,6 +8,7 @@ from pygame.event import Event
 from scenes.abstract import AbstractScene
 from scenes.components import Ball, Segment
 from scenes.components.pj import PJ
+
 from .utils import convert
 
 log = getLogger()
@@ -48,8 +49,8 @@ class GravityScene(AbstractScene):
                     self.co1 = pymunk.Vec2d(*event.pos)
             if event.dict["button"] == 2:
                 for obj in self.renders_objs:
-                    if isinstance(obj,Ball) :
-                        if obj.body.position.get_distance(convert(event.pos,self.size_sc[1])) <= obj.shape.radius :
+                    if isinstance(obj, Ball):
+                        if obj.body.position.get_distance(convert(event.pos, self.size_sc[1])) <= obj.shape.radius:
                             self.co1 = obj
             if event.dict["button"] == 4:
                 self.mode = False
@@ -85,19 +86,33 @@ class GravityScene(AbstractScene):
             if event.dict["button"] == 1:
                 if self.mode:
                     self.co2 = pymunk.Vec2d(*event.pos)
-                    seg = Segment(convert(self.co1, self.size_sc[1]), convert(self.co2, self.size_sc[1]), 5, self.space, btype=pymunk.Body.KINEMATIC)
-                    #self.space.add(seg.body, seg.shape)
+                    seg = Segment(
+                        convert(self.co1, self.size_sc[1]),
+                        convert(self.co2, self.size_sc[1]),
+                        5,
+                        self.space,
+                        btype=pymunk.Body.KINEMATIC,
+                    )
+                    # self.space.add(seg.body, seg.shape)
                     self.renders_objs.append(seg)
             if event.dict["button"] == 2:
                 self.co2 = None
-                for obj in self.renders_objs :
+                for obj in self.renders_objs:
                     if isinstance(obj, Ball):
-                        if obj.body.position.get_distance(convert(event.pos,self.size_sc[1])) <= obj.shape.radius :
+                        if obj.body.position.get_distance(convert(event.pos, self.size_sc[1])) <= obj.shape.radius:
                             if event.dict["button"] == 2:
                                 self.co2 = obj
                                 break
                 if self.co2 and self.co1 and self.co1 != self.co2:
-                    join = pymunk.DampedSpring(self.co1.body, self.co2.body, (0,0), (0,0), self.co1.body.position.get_distance(self.co2.body.position)/10, 600, 0.3)
+                    join = pymunk.DampedSpring(
+                        self.co1.body,
+                        self.co2.body,
+                        (0, 0),
+                        (0, 0),
+                        self.co1.body.position.get_distance(self.co2.body.position) / 10,
+                        600,
+                        0.3,
+                    )
                     self.renders_objs.append(PJ(join))
                     self.space.add(join)
 

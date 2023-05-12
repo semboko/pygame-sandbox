@@ -1,5 +1,6 @@
+import os
 import random
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import pygame
 import pymunk
@@ -7,10 +8,23 @@ from noise.perlin import SimplexNoise
 from pygame.surface import Surface
 from pymunk import Body, Space
 
-from scenes.components.biomes import BaseBiome, Flatland, Mine, Mountain, Swamp
+from scenes.components.biomes import BaseBiome, Flatland, Mountain, Swamp
 from scenes.components.rect import Rect
 from scenes.components.resources import BaseResource
+from scenes.components.sprite import Sprite
 from scenes.utils import convert
+
+tree_imgs: List[Surface] = []
+tree_folder = os.getcwd() + "/assets/tree/"
+for i, tree_img in enumerate(os.listdir(tree_folder)):
+    tree_imgs.append(pygame.image.load(tree_folder + tree_img))
+    tree_imgs[i] = pygame.transform.scale(tree_imgs[i], (460, 500))
+
+plant_imgs: List[Surface] = []
+plant_folder = os.getcwd() + "/assets/plant/"
+for i, plant_img in enumerate(os.listdir(plant_folder)):
+    plant_imgs.append(pygame.image.load(plant_folder + plant_img))
+    plant_imgs[i] = pygame.transform.scale(plant_imgs[i], (70, 40))
 
 
 class TerrainBlock(Rect):
@@ -27,20 +41,25 @@ class TerrainBlock(Rect):
         self.biome = biome
         self.underlying_block: Optional[Rect] = None
         self.space = space
+        self.topobjs: List[Sprite] = []
 
     def set_underlying_block(self) -> None:
         x, top_block_y = self.body.position
-        top_y = top_block_y - self.width/2
+        top_y = top_block_y - self.width / 2
         bottom_y = top_y - self.underlying_block_height
         y = (top_y + bottom_y) / 2
         self.underlying_block = Rect(x, y, self.width, self.underlying_block_height, self.space)
         self.underlying_block.body.body_type = Body.STATIC
+
+    def add_top_object(self, obj):
+        self.topobjs.append(obj)
 
     def get_resources(self) -> Tuple[BaseResource]:
         result = []
         for res, quantity in self.biome.resources.items():
             for i in range(quantity):
                 result.append(res())
+        self.topobjs = []
         return tuple(result)
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
@@ -53,25 +72,37 @@ class TerrainBlock(Rect):
         if self.underlying_block:
             self.underlying_block.render(display, camera_shift)
 
+        for obj in self.topobjs:
+            obj.render(display, camera_shift)
+
+
 class FalseTerrain:
-    def __init__(self, *args, **kwargs): pass
+    def __init__(self, *args, **kwargs):
+        pass
 
-    def get_noise(self, *args, **kwargs): pass
+    def get_noise(self, *args, **kwargs):
+        pass
 
-    def get_block(self, *args, **kwargs): pass
+    def get_block(self, *args, **kwargs):
+        pass
 
-    def get_y(self, *args, **kwargs): pass
+    def get_y(self, *args, **kwargs):
+        pass
 
-    def get_biome(self, *args, **kwargs): pass
+    def get_biome(self, *args, **kwargs):
+        pass
 
-    def get_brick_by_body(self, *args, **kwargs): pass
+    def get_brick_by_body(self, *args, **kwargs):
+        pass
 
-    def delete_block(self, *args, **kwargs): pass
+    def delete_block(self, *args, **kwargs):
+        pass
 
-    def update(self, *args, **kwargs): pass
+    def update(self, *args, **kwargs):
+        pass
 
-    def render(self, *args, **kwargs): pass
-
+    def render(self, *args, **kwargs):
+        pass
 
 
 class Terrain:
@@ -79,6 +110,7 @@ class Terrain:
         self.space = space
         self.noise = SimplexNoise()
         self.sf = pymunk.ShapeFilter(group=0b0010, categories=0b1101)
+        self.objects = []
         self.bricks = []
         self.x_max, self.x_min, self.y_max, self.y_min = x_max, x_min, y_max, y_min
         self.abs_min_y = -300
@@ -88,8 +120,8 @@ class Terrain:
             block = self.get_block(x, y_top)
             self.bricks.append(block)
 
-    def get_noise(self, x: float) -> float:
-        return self.noise.noise2(x / 700, 0)
+    def get_noise(self, x: float, noise=700) -> float:
+        return self.noise.noise2(x / noise, 0)
 
     def get_block(self, x: int, y: int = None) -> TerrainBlock:
         if not y:
@@ -99,7 +131,42 @@ class Terrain:
         else:
             biome = self.get_biome(y)
         block = TerrainBlock(x, y, self.space, self.sf, biome)
+        if len(self.space.point_query((x, y), 1, pymunk.ShapeFilter())) > 1:
+            block.body.body_type = pymunk.Body.STATIC
         block.set_underlying_block()
+        nv = abs(self.get_noise(x, 650))
+        nv1 = abs(self.get_noise(x + TerrainBlock.width, 650))
+        print(nv)
+        if 0.5 < nv < 0.8:
+            sprite = Sprite()
+            sprite.add_sprite("flower", "assets/flower.png")
+            sprite.active_sprite = "flower"
+            sprite.pos = convert((x, y + 50), 500)
+            block.add_top_object(sprite)
+        elif 0.4 < nv < 0.6:
+            sprite = Sprite()
+            sprite.add_sprite("rock", "assets/rock.png")
+            sprite.active_sprite = "rock"
+            sprite.pos = convert((x - 10, y + 20), 500)
+            block.add_top_object(sprite)
+        if 0.4 < nv < 0.6 and not 0.4 < nv1 < 0.6 and not nv - 0.1 < nv1 < nv + 0.1:
+            sprite = Sprite()
+            sprite.imgs["tree"] = tree_imgs[int(nv * (len(tree_imgs) - 1))]
+            sprite.active_sprite = "tree"
+            sprite.pos = (
+                x - sprite.imgs["tree"].get_width() / 2,
+                (500 - block.body.position.y) - sprite.imgs["tree"].get_height(),
+            )
+            block.add_top_object(sprite)
+        if 0.4 < nv:
+            sprite = Sprite()
+            sprite.imgs["plant"] = plant_imgs[int(nv * (len(plant_imgs) - 1))]
+            sprite.active_sprite = "plant"
+            sprite.pos = (
+                x - sprite.imgs["plant"].get_width() / 2,
+                (500 - block.body.position.y) - sprite.imgs["plant"].get_height(),
+            )
+            block.add_top_object(sprite)
         return block
 
     def get_y(self, x: float) -> float:
@@ -109,7 +176,7 @@ class Terrain:
     def get_biome(self, noise_value: float) -> BaseBiome:
         if noise_value > 0.8:
             return Mountain()
-        elif noise_value < -0.8:
+        elif noise_value < -90:
             return Swamp()
         else:
             return Flatland()
@@ -119,8 +186,12 @@ class Terrain:
             if b.body == body:
                 return b
 
-    def delete_block(self, brick: TerrainBlock) -> None:
+    def delete_block(self, brick: TerrainBlock, *, full=False) -> None:
         old_x, old_y = brick.body.position
+        if old_y > self.get_y(old_x) or full:
+            self.space.remove(brick.body, brick.shape)
+            self.bricks.remove(brick)
+            return
         brick_idx = self.bricks.index(brick)
         self.space.remove(brick.body, brick.shape, brick.underlying_block.body, brick.underlying_block.shape)
         new_brick = self.get_block(old_x, old_y - brick.height)
@@ -132,12 +203,14 @@ class Terrain:
 
         lbx = lb.body.position.x
         if x_shift + 50 < lbx:
+            self.delete_block(rb, full=True)
             y_top = int(self.get_y(lbx - TerrainBlock.width))
             block = self.get_block(lbx - TerrainBlock.width, y_top)
             self.bricks.insert(0, block)
 
         rbx = rb.body.position.x
-        if x_shift > rbx - 1000:
+        if x_shift > rbx - 1505:
+            self.delete_block(lb, full=True)
             y_top = int(self.get_y(rbx + TerrainBlock.width))
             block = self.get_block(rbx + TerrainBlock.width, y_top)
             self.bricks.append(block)
@@ -145,3 +218,8 @@ class Terrain:
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         for s in self.bricks:
             s.render(display, camera_shift)
+        for o in self.objects:
+            o.render(display, camera_shift)
+        # for i in range(self.x_min, self.x_max):
+        #     col = max(min(int(self.get_noise(i) * 255), 255), 0)
+        #     pygame.draw.rect(display, (col, col, col), (i-camera_shift.x, 500-self.get_noise(i)*(self.y_max-self.y_min)+camera_shift.y, 1, 1))

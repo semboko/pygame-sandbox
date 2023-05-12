@@ -7,7 +7,7 @@ from scenes import VoxelWorld
 class InfJump(BaseMod):
     name = "InfJump"
     author = "Kolya142"
-    locked = True
+    locked = False
 
     def start(self, *args, **kwargs):
         super(InfJump, self).start(*args, **kwargs)
