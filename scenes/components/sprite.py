@@ -1,8 +1,6 @@
-from typing import Tuple
-
 import pygame
+from typing import Tuple
 import pymunk
-
 from scenes.utils import convert
 
 

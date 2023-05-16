@@ -7,6 +7,8 @@ from pygame.event import Event
 from scenes.abstract import AbstractPymunkScene
 from scenes.components.player import Player
 from scenes.components.resources import *
+from scenes.components.terrain import Terrain
+from scenes.components.tile import Tile
 from scenes.components.speedometer import Speedometer
 from scenes.components.terrain import Terrain
 from scenes.utils import convert
@@ -21,6 +23,7 @@ class VoxelWorld(AbstractPymunkScene):
         self.player = Player(250, 250, 50, 60, self.space, (25, 25, 25), True)
         self.floor = Terrain(0, self.display.get_width(), 10, 200, 400, self.space)
         self.objects.extend((self.player, self.floor))
+        self.tiles = [Tile(pygame.image.load("assets/bgs/bg-0.png"), 5, 0), Tile(pygame.image.load("assets/bgs/bg-1.png"), 3, 0), Tile(pygame.image.load("assets/bgs/bg-2.png"), 1, 0)]
         self.menu_state = 0
 
     def update(self):
@@ -71,7 +74,10 @@ class VoxelWorld(AbstractPymunkScene):
                     self.objects.extend(resources)
 
     def render(self):
-        super(VoxelWorld, self).render()
+        for tile in self.tiles:
+            tile.render(self.display)
+        for obj in self.objects:
+            obj.render(self.display, self.camera_shift)
         for p in self.player.dp:
             pos = [p.x - self.camera_shift[0], p.y + self.camera_shift[1]]
             pygame.draw.circle(self.display, (255, 0, 0), pos, 10)
