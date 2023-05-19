@@ -1,11 +1,11 @@
-from math import degrees
 from typing import Optional
 
-from pygame.image import load
 from pygame.surface import Surface
+from pygame.image import load
 from pygame.transform import rotate
 from pymunk import Body, Poly, Space
 from pymunk.vec2d import Vec2d
+from math import degrees
 
 from scenes.components.rect import Rect
 from scenes.utils import convert

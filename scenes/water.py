@@ -9,11 +9,12 @@ from scenes.abstract import AbstractScene
 from scenes.components import Ball, Segment
 from scenes.components.pj import PJ
 from .utils import convert
+import math
 
 log = getLogger()
 
 
-class GravityScene(AbstractScene):
+class WaterScene(AbstractScene):
     space: pymunk.Space
     circle: Ball
     segment: Segment
@@ -124,17 +125,22 @@ class GravityScene(AbstractScene):
         self.space.gravity = 0, -1000
         self.space.damping = 0.5  # Set the friction coefficient of the space object
         self.pause = False
-        self.segment = Segment((0, 100), (500, 50), 5, self.space, btype=pymunk.Body.KINEMATIC)
+        self.segment = Segment((0, 100), (500, 100), 5, self.space, btype=pymunk.Body.KINEMATIC)
         self.co2 = None
         self.co1 = None
         self.mode = False
         self.renders_objs.append(self.segment)
-        self.renders_objs.append(Segment((497, 300), (497, 50), 5, self.space, btype=pymunk.Body.KINEMATIC))
-        self.renders_objs.append(Segment((0, 300), (0, 50), 5, self.space, btype=pymunk.Body.KINEMATIC))
+        self.renders_objs.append(Segment((497, 300), (497, 100), 5, self.space, btype=pymunk.Body.KINEMATIC))
+        self.renders_objs.append(Segment((0, 300), (0, 100), 5, self.space, btype=pymunk.Body.KINEMATIC))
 
     def update(self):
         if not self.pause:
             self.space.step(1 / self.fps)
+            c = self.space.bb_query(pymunk.BB(left = 0, bottom = 100, right = 500, top = 500-210), pymunk.ShapeFilter())
+            if len(c) > 1:
+                for obj in c:
+                    obj.body.apply_impulse_at_world_point([0, (math.pi * 5 * (300 - obj.body.position.y) * -.0003) * 10 * -1000], obj.body.position)
+
         # self.clean_up()
 
     def clean_up(self):
@@ -145,5 +151,6 @@ class GravityScene(AbstractScene):
 
     def render(self, obj=None):
         self.display.fill((255, 255, 255))
+        pygame.draw.rect(self.display, (0, 0, 245), (0, 210, 500, 190))
         for obj in self.renders_objs:
             obj.render(self.display, pymunk.vec2d.Vec2d(0, 0))
