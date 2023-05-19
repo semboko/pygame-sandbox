@@ -1,4 +1,4 @@
-import random
+import pickle
 
 import pygame
 import pymunk
@@ -8,7 +8,7 @@ from scenes.abstract import AbstractPymunkScene
 from scenes.components.player import Player
 from scenes.components.resources import *
 from scenes.components.terrain import Terrain
-from scenes.components.tile import Background, Tile
+from scenes.components.tile import Background
 from scenes.utils import convert
 
 pygame.init()
@@ -35,6 +35,12 @@ class VoxelWorld(AbstractPymunkScene):
         elif keys[pygame.K_d]:
             self.player.move(1)
             self.player.is_run = True
+        elif keys[pygame.K_s] and keys[pygame.K_LCTRL]:
+            print("Saving...")
+            self.save()
+        elif keys[pygame.K_l] and keys[pygame.K_LCTRL]:
+            print("Loading...")
+            self.load("save.txt")
         else:
             self.player.is_run = False
         self.player.update(self.space)
@@ -70,6 +76,27 @@ class VoxelWorld(AbstractPymunkScene):
                 resources = self.player.mine(self.floor, self.camera_shift + pos)
                 if resources:
                     self.objects.extend(resources)
+
+    def save(self):
+        resources = [o for o in self.objects if type(o).__base__ == BaseResource]
+        data = {
+            "player": {
+                "position": self.player.body.position,
+                "inventory": self.player.inv.icons,
+                "resources": resources
+            },
+        }
+        with open("save.txt", "wb") as file:
+            pickle.dump(data, file)
+
+    def load(self, save_name: str):
+        with open(save_name, "rb") as file:
+            data = pickle.load(file)
+            self.player.body.position = data["player"]["position"]
+            self.player.inv.icons = data["player"]["inventory"]
+            for resource in data["player"]["resources"]:
+                self.objects.append(resource)
+                resource.materialize(resource.rect.body.position, self.space)
 
     def render(self):
         self.bg.render(self.display, self.camera_shift)

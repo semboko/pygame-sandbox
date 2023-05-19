@@ -136,7 +136,6 @@ class Terrain:
         block.set_underlying_block()
         nv = abs(self.get_noise(x, 650))
         nv1 = abs(self.get_noise(x + TerrainBlock.width, 650))
-        print(nv)
         if 0.5 < nv < 0.8:
             sprite = Sprite()
             sprite.add_sprite("flower", "assets/flower.png")
