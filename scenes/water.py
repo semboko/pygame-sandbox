@@ -1,3 +1,4 @@
+import math
 from logging import getLogger
 from typing import Tuple
 
@@ -8,8 +9,8 @@ from pygame.event import Event
 from scenes.abstract import AbstractScene
 from scenes.components import Ball, Segment
 from scenes.components.pj import PJ
+
 from .utils import convert
-import math
 
 log = getLogger()
 
@@ -136,10 +137,12 @@ class WaterScene(AbstractScene):
     def update(self):
         if not self.pause:
             self.space.step(1 / self.fps)
-            c = self.space.bb_query(pymunk.BB(left = 0, bottom = 100, right = 500, top = 500-210), pymunk.ShapeFilter())
+            c = self.space.bb_query(pymunk.BB(left=0, bottom=100, right=500, top=500 - 210), pymunk.ShapeFilter())
             if len(c) > 1:
                 for obj in c:
-                    obj.body.apply_impulse_at_world_point([0, (math.pi * 5 * (300 - obj.body.position.y) * -.0003) * 10 * -1000], obj.body.position)
+                    obj.body.apply_impulse_at_world_point(
+                        [0, (math.pi * 5 * (300 - obj.body.position.y) * -0.0003) * 10 * -1000], obj.body.position
+                    )
 
         # self.clean_up()
 

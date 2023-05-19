@@ -8,6 +8,7 @@ from pygame.event import Event
 from scenes.abstract import AbstractScene
 from scenes.components import Ball, Segment
 from scenes.components.pj import PJ
+
 from .utils import convert
 
 log = getLogger()
