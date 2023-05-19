@@ -1,5 +1,6 @@
 import os
-from typing import List, Optional, Tuple
+import random
+from typing import Optional, Tuple, List
 
 import pygame
 import pymunk
@@ -219,3 +220,6 @@ class Terrain:
             s.render(display, camera_shift)
         for o in self.objects:
             o.render(display, camera_shift)
+        # for i in range(self.x_min, self.x_max):
+        #     col = max(min(int(self.get_noise(i) * 255), 255), 0)
+        #     pygame.draw.rect(display, (col, col, col), (i-camera_shift.x, 500-self.get_noise(i)*(self.y_max-self.y_min)+camera_shift.y, 1, 1))
