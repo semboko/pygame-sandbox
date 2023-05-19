@@ -1,17 +1,16 @@
 import time
+from enum import Enum
 from typing import Tuple
 
 import pygame
-from pygame import mixer
 import pymunk
-from pygame import Vector2
+from pygame import Vector2, mixer
 
 from scenes.components.invertory import Invertory
 from scenes.components.rect import Rect
 from scenes.components.resources import *
-from scenes.components.terrain import Terrain
 from scenes.components.sprite import Sprite
-from enum import Enum
+from scenes.components.terrain import Terrain
 
 
 class PlayerState(Enum):
