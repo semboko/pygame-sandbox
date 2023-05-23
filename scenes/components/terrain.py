@@ -54,6 +54,9 @@ class TerrainBlock(Rect):
     def add_top_object(self, obj):
         self.topobjs.append(obj)
 
+    def save(self):
+        return self.body.position, type(self.biome).__name__
+
     def get_resources(self) -> Tuple[BaseResource]:
         result = []
         for res, quantity in self.biome.resources.items():
@@ -98,6 +101,9 @@ class FalseTerrain:
     def delete_block(self, *args, **kwargs):
         pass
 
+    def load(self, *args, **kwargs):
+        pass
+
     def update(self, *args, **kwargs):
         pass
 
@@ -136,21 +142,18 @@ class Terrain:
         block.set_underlying_block()
         nv = abs(self.get_noise(x, 650))
         nv1 = abs(self.get_noise(x + TerrainBlock.width, 650))
-        print(nv)
+        sprite = Sprite()
         if 0.5 < nv < 0.8:
-            sprite = Sprite()
             sprite.add_sprite("flower", "assets/flower.png")
             sprite.active_sprite = "flower"
             sprite.pos = convert((x, y + 50), 500)
             block.add_top_object(sprite)
         elif 0.4 < nv < 0.6:
-            sprite = Sprite()
             sprite.add_sprite("rock", "assets/rock.png")
             sprite.active_sprite = "rock"
             sprite.pos = convert((x - 10, y + 20), 500)
             block.add_top_object(sprite)
         if 0.4 < nv < 0.6 and not 0.4 < nv1 < 0.6 and not nv - 0.1 < nv1 < nv + 0.1:
-            sprite = Sprite()
             sprite.imgs["tree"] = tree_imgs[int(nv * (len(tree_imgs) - 1))]
             sprite.active_sprite = "tree"
             sprite.pos = (
@@ -159,7 +162,6 @@ class Terrain:
             )
             block.add_top_object(sprite)
         if 0.4 < nv:
-            sprite = Sprite()
             sprite.imgs["plant"] = plant_imgs[int(nv * (len(plant_imgs) - 1))]
             sprite.active_sprite = "plant"
             sprite.pos = (
@@ -196,6 +198,30 @@ class Terrain:
         self.space.remove(brick.body, brick.shape, brick.underlying_block.body, brick.underlying_block.shape)
         new_brick = self.get_block(old_x, old_y - brick.height)
         self.bricks[brick_idx] = new_brick
+
+    def load(self, data: List[Tuple[pymunk.Vec2d, str]]):
+        for brick in self.bricks:
+            if brick is None:
+                continue
+            self.space.remove(brick.body, brick.shape)
+            if brick.underlying_block is not None:
+                self.space.remove(brick.underlying_block.body, brick.underlying_block.shape)
+        self.bricks = []
+        for d in data:
+            name = d[1]
+            pos = d[0]
+            if name == "Flatland":
+                bl = TerrainBlock(pos.x, pos.y, self.space, self.sf, Flatland)
+                bl.set_underlying_block()
+                self.bricks.append(bl)
+            elif name == "Mountain":
+                bl = TerrainBlock(pos.x, pos.y, self.space, self.sf, Mountain)
+                bl.set_underlying_block()
+                self.bricks.append(bl)
+            elif name == "Swamp":
+                bl = TerrainBlock(pos.x, pos.y, self.space, self.sf, Swamp)
+                bl.set_underlying_block()
+                self.bricks.append(bl)
 
     def update(self, x_shift: float) -> None:
         lb = self.bricks[0]
