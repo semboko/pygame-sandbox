@@ -113,6 +113,7 @@ class VoxelWorld(AbstractPymunkScene):
                     self.objects.extend(resources)
 
     def render(self):
+        # self.display.fill((255, 255, 255))
         self.bg.render(self.display, self.camera_shift)
         for obj in self.objects:
             obj.render(self.display, self.camera_shift)
