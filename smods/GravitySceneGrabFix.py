@@ -19,7 +19,7 @@ class GravitySceneGrabFix(BaseMod):
     def start(self, *args, **kwargs):
         super(GravitySceneGrabFix, self).start(*args, **kwargs)
         self.scene: GravityScene = self.scene
-        if type(self.scene).__name__ != "GravityScene":
+        if type(self.scene).__name__ != "GravityScene" and type(self.scene).__name__ != "WaterScene":
             self.locked = True
 
     def handle_events(self, event: Event):

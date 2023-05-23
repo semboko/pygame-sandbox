@@ -1,14 +1,18 @@
+import pickle
 import random
 
 import pygame
 import pymunk
 from pygame.event import Event
 
+from scenes.components.resources import BaseResource
 from scenes.abstract import AbstractPymunkScene
 from scenes.components.player import Player
 from scenes.components.resources import *
-from scenes.components.terrain import Terrain
-from scenes.components.tile import Background, Tile
+from scenes.components.terrain import Terrain, TerrainBlock
+from scenes.components.biomes import BaseBiome, Flatland, Mountain, Swamp
+from scenes.components.sprite import Sprite
+from scenes.components.tile import Background
 from scenes.utils import convert
 
 pygame.init()
@@ -35,6 +39,12 @@ class VoxelWorld(AbstractPymunkScene):
         elif keys[pygame.K_d]:
             self.player.move(1)
             self.player.is_run = True
+        elif keys[pygame.K_LCTRL] and keys[pygame.K_s]:
+            print("saving...")
+            self.save()
+        elif keys[pygame.K_LCTRL] and keys[pygame.K_l]:
+            print("loading...")
+            self.load("save.g2")
         else:
             self.player.is_run = False
         self.player.update(self.space)
@@ -47,6 +57,37 @@ class VoxelWorld(AbstractPymunkScene):
                 self.player.consume_resource(obj)
                 self.objects.remove(obj)
                 self.space.remove(obj.rect.body, obj.rect.shape)
+
+    def save(self):
+        resources = [
+            o
+            for o in self.objects
+            if type(o).__base__ == BaseResource
+        ]
+        data = {
+            "player": {
+                "position": self.player.body.position,
+                "inventory": self.player.inv.icons,
+                "resources": resources
+            },
+            "terrain": [
+                o.save()
+                for o in self.floor.bricks
+            ]
+        }
+        with open("save.g2", "wb") as file:
+            pickle.dump(data, file)
+
+    def load(self, save_name: str):
+        with open(save_name, "rb") as file:
+            data = pickle.load(file)
+            self.player.body.position = data["player"]["position"]
+            self.player.inv.icons = data["player"]["inventory"]
+            self.floor.load(data["terrain"])
+            for resource in data["player"]["resources"]:
+                resource: BaseResource
+                self.objects.append(resource)
+                resource.materialize(resource.rect.body.position, self.space)
 
     def handle_event(self, event: Event) -> None:
         if event.type == pygame.KEYDOWN:

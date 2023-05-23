@@ -6,6 +6,7 @@ import pygame
 
 from mods.basemod import BaseMod
 from scenes.abstract import AbstractScene
+from scenes.water import WaterScene
 from scenes.carscene import CarScene
 
 # from scenes.CMS import CMS
