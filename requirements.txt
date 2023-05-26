@@ -5,5 +5,5 @@ pygame==2.1.2
 pymunk==6.4.0
 setuptools==60.2.0
 wheel==0.37.1
-noise~=1.2.2
+vnoise
 opencv-python~=4.7.0.72

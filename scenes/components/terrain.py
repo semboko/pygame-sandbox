@@ -4,7 +4,7 @@ from typing import Optional, Tuple, List
 
 import pygame
 import pymunk
-from noise.perlin import SimplexNoise
+from vnoise import Noise
 from pygame.surface import Surface
 from pymunk import Body, Space
 
@@ -55,7 +55,7 @@ class TerrainBlock(Rect):
         self.topobjs.append(obj)
 
     def save(self):
-        return self.body.position, type(self.biome).__name__
+        return self.body.position, self.biome.name
 
     def get_resources(self) -> Tuple[BaseResource]:
         result = []
@@ -114,7 +114,8 @@ class FalseTerrain:
 class Terrain:
     def __init__(self, x_min: int, x_max: int, y_min: int, y_max: int, steps: int, space: Space):
         self.space = space
-        self.noise = SimplexNoise()
+        self.noise = Noise()
+        self.noise.seed(random.uniform(1000, 100_000_000))
         self.sf = pymunk.ShapeFilter(group=0b0010, categories=0b1101)
         self.objects = []
         self.bricks = []
@@ -126,8 +127,8 @@ class Terrain:
             block = self.get_block(x, y_top)
             self.bricks.append(block)
 
-    def get_noise(self, x: float, noise=700) -> float:
-        return self.noise.noise2(x / noise, 0)
+    def get_noise(self, x: float, noise=560) -> float:
+        return self.noise.noise1(x / noise * 1.1, 1, 2, 190)
 
     def get_block(self, x: int, y: int = None) -> TerrainBlock:
         if not y:
@@ -139,7 +140,7 @@ class Terrain:
         block = TerrainBlock(x, y, self.space, self.sf, biome)
         if len(self.space.point_query((x, y), 1, pymunk.ShapeFilter())) > 1:
             block.body.body_type = pymunk.Body.STATIC
-        block.set_underlying_block()
+        # block.set_underlying_block()
         nv = abs(self.get_noise(x, 650))
         nv1 = abs(self.get_noise(x + TerrainBlock.width, 650))
         sprite = Sprite()
@@ -228,7 +229,7 @@ class Terrain:
         rb = self.bricks[-1]
 
         lbx = lb.body.position.x
-        if x_shift + 50 < lbx:
+        if x_shift - 50 < lbx:
             self.delete_block(rb, full=True)
             y_top = int(self.get_y(lbx - TerrainBlock.width))
             block = self.get_block(lbx - TerrainBlock.width, y_top)

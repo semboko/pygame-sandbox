@@ -1,4 +1,4 @@
-from smods import Animate, AudioLib, CMSmod, DebugMod, GravitySceneGrabFix, InfJump, rgbline, SaveVideo, UserData, Tas
+from smods import Animate, AudioLib, CMSmod, DebugMod, GravitySceneGrabFix, InfJump, SaveVideo, UserData, Tas, balldeb
 mods = [
     Animate.Animate,
     AudioLib.AudioLib,
@@ -6,10 +6,10 @@ mods = [
     DebugMod.DebugMod,
     GravitySceneGrabFix.GravitySceneGrabFix,
     InfJump.InfJump,
-    rgbline.rgbline,
     SaveVideo.SaveVideo,
     UserData.UserData,
     Tas.Tas,
+    balldeb.Balldeb
 ]
 # mods = [
 #     Animate.Animate,
