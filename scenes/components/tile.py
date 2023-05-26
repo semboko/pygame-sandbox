@@ -30,8 +30,15 @@ class Background:
         self.image_width = self.images[0].get_width()
         self.n = ceil(display_width / self.image_width) + 1
 
+        for i, image in enumerate(self.images):
+            image.convert_alpha()
+            full_image = pygame.Surface((self.image_width * (self.n + i), 500), pygame.SRCALPHA, 32)
+            full_image.convert_alpha()
+            for j in range(self.n + i):
+                full_image.blit(image, (self.image_width * j, 0))
+            self.images[i] = full_image
+
     def render(self, display: pygame.Surface, shift: pygame.Vector2) -> None:
         for image_idx, image in enumerate(self.images):
             layer_shift = (shift.x * (image_idx + 1) * 0.3) % self.image_width
-            for i in range(self.n + image_idx):
-                display.blit(image, (i * self.image_width - layer_shift, 0))
+            display.blit(image, (-layer_shift, 0))
