@@ -1,10 +1,9 @@
 import os
-import random
 from typing import Optional, Tuple, List
 
 import pygame
 import pymunk
-from noise.perlin import SimplexNoise
+import vnoise
 from pygame.surface import Surface
 from pymunk import Body, Space
 
@@ -114,7 +113,7 @@ class FalseTerrain:
 class Terrain:
     def __init__(self, x_min: int, x_max: int, y_min: int, y_max: int, steps: int, space: Space):
         self.space = space
-        self.noise = SimplexNoise()
+        self.noise = vnoise.Noise()
         self.sf = pymunk.ShapeFilter(group=0b0010, categories=0b1101)
         self.objects = []
         self.bricks = []
@@ -126,8 +125,9 @@ class Terrain:
             block = self.get_block(x, y_top)
             self.bricks.append(block)
 
-    def get_noise(self, x: float, noise=700) -> float:
-        return self.noise.noise2(x / noise, 0)
+    def get_noise(self, x: float, noise=1000) -> float:
+        # return self.noise.noise2(x / noise, 0)
+        return self.noise.noise1(x/noise)
 
     def get_block(self, x: int, y: int = None) -> TerrainBlock:
         if not y:
@@ -228,7 +228,7 @@ class Terrain:
         rb = self.bricks[-1]
 
         lbx = lb.body.position.x
-        if x_shift + 50 < lbx:
+        if x_shift - 50 < lbx:
             self.delete_block(rb, full=True)
             y_top = int(self.get_y(lbx - TerrainBlock.width))
             block = self.get_block(lbx - TerrainBlock.width, y_top)
