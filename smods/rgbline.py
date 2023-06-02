@@ -5,7 +5,7 @@ from typing import Sequence
 
 import pygame
 import pymunk
-from noise.perlin import SimplexNoise
+# from noise.perlin import SimplexNoise
 
 from mods.basemod import *
 from scenes.abstract import AbstractPymunkScene
