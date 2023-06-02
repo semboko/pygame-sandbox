@@ -66,10 +66,8 @@ class TerrainBlock(Rect):
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()
-        adj = pymunk.Vec2d(self.width / 2, -self.height / 2)
-        pos = self.body.position - adj - camera_shift
-
-        display.blit(self.biome.image, convert(pos, h))
+        dest = self.biome.image.get_rect(center=convert(self.body.position - camera_shift, h))
+        display.blit(self.biome.image, dest)
 
         if self.underlying_block:
             self.underlying_block.render(display, camera_shift)
@@ -127,7 +125,7 @@ class Terrain:
 
     def get_noise(self, x: float, noise=1000) -> float:
         # return self.noise.noise2(x / noise, 0)
-        return self.noise.noise1(x/noise)
+        return self.noise.noise1(x/noise) * 2
 
     def get_block(self, x: int, y: int = None) -> TerrainBlock:
         if not y:
@@ -139,36 +137,36 @@ class Terrain:
         block = TerrainBlock(x, y, self.space, self.sf, biome)
         if len(self.space.point_query((x, y), 1, pymunk.ShapeFilter())) > 1:
             block.body.body_type = pymunk.Body.STATIC
-        block.set_underlying_block()
-        nv = abs(self.get_noise(x, 650))
-        nv1 = abs(self.get_noise(x + TerrainBlock.width, 650))
-        sprite = Sprite()
-        if 0.5 < nv < 0.8:
-            sprite.add_sprite("flower", "assets/flower.png")
-            sprite.active_sprite = "flower"
-            sprite.pos = convert((x, y + 50), 500)
-            block.add_top_object(sprite)
-        elif 0.4 < nv < 0.6:
-            sprite.add_sprite("rock", "assets/rock.png")
-            sprite.active_sprite = "rock"
-            sprite.pos = convert((x - 10, y + 20), 500)
-            block.add_top_object(sprite)
-        if 0.4 < nv < 0.6 and not 0.4 < nv1 < 0.6 and not nv - 0.1 < nv1 < nv + 0.1:
-            sprite.imgs["tree"] = tree_imgs[int(nv * (len(tree_imgs) - 1))]
-            sprite.active_sprite = "tree"
-            sprite.pos = (
-                x - sprite.imgs["tree"].get_width() / 2,
-                (500 - block.body.position.y) - sprite.imgs["tree"].get_height(),
-            )
-            block.add_top_object(sprite)
-        if 0.4 < nv:
-            sprite.imgs["plant"] = plant_imgs[int(nv * (len(plant_imgs) - 1))]
-            sprite.active_sprite = "plant"
-            sprite.pos = (
-                x - sprite.imgs["plant"].get_width() / 2,
-                (500 - block.body.position.y) - sprite.imgs["plant"].get_height(),
-            )
-            block.add_top_object(sprite)
+        # block.set_underlying_block()
+        # nv = abs(self.get_noise(x, 650))
+        # nv1 = abs(self.get_noise(x + TerrainBlock.width, 650))
+        # sprite = Sprite()
+        # if 0.5 < nv < 0.8:
+        #     sprite.add_sprite("flower", "assets/flower.png")
+        #     sprite.active_sprite = "flower"
+        #     sprite.pos = convert((x, y + 50), 500)
+        #     block.add_top_object(sprite)
+        # elif 0.4 < nv < 0.6:
+        #     sprite.add_sprite("rock", "assets/rock.png")
+        #     sprite.active_sprite = "rock"
+        #     sprite.pos = convert((x - 10, y + 20), 500)
+        #     block.add_top_object(sprite)
+        # if 0.4 < nv < 0.6 and not 0.4 < nv1 < 0.6 and not nv - 0.1 < nv1 < nv + 0.1:
+        #     sprite.imgs["tree"] = tree_imgs[int(nv * (len(tree_imgs) - 1))]
+        #     sprite.active_sprite = "tree"
+        #     sprite.pos = (
+        #         x - sprite.imgs["tree"].get_width() / 2,
+        #         (500 - block.body.position.y) - sprite.imgs["tree"].get_height(),
+        #     )
+        #     block.add_top_object(sprite)
+        # if 0.4 < nv:
+        #     sprite.imgs["plant"] = plant_imgs[int(nv * (len(plant_imgs) - 1))]
+        #     sprite.active_sprite = "plant"
+        #     sprite.pos = (
+        #         x - sprite.imgs["plant"].get_width() / 2,
+        #         (500 - block.body.position.y) - sprite.imgs["plant"].get_height(),
+        #     )
+        #     block.add_top_object(sprite)
         return block
 
     def get_y(self, x: float) -> float:
@@ -176,9 +174,9 @@ class Terrain:
         return y - y % TerrainBlock.height
 
     def get_biome(self, noise_value: float) -> BaseBiome:
-        if noise_value > 0.8:
+        if noise_value > .8:
             return Mountain()
-        elif noise_value < -90:
+        elif noise_value < -.9:
             return Swamp()
         else:
             return Flatland()
@@ -249,3 +247,4 @@ class Terrain:
         # for i in range(self.x_min, self.x_max):
         #     col = max(min(int(self.get_noise(i) * 255), 255), 0)
         #     pygame.draw.rect(display, (col, col, col), (i-camera_shift.x, 500-self.get_noise(i)*(self.y_max-self.y_min)+camera_shift.y, 1, 1))
+
