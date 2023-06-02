@@ -47,7 +47,7 @@ class TerrainBlock(Rect):
         top_y = top_block_y - self.width / 2
         bottom_y = top_y - self.underlying_block_height
         y = (top_y + bottom_y) / 2
-        self.underlying_block = Rect(x, y, self.width, self.underlying_block_height, self.space)
+        self.underlying_block = Rect(x, y, self.width, self.underlying_block_height, self.space, color=(18, 78, 53))
         self.underlying_block.body.body_type = Body.STATIC
 
     def add_top_object(self, obj):
@@ -63,6 +63,9 @@ class TerrainBlock(Rect):
                 result.append(res())
         self.topobjs = []
         return tuple(result)
+
+    def __repr__(self):
+        return f"<TerrainBlock {self.body.position}>"
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()
@@ -123,7 +126,9 @@ class Terrain:
             block = self.get_block(x, y_top)
             self.bricks.append(block)
 
-    def get_noise(self, x: float, noise=1000) -> float:
+        print(self.bricks)
+
+    def get_noise(self, x: float, noise=700) -> float:
         # return self.noise.noise2(x / noise, 0)
         return self.noise.noise1(x/noise) * 2
 
@@ -137,36 +142,36 @@ class Terrain:
         block = TerrainBlock(x, y, self.space, self.sf, biome)
         if len(self.space.point_query((x, y), 1, pymunk.ShapeFilter())) > 1:
             block.body.body_type = pymunk.Body.STATIC
-        # block.set_underlying_block()
-        # nv = abs(self.get_noise(x, 650))
-        # nv1 = abs(self.get_noise(x + TerrainBlock.width, 650))
-        # sprite = Sprite()
-        # if 0.5 < nv < 0.8:
-        #     sprite.add_sprite("flower", "assets/flower.png")
-        #     sprite.active_sprite = "flower"
-        #     sprite.pos = convert((x, y + 50), 500)
-        #     block.add_top_object(sprite)
-        # elif 0.4 < nv < 0.6:
-        #     sprite.add_sprite("rock", "assets/rock.png")
-        #     sprite.active_sprite = "rock"
-        #     sprite.pos = convert((x - 10, y + 20), 500)
-        #     block.add_top_object(sprite)
-        # if 0.4 < nv < 0.6 and not 0.4 < nv1 < 0.6 and not nv - 0.1 < nv1 < nv + 0.1:
-        #     sprite.imgs["tree"] = tree_imgs[int(nv * (len(tree_imgs) - 1))]
-        #     sprite.active_sprite = "tree"
-        #     sprite.pos = (
-        #         x - sprite.imgs["tree"].get_width() / 2,
-        #         (500 - block.body.position.y) - sprite.imgs["tree"].get_height(),
-        #     )
-        #     block.add_top_object(sprite)
-        # if 0.4 < nv:
-        #     sprite.imgs["plant"] = plant_imgs[int(nv * (len(plant_imgs) - 1))]
-        #     sprite.active_sprite = "plant"
-        #     sprite.pos = (
-        #         x - sprite.imgs["plant"].get_width() / 2,
-        #         (500 - block.body.position.y) - sprite.imgs["plant"].get_height(),
-        #     )
-        #     block.add_top_object(sprite)
+        block.set_underlying_block()
+        nv = abs(self.get_noise(x, 650))
+        nv1 = abs(self.get_noise(x + TerrainBlock.width, 650))
+        sprite = Sprite()
+        if 0.5 < nv < 0.8:
+            sprite.add_sprite("flower", "assets/flower.png")
+            sprite.active_sprite = "flower"
+            sprite.pos = convert((x, y + 50), 500)
+            block.add_top_object(sprite)
+        elif 0.4 < nv < 0.6:
+            sprite.add_sprite("rock", "assets/rock.png")
+            sprite.active_sprite = "rock"
+            sprite.pos = convert((x - 10, y + 20), 500)
+            block.add_top_object(sprite)
+        if 0.4 < nv < 0.6 and not 0.4 < nv1 < 0.6 and not nv - 0.1 < nv1 < nv + 0.1:
+            sprite.imgs["tree"] = tree_imgs[int(nv * (len(tree_imgs) - 1))]
+            sprite.active_sprite = "tree"
+            sprite.pos = (
+                x - sprite.imgs["tree"].get_width() / 2,
+                (500 - block.body.position.y) - sprite.imgs["tree"].get_height(),
+            )
+            block.add_top_object(sprite)
+        if 0.4 < nv:
+            sprite.imgs["plant"] = plant_imgs[int(nv * (len(plant_imgs) - 1))]
+            sprite.active_sprite = "plant"
+            sprite.pos = (
+                x - sprite.imgs["plant"].get_width() / 2,
+                (500 - block.body.position.y) - sprite.imgs["plant"].get_height(),
+            )
+            block.add_top_object(sprite)
         return block
 
     def get_y(self, x: float) -> float:
@@ -231,9 +236,10 @@ class Terrain:
             y_top = int(self.get_y(lbx - TerrainBlock.width))
             block = self.get_block(lbx - TerrainBlock.width, y_top)
             self.bricks.insert(0, block)
+            return
 
         rbx = rb.body.position.x
-        if x_shift > rbx - 1505:
+        if x_shift > rbx - 1750:
             self.delete_block(lb, full=True)
             y_top = int(self.get_y(rbx + TerrainBlock.width))
             block = self.get_block(rbx + TerrainBlock.width, y_top)
