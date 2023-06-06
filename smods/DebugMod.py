@@ -1,23 +1,21 @@
-import pygame
-
-
 try:
     from smods.UserData import UserData
 except ImportError:
     print("install \"UserDataMenager\" mod")
     exit(1)
 
-from mods.basemod import *
 from datetime import datetime
 
-class DebugMod(BaseMod):
+from mods.basemod import *
 
+
+class DebugMod(BaseMod):
     name = "DebugMod"
     author = "Kolya142"
     logs: list = []
 
     def start(self, *args, **kwargs):
-        super(DebugMod, self).start(*args, **kwargs)
+        super(DebugMod, self).start()
         print("OnSetup")
         UserData.get_files("DebugMod")
 
@@ -32,7 +30,7 @@ class DebugMod(BaseMod):
     def handle_pressed_keys(self, keys: Sequence[bool]):
         self.logs.append(f'{datetime.now():%Y-%m-%d %H:%M:%S%z}: pressed({", ".join(map(str, keys))})')
 
-    def handle_events(self,event: Event):
+    def handle_events(self, event: Event):
         self.logs.append(f'{datetime.now():%Y-%m-%d %H:%M:%S%z}: event({event})')
 
     def quit(self, error: str = None):
