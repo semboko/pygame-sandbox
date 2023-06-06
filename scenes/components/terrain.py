@@ -115,7 +115,8 @@ class Terrain:
     def __init__(self, x_min: int, x_max: int, y_min: int, y_max: int, steps: int, space: Space):
         self.space = space
         self.noise = Noise()
-        self.noise.seed(random.uniform(1000, 100_000_000))
+        self.seed = int(random.uniform(1000, 100_000))
+        self.noise.seed(self.seed)
         self.sf = pymunk.ShapeFilter(group=0b0010, categories=0b1101)
         self.objects = []
         self.bricks = []
@@ -140,7 +141,7 @@ class Terrain:
         block = TerrainBlock(x, y, self.space, self.sf, biome)
         if len(self.space.point_query((x, y), 1, pymunk.ShapeFilter())) > 1:
             block.body.body_type = pymunk.Body.STATIC
-        # block.set_underlying_block()
+        block.set_underlying_block()
         nv = abs(self.get_noise(x, 650))
         nv1 = abs(self.get_noise(x + TerrainBlock.width, 650))
         sprite = Sprite()
@@ -197,8 +198,8 @@ class Terrain:
             return
         brick_idx = self.bricks.index(brick)
         self.space.remove(brick.body, brick.shape, brick.underlying_block.body, brick.underlying_block.shape)
-        new_brick = self.get_block(old_x, old_y - brick.height)
-        self.bricks[brick_idx] = new_brick
+        # new_brick = self.get_block(old_x, old_y - brick.height)
+        # self.bricks[brick_idx] = new_brick
 
     def load(self, data: List[Tuple[pymunk.Vec2d, str]]):
         for brick in self.bricks:
@@ -234,6 +235,7 @@ class Terrain:
             y_top = int(self.get_y(lbx - TerrainBlock.width))
             block = self.get_block(lbx - TerrainBlock.width, y_top)
             self.bricks.insert(0, block)
+            return
 
         rbx = rb.body.position.x
         if x_shift > rbx - 1505:

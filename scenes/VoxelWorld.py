@@ -23,7 +23,7 @@ class VoxelWorld(AbstractPymunkScene):
     def reset_scene(self):
         super().reset_scene()
         self.player = Player(250, 250, 50, 60, self.space, (25, 25, 25), True)
-        self.floor = Terrain(0, self.display.get_width(), 10, 200, 400, self.space)
+        self.floor = Terrain(0, self.display.get_width() + 100, 10, 200, 400, self.space)
         self.objects.extend((self.player, self.floor))
         self.menu_state = 0
         self.bg = Background(self.display.get_width())
@@ -68,7 +68,8 @@ class VoxelWorld(AbstractPymunkScene):
             "player": {
                 "position": self.player.body.position,
                 "inventory": self.player.inv.icons,
-                "resources": resources
+                "resources": resources,
+                "seed": self.floor.seed
             },
             "terrain": [
                 o.save()
@@ -81,13 +82,14 @@ class VoxelWorld(AbstractPymunkScene):
     def load(self, save_name: str):
         with open(save_name, "rb") as file:
             data = pickle.load(file)
-            self.player.body.position = data["player"]["position"]
-            self.player.inv.icons = data["player"]["inventory"]
-            self.floor.load(data["terrain"])
-            for resource in data["player"]["resources"]:
-                resource: BaseResource
-                self.objects.append(resource)
-                resource.materialize(resource.rect.body.position, self.space)
+        self.player.body.position = data["player"]["position"]
+        self.player.inv.icons = data["player"]["inventory"]
+        self.floor.noise.seed(data["player"]["seed"])
+        self.floor.load(data["terrain"])
+        for resource in data["player"]["resources"]:
+            resource: BaseResource
+            self.objects.append(resource)
+            resource.materialize(resource.rect.body.position, self.space)
 
     def handle_event(self, event: Event) -> None:
         if event.type == pygame.KEYDOWN:
