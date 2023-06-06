@@ -1,31 +1,39 @@
-import pygame
+try:
+    from smods.UserData import UserData
+except ImportError:
+    print("install \"UserDataMenager\" mod")
+    exit(1)
 
-import random
+from datetime import datetime
+
 from mods.basemod import *
 
 
 class DebugMod(BaseMod):
     name = "DebugMod"
     author = "Kolya142"
-    scenet = ""
+    logs: list = []
 
     def start(self, *args, **kwargs):
-        super(DebugMod, self).start(*args, **kwargs)
+        super(DebugMod, self).start()
         print("OnSetup")
-        self.scenet = type(self.scene).__name__
-        print(self.scenet)
+        UserData.get_files("DebugMod")
 
-    # def update(self) :
-    #     print("Update")
-    #
-    # def onrender(self) :
-    #     print("OnRender")
+    def update(self):
+        if len(self.logs) >= 700:
+            self.logs = []
+        self.logs.append(f'{datetime.now():%Y-%m-%d %H:%M:%S%z}: update()')
 
-    #     def handle_pressed_keys(self, keys: Sequence[bool]):
-    #         print(keys[pygame.K_a], keys[pygame.K_SPACE], keys[pygame.K_d])
+    def onrender(self):
+        self.logs.append(f'{datetime.now():%Y-%m-%d %H:%M:%S%z}: render()')
 
-    #     def handle_events(self,event: Event) :
-    #         print(f'event: {event}')
+    def handle_pressed_keys(self, keys: Sequence[bool]):
+        self.logs.append(f'{datetime.now():%Y-%m-%d %H:%M:%S%z}: pressed({", ".join(map(str, keys))})')
+
+    def handle_events(self, event: Event):
+        self.logs.append(f'{datetime.now():%Y-%m-%d %H:%M:%S%z}: event({event})')
 
     def quit(self, error: str = None):
-        print(f"quit \n{error}")
+        if error:
+            UserData.set_file("DebugMod", "log.txt", "\n".join(self.logs + ["error: " + str(error)]))
+        print(f'quit \n{error}')

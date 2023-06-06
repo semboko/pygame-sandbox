@@ -3,6 +3,7 @@ from typing import Optional, Tuple, List
 
 import pygame
 import pymunk
+from vnoise import Noise
 import vnoise
 from pygame.surface import Surface
 from pymunk import Body, Space
@@ -54,7 +55,7 @@ class TerrainBlock(Rect):
         self.topobjs.append(obj)
 
     def save(self):
-        return self.body.position, type(self.biome).__name__
+        return self.body.position, self.biome.name
 
     def get_resources(self) -> Tuple[BaseResource]:
         result = []

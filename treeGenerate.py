@@ -29,7 +29,7 @@ tree = get(10)
 # window.setup(1000, 1000, 0, 0)
 print(tree)
 EpsImagePlugin.gs_windows_binary = "C:/Program Files/gs/gs10.01.1/bin/gswin64c.exe"
-fc = 80
+fc = 20-0
 mfc = fc
 run = True
 mode = "fast" # norm, fast
