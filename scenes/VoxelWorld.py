@@ -14,6 +14,7 @@ from scenes.components.biomes import BaseBiome, Flatland, Mountain, Swamp
 from scenes.components.sprite import Sprite
 from scenes.components.tile import Background
 from scenes.utils import convert
+from log import logger
 
 pygame.init()
 pygame.font.init()
@@ -59,6 +60,7 @@ class VoxelWorld(AbstractPymunkScene):
                 self.space.remove(obj.rect.body, obj.rect.shape)
 
     def save(self):
+        logger.info("Saved into file")
         resources = [
             o
             for o in self.objects
