@@ -25,7 +25,7 @@ class VoxelWorld(AbstractPymunkScene):
     def reset_scene(self):
         super().reset_scene()
         self.player = Player(250, 250, 50, 60, self.space, (25, 25, 25), True)
-        self.floor = Terrain(0, self.display.get_width() + 100, 10, 200, 400, self.space)
+        self.floor = Terrain(0, self.display.get_width() + 200, 10, 200, 400, self.space)
         self.objects.extend((self.player, self.floor))
         self.menu_state = 0
         self.bg = Background(self.display.get_width())

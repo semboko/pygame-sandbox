@@ -1,10 +1,10 @@
 import os
-import random
 from typing import Optional, Tuple, List
 
 import pygame
 import pymunk
 from vnoise import Noise
+import vnoise
 from pygame.surface import Surface
 from pymunk import Body, Space
 
@@ -48,7 +48,7 @@ class TerrainBlock(Rect):
         top_y = top_block_y - self.width / 2
         bottom_y = top_y - self.underlying_block_height
         y = (top_y + bottom_y) / 2
-        self.underlying_block = Rect(x, y, self.width, self.underlying_block_height, self.space)
+        self.underlying_block = Rect(x, y, self.width, self.underlying_block_height, self.space, color=(18, 78, 53))
         self.underlying_block.body.body_type = Body.STATIC
 
     def add_top_object(self, obj):
@@ -65,12 +65,13 @@ class TerrainBlock(Rect):
         self.topobjs = []
         return tuple(result)
 
+    def __repr__(self):
+        return f"<TerrainBlock {self.body.position}>"
+
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         h = display.get_height()
-        adj = pymunk.Vec2d(self.width / 2, -self.height / 2)
-        pos = self.body.position - adj - camera_shift
-
-        display.blit(self.biome.image, convert(pos, h))
+        dest = self.biome.image.get_rect(center=convert(self.body.position - camera_shift, h))
+        display.blit(self.biome.image, dest)
 
         if self.underlying_block:
             self.underlying_block.render(display, camera_shift)
@@ -114,9 +115,7 @@ class FalseTerrain:
 class Terrain:
     def __init__(self, x_min: int, x_max: int, y_min: int, y_max: int, steps: int, space: Space):
         self.space = space
-        self.noise = Noise()
-        self.seed = int(random.uniform(1000, 100_000))
-        self.noise.seed(self.seed)
+        self.noise = vnoise.Noise()
         self.sf = pymunk.ShapeFilter(group=0b0010, categories=0b1101)
         self.objects = []
         self.bricks = []
@@ -128,8 +127,11 @@ class Terrain:
             block = self.get_block(x, y_top)
             self.bricks.append(block)
 
-    def get_noise(self, x: float, noise=560) -> float:
-        return self.noise.noise1(x / noise * 1.1, 1, 2, 190)
+        print(self.bricks)
+
+    def get_noise(self, x: float, noise=700) -> float:
+        # return self.noise.noise2(x / noise, 0)
+        return self.noise.noise1(x/noise) * 2
 
     def get_block(self, x: int, y: int = None) -> TerrainBlock:
         if not y:
@@ -178,9 +180,9 @@ class Terrain:
         return y - y % TerrainBlock.height
 
     def get_biome(self, noise_value: float) -> BaseBiome:
-        if noise_value > 0.8:
+        if noise_value > .8:
             return Mountain()
-        elif noise_value < -90:
+        elif noise_value < -.9:
             return Swamp()
         else:
             return Flatland()
@@ -198,8 +200,8 @@ class Terrain:
             return
         brick_idx = self.bricks.index(brick)
         self.space.remove(brick.body, brick.shape, brick.underlying_block.body, brick.underlying_block.shape)
-        # new_brick = self.get_block(old_x, old_y - brick.height)
-        # self.bricks[brick_idx] = new_brick
+        new_brick = self.get_block(old_x, old_y - brick.height)
+        self.bricks[brick_idx] = new_brick
 
     def load(self, data: List[Tuple[pymunk.Vec2d, str]]):
         for brick in self.bricks:
@@ -238,7 +240,7 @@ class Terrain:
             return
 
         rbx = rb.body.position.x
-        if x_shift > rbx - 1505:
+        if x_shift > rbx - 1750:
             self.delete_block(lb, full=True)
             y_top = int(self.get_y(rbx + TerrainBlock.width))
             block = self.get_block(rbx + TerrainBlock.width, y_top)
@@ -252,3 +254,4 @@ class Terrain:
         # for i in range(self.x_min, self.x_max):
         #     col = max(min(int(self.get_noise(i) * 255), 255), 0)
         #     pygame.draw.rect(display, (col, col, col), (i-camera_shift.x, 500-self.get_noise(i)*(self.y_max-self.y_min)+camera_shift.y, 1, 1))
+
