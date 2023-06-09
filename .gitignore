@@ -3,4 +3,4 @@
 venv
 __pycache__
 save.*
-log.txt
+log
