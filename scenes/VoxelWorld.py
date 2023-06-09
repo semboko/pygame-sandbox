@@ -13,7 +13,9 @@ from scenes.components.terrain import Terrain, TerrainBlock
 from scenes.components.biomes import BaseBiome, Flatland, Mountain, Swamp
 from scenes.components.sprite import Sprite
 from scenes.components.tile import Background
+from scenes.components.menu.main_menu import create_menu
 from scenes.utils import convert
+from log import logger
 
 pygame.init()
 pygame.font.init()
@@ -26,6 +28,7 @@ class VoxelWorld(AbstractPymunkScene):
         self.floor = Terrain(0, self.display.get_width() + 200, 10, 200, 400, self.space)
         self.objects.extend((self.player, self.floor))
         self.menu_state = 0
+        self.menu = create_menu(self.display)
         self.bg = Background(self.display.get_width())
 
     def update(self):
@@ -59,6 +62,7 @@ class VoxelWorld(AbstractPymunkScene):
                 self.space.remove(obj.rect.body, obj.rect.shape)
 
     def save(self):
+        logger.info("Saved into file")
         resources = [
             o
             for o in self.objects
@@ -103,11 +107,11 @@ class VoxelWorld(AbstractPymunkScene):
                 else:
                     self.menu_state = 0
             if event.key == pygame.K_q:
-                if self.menu_state != 1:
-                    self.menu_state = 1
-                else:
-                    self.menu_state = 0
+                self.menu.active = not self.menu.active
         if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.menu.active:
+                self.menu.handle_mouse(event)
+                return
             if event.button == pygame.BUTTON_LEFT:
                 pos = convert(event.pos, self.size_sc[1])
                 resources = self.player.mine(self.floor, self.camera_shift + pos)
@@ -127,3 +131,5 @@ class VoxelWorld(AbstractPymunkScene):
             text = f"position: {pos}, fps: {round(self.game.clock.get_fps(), 2)}"
             self.display.blit(font.render(text, True, (0, 0, 0)), (10, 10))
         self.player.inv.render(self.display)
+        if self.menu.active:
+            self.menu.render(self.display)

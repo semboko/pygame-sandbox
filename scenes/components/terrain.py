@@ -13,6 +13,7 @@ from scenes.components.rect import Rect
 from scenes.components.resources import BaseResource
 from scenes.components.sprite import Sprite
 from scenes.utils import convert
+from log import logger
 
 tree_imgs: List[Surface] = []
 tree_folder = os.getcwd() + "/assets/tree/"
