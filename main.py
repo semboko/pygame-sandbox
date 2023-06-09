@@ -1,4 +1,6 @@
 import os
+import traceback
+import types
 from pickle import load as pload
 from typing import List, Optional, Sequence, Type
 
@@ -13,6 +15,7 @@ from scenes.carscene import CarScene
 from scenes.constraints import ConstraintScene
 from scenes.gravity import GravityScene
 from scenes.VoxelWorld import VoxelWorld
+from log import create_logger
 
 
 class Game:
@@ -22,6 +25,8 @@ class Game:
         self.scene: Optional[AbstractScene] = None
         self.mods: List[BaseMod] = []
         self.clock = pygame.time.Clock()
+        self.log = create_logger("main", "./log/main.log")
+        self.glog = create_logger("game", "./log/game.log")
         self.fps = 60
 
     def __enter__(self):
@@ -31,17 +36,21 @@ class Game:
         return self
 
     def __exit__(self, exc_class, exc_message, traceback_obj):
+        if exc_message:
+            eror = f'error class({exc_class}), message({exc_message}), traceback(\n{traceback_obj.tb_frame.f_locals}\n)'
+            self.glog.error(eror)
+            self.log.error(eror)
         for mod in self.mods:
             mod.quit(exc_message)
         pygame.quit()
         pygame.mixer.quit()
 
     def load_scene(self, scene: Type[AbstractScene]):
-        self.scene = scene(self.sc, self.fps, self)
+        self.scene = scene(self.sc, self.fps, self.glog, self.clock)
 
     def load_mods(self, mods: List[Type[BaseMod]]) -> None:
         for Mod in mods:
-            m = Mod(self.sc, self.scene, self.clock)
+            m = Mod(self.sc, self.scene, self.clock, self.glog)
             print(f"mod loading: {m.name} by {m.author}")
             self.mods.append(m)
 
@@ -53,7 +62,13 @@ class Game:
             mod.start()
         while True:
             for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    self.log.debug(f'key down \'{event.unicode}\'')
+                if event.type == pygame.KEYUP:
+                    self.log.debug(f'key up \'{event.unicode}\'')
                 if event.type == pygame.QUIT:
+                    if event.type == pygame.KEYDOWN:
+                        self.log.debug(f'quit')
                     for mod in self.mods:
                         mod.quit()
                     return

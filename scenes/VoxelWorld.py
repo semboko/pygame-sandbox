@@ -5,6 +5,7 @@ import pygame
 import pymunk
 from pygame.event import Event
 
+from scenes.components import Ball
 from scenes.components.resources import BaseResource
 from scenes.abstract import AbstractPymunkScene
 from scenes.components.player import Player
@@ -14,6 +15,7 @@ from scenes.components.biomes import BaseBiome, Flatland, Mountain, Swamp
 from scenes.components.sprite import Sprite
 from scenes.components.tile import Background
 from scenes.utils import convert
+from log import create_logger
 
 pygame.init()
 pygame.font.init()
@@ -27,6 +29,7 @@ class VoxelWorld(AbstractPymunkScene):
         self.objects.extend((self.player, self.floor))
         self.menu_state = 0
         self.bg = Background(self.display.get_width())
+        self.log = create_logger("voxel world", "./log/vw.log")
 
     def update(self):
         if 0 <= self.menu_state <= 1:
@@ -76,6 +79,8 @@ class VoxelWorld(AbstractPymunkScene):
                 for o in self.floor.bricks
             ]
         }
+        self.log.info("save")
+        self.dlog.info("save")
         with open("save.g2", "wb") as file:
             pickle.dump(data, file)
 
@@ -90,6 +95,8 @@ class VoxelWorld(AbstractPymunkScene):
             resource: BaseResource
             self.objects.append(resource)
             resource.materialize(resource.rect.body.position, self.space)
+        self.log.info("load")
+        self.dlog.info("load")
 
     def handle_event(self, event: Event) -> None:
         if event.type == pygame.KEYDOWN:
@@ -108,6 +115,11 @@ class VoxelWorld(AbstractPymunkScene):
                 else:
                     self.menu_state = 0
         if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.dict["button"] == 3:
+                self.log.debug(f'tryning create ball')
+                pos = convert(event.pos, self.size_sc[1])
+                self.objects.append(Ball(pos[0] + self.camera_shift.x, pos[1] + self.camera_shift.y, 15, self.space))
+                self.log.debug(f'ball created in {self.objects[-1].body.position}')
             if event.button == pygame.BUTTON_LEFT:
                 pos = convert(event.pos, self.size_sc[1])
                 resources = self.player.mine(self.floor, self.camera_shift + pos)
@@ -124,6 +136,6 @@ class VoxelWorld(AbstractPymunkScene):
         if 1 <= self.menu_state <= 2:
             font = pygame.font.SysFont("Comic Sans MS", 30)
             pos = " ".join([str(round(i, 2)) for i in list(self.player.body.position)])
-            text = f"position: {pos}, fps: {round(self.game.clock.get_fps(), 2)}"
+            text = f"position: {pos}, fps: {round(self.clock.get_fps(), 2)}"
             self.display.blit(font.render(text, True, (0, 0, 0)), (10, 10))
         self.player.inv.render(self.display)

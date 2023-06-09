@@ -1,7 +1,9 @@
+import logging
 from abc import ABC
 from logging import getLogger
 from typing import Any, List
 
+import pygame.time
 import pymunk
 from pygame.event import Event
 from pygame.surface import Surface
@@ -10,11 +12,12 @@ log = getLogger()
 
 
 class AbstractScene(ABC):
-    def __init__(self, display: Surface, fps: int, game) -> None:
+    def __init__(self, display: Surface, fps: int, dlog: logging.Logger, clock: pygame.time.Clock) -> None:
         self.display: Surface = display
         self.size_sc: tuple = display.get_size()
         self.fps: int = fps
-        self.game = game
+        self.clock = clock
+        self.dlog = dlog
 
     def handle_event(self, event: Event) -> None:
         raise NotImplementedError()

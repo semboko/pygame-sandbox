@@ -1,5 +1,7 @@
+import logging
 from typing import Sequence
 
+import pygame.time
 from pygame.event import Event
 from pygame.surface import Surface
 from pygame.time import Clock
@@ -11,11 +13,12 @@ class BaseMod:
     name: str = "Mod"
     author: str = "Author"
 
-    def __init__(self, display: Sequence, scene: AbstractScene, clock: Clock):
+    def __init__(self, display: Sequence, scene: AbstractScene, clock: Clock, dlog: logging.Logger):
         self.disp = display
         self.scene = scene
         self.clock = clock
         self.mods = []
+        self.dlog = dlog
 
     def get_mod(self, name):
         for i in self.mods:
