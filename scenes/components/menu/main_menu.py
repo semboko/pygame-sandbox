@@ -32,9 +32,16 @@ class MainMenu(AbstractMenu):
             return
         if event.key == pygame.K_BACKSPACE:
             self._active_input.text = self._active_input.text[:-1]
+            self._active_input.move_cursor(-1)
+        if event.key == pygame.K_LEFT:
+            self._active_input.move_cursor(-1)
+            return
+        if event.key == pygame.K_RIGHT:
+            self._active_input.move_cursor(1)
             return
         if event.unicode in printable:
-            self._active_input.text += event.unicode
+            self._active_input.add_text(event.unicode)
+            self._active_input.move_cursor(1)
 
 
 def create_menu(display: Surface) -> MainMenu:
