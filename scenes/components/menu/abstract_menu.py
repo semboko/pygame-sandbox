@@ -4,6 +4,8 @@ from pygame.event import Event
 from pygame.rect import Rect
 from pygame.font import Font
 
+RGB = Tuple[int, int, int]
+
 
 class AbstractMenuElement:
     surface: Surface
@@ -26,6 +28,9 @@ class AbstractMenu:
         self.elements = []
 
     def handle_mouse(self, event: Event):
+        pass
+
+    def handle_keyboard(self, event: Event):
         pass
 
     def add_element(self, el: AbstractMenuElement) -> None:

@@ -108,6 +108,10 @@ class VoxelWorld(AbstractPymunkScene):
                     self.menu_state = 0
             if event.key == pygame.K_q:
                 self.menu.active = not self.menu.active
+
+            if self.menu.active:
+                self.menu.handle_keyboard(event)
+
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.menu.active:
                 self.menu.handle_mouse(event)

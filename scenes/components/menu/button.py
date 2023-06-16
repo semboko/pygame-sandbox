@@ -1,11 +1,8 @@
 import pygame
 from pygame.surface import Surface
 from pygame.font import Font, SysFont
-from scenes.components.menu.abstract_menu import AbstractMenuElement
+from scenes.components.menu.abstract_menu import AbstractMenuElement, RGB
 from typing import Tuple, Callable
-
-
-RGB = Tuple[int, int, int]
 
 
 class Button(AbstractMenuElement):
