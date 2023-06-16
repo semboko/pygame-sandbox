@@ -15,6 +15,7 @@ from scenes.components.sprite import Sprite
 from scenes.components.tile import Background
 from scenes.utils import convert
 from log import logger
+from scenes.components.menu.main_menu import create_menu
 
 pygame.init()
 pygame.font.init()
@@ -26,11 +27,11 @@ class VoxelWorld(AbstractPymunkScene):
         self.player = Player(250, 250, 50, 60, self.space, (25, 25, 25), True)
         self.floor = Terrain(0, self.display.get_width() + 200, 10, 200, 400, self.space)
         self.objects.extend((self.player, self.floor))
-        self.menu_state = 0
         self.bg = Background(self.display.get_width())
+        self.menu = create_menu()
 
     def update(self):
-        if 0 <= self.menu_state <= 1:
+        if not self.menu.active:
             super().update()
         self.player.body.angle = 0
         keys = pygame.key.get_pressed()
@@ -52,6 +53,7 @@ class VoxelWorld(AbstractPymunkScene):
 
         self.camera_shift = pymunk.Vec2d(self.player.body.position.x - 250, self.player.body.position.y - 250)
         self.floor.update(self.camera_shift.x)
+        self.menu.elements[1] = self.menu.fps[round(self.game.clock.get_fps(), 1)] if self.game.clock.get_fps() > 10 else self.menu.fps[60]
 
         for obj in self.objects:
             if issubclass(type(obj), BaseResource) and self.player.shape.shapes_collide(obj.rect.shape).points:
@@ -100,15 +102,11 @@ class VoxelWorld(AbstractPymunkScene):
             if event.key == pygame.K_SPACE:
                 self.player.jump(self.floor.space)
             if event.key == pygame.K_ESCAPE:
-                if self.menu_state != 2:
-                    self.menu_state = 2
-                else:
-                    self.menu_state = 0
-            if event.key == pygame.K_q:
-                if self.menu_state != 1:
-                    self.menu_state = 1
-                else:
-                    self.menu_state = 0
+                self.menu.active = not self.menu.active
+        if event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEMOTION, pygame.MOUSEBUTTONUP):
+            self.menu.handle_mouse(event)
+        if event.type == pygame.KEYDOWN:
+            self.menu.handle_keyboard(event)
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == pygame.BUTTON_LEFT:
                 pos = convert(event.pos, self.size_sc[1])
@@ -123,9 +121,6 @@ class VoxelWorld(AbstractPymunkScene):
         for p in self.player.dp:
             pos = [p.x - self.camera_shift[0], p.y + self.camera_shift[1]]
             pygame.draw.circle(self.display, (255, 0, 0), pos, 10)
-        if 1 <= self.menu_state <= 2:
-            font = pygame.font.SysFont("Comic Sans MS", 30)
-            pos = " ".join([str(round(i, 2)) for i in list(self.player.body.position)])
-            text = f"position: {pos}, fps: {round(self.game.clock.get_fps(), 2)}"
-            self.display.blit(font.render(text, True, (0, 0, 0)), (10, 10))
+        if self.menu.active:
+            self.menu.render(self.display)
         self.player.inv.render(self.display)

@@ -16,9 +16,9 @@ class Tas(BaseMod):
         super(Tas, self).start(*args, **kwargs)
 
     def update(self):
-        self.get_mod("SaveVideo").active_sprite = (self.scene.menu_state!=2)
+        self.get_mod("SaveVideo").active = (not self.scene.menu.active)
         if self.on:
-            if not pygame.key.get_pressed()[pygame.K_KP4] and self.scene.menu_state != 2:
+            if not pygame.key.get_pressed()[pygame.K_KP4] and not self.scene.menu.active:
                 self.names.append(self.get_mod("SaveVideo").nam)
                 self.Poses.append(convert(self.scene.player.body.position, self.scene.size_sc[1]))
             if pygame.key.get_pressed()[pygame.K_KP6] :
