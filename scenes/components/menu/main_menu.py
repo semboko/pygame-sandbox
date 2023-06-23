@@ -9,6 +9,7 @@ from pygame.surface import Surface
 from scenes.components.menu.abstract_menu import AbstractMenu
 from scenes.components.menu.button import Button
 from scenes.components.menu.text_input import TextInput
+from scenes.components.menu.comands_history import CommandsHistory
 
 
 class MainMenu(AbstractMenu):
@@ -16,6 +17,9 @@ class MainMenu(AbstractMenu):
         super().__init__()
         self._active_input: Optional[TextInput] = None
         self._commands_buffer: List[str] = []
+
+        self.commands_history: List[str] = []
+        self._commands_history_cursor = 0
 
     def handle_mouse(self, event: Event):
         self._active_input = None
@@ -47,6 +51,12 @@ class MainMenu(AbstractMenu):
         if event.unicode in printable:
             self._active_input.add_text(event.unicode)
             self._active_input.move_cursor(1)
+        if event.key == pygame.K_UP:
+            self._commands_history_cursor -= 1
+            self._active_input.text = self.commands_history[self._commands_history_cursor]
+        if event.key == pygame.K_DOWN:
+            self._commands_history_cursor += 1
+            self._active_input.text = self.commands_history[self._commands_history_cursor]
 
     def next_command(self):
         return None if len(self._commands_buffer) == 0 else self._commands_buffer.pop(0)
@@ -59,17 +69,18 @@ class MainMenu(AbstractMenu):
         if command is not None:
             print("Print from main: " + command)
             self._commands_buffer.append(command)
+            self.commands_history.append(command)
 
 
 def create_menu(display: Surface) -> MainMenu:
     menu = MainMenu()
     menu.add_element(Button(V2(0, 0), V2(100, 50), "Exit game", (150, 150, 150), (10, 10, 10), exit))
-    menu.add_element(
-        TextInput(V2(20, display.get_height() - 70), V2(600, 50), (150, 150, 150), (10, 10, 10)), label="command_line"
-    )
+    text_input = TextInput(V2(20, display.get_height() - 70), V2(600, 50), (150, 150, 150), (10, 10, 10))
+    menu.add_element(text_input, label="command_line")
     menu.add_element(
         Button(
             V2(630, display.get_height() - 70), V2(100, 50), "Enter", (150, 150, 150), (10, 10, 10), menu.enter_command
         )
     )
+    menu.add_element(CommandsHistory(text_input, 300, menu.commands_history))
     return menu

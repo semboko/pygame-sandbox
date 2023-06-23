@@ -29,6 +29,12 @@ class VoxelWorld(AbstractPymunkScene):
         self.commands_buffer: List[str] = []
         self.bg = Background(self.display.get_width())
 
+    def execute_command(self, command: str):
+        if command.startswith("sg"):
+            _, x, y = command.split(" ")
+            self.space.gravity = float(x), float(y)
+        print("Print from scene:" + command)
+
     def update(self):
         if 0 <= self.menu_state <= 1:
             super().update()
@@ -61,11 +67,8 @@ class VoxelWorld(AbstractPymunkScene):
 
         command = self.menu.next_command()
         if command:
+            self.execute_command(command)
             self.commands_buffer.append(command)
-            if command.startswith("sg"):
-                _, x, y = command.split(" ")
-                self.space.gravity = float(x), float(y)
-            print("Print from scene:" + command)
 
     def save(self):
         logger.info("Saved into file")

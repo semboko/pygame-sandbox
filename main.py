@@ -13,6 +13,10 @@ from scenes.constraints import ConstraintScene
 from scenes.gravity import GravityScene
 from scenes.VoxelWorld import VoxelWorld
 from scenes.water import WaterScene
+from logging import getLogger
+
+
+logger = getLogger()
 
 
 class Game:
@@ -52,30 +56,33 @@ class Game:
         for mod in self.mods:
             mod.start()
         while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+            try:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        for mod in self.mods:
+                            mod.quit()
+                        return
+                    self.scene.handle_event(event)
                     for mod in self.mods:
-                        mod.quit()
-                    return
-                self.scene.handle_event(event)
+                        mod.handle_pressed_keys(pygame.key.get_pressed())
+                    for mod in self.mods:
+                        mod.handle_events(event)
+                self.scene.update()
                 for mod in self.mods:
-                    mod.handle_pressed_keys(pygame.key.get_pressed())
-                for mod in self.mods:
-                    mod.handle_events(event)
-            self.scene.update()
-            for mod in self.mods:
-                mod.update()
+                    mod.update()
 
-            command_to_handle = self.scene.next_command()
-            if command_to_handle is not None:
-                for mod in self.mods:
-                    mod.handle_command(command_to_handle)
+                command_to_handle = self.scene.next_command()
+                if command_to_handle is not None:
+                    for mod in self.mods:
+                        mod.handle_command(command_to_handle)
 
-            self.scene.render()
-            for mod in self.mods:
-                mod.onrender()
-            pygame.display.update()
-            self.clock.tick(self.fps)
+                self.scene.render()
+                for mod in self.mods:
+                    mod.onrender()
+                pygame.display.update()
+                self.clock.tick(self.fps)
+            except Exception as e:
+                logger.error(f"Encountered a problem {e}")
 
 
 def read_mods(local_dir: str) -> List[Type[BaseMod]]:
