@@ -1,9 +1,11 @@
 import pickle
 import random
+from typing import List
 
 import pygame
 import pymunk
 from pygame.event import Event
+from re import fullmatch as rematch
 
 from scenes.components.resources import BaseResource
 from scenes.abstract import AbstractPymunkScene
@@ -16,6 +18,7 @@ from scenes.components.tile import Background
 from scenes.utils import convert
 from log import logger
 from scenes.components.menu.main_menu import create_menu
+from clparser import Parser, Token
 
 pygame.init()
 pygame.font.init()
@@ -28,7 +31,9 @@ class VoxelWorld(AbstractPymunkScene):
         self.floor = Terrain(0, self.display.get_width() + 200, 10, 200, 400, self.space)
         self.objects.extend((self.player, self.floor))
         self.bg = Background(self.display.get_width())
-        self.menu = create_menu()
+        self.menu = create_menu(self.display)
+        self._commands_buffer: List[str] = []
+        self._pars = Parser()
 
     def update(self):
         if not self.menu.active:
@@ -50,10 +55,14 @@ class VoxelWorld(AbstractPymunkScene):
         else:
             self.player.is_run = False
         self.player.update(self.space)
+        command = self.menu.pop_buffer()
+        if command:
+            print("command: " + command)
+            self._commands_buffer.append(command)
+            self.handle_command()
 
         self.camera_shift = pymunk.Vec2d(self.player.body.position.x - 250, self.player.body.position.y - 250)
         self.floor.update(self.camera_shift.x)
-        self.menu.elements[1] = self.menu.fps[round(self.game.clock.get_fps(), 1)] if self.game.clock.get_fps() > 10 else self.menu.fps[60]
 
         for obj in self.objects:
             if issubclass(type(obj), BaseResource) and self.player.shape.shapes_collide(obj.rect.shape).points:
@@ -95,9 +104,24 @@ class VoxelWorld(AbstractPymunkScene):
             self.objects.append(resource)
             resource.materialize(resource.rect.body.position, self.space)
 
+    def handle_command(self):
+        command = self._commands_buffer[-1]
+        self._pars.set_line(command)
+        token = self._pars.get_tokens()
+        if not token:
+            return
+        token = token[0]
+        print(f"VoxelWorld, handle_command, token is ({token.__str__()})")
+
+        value: List[Token] = token.value
+
+        if token.type == "call" and value[0] == "set" and value[1] == "gravity" and value[2].type == "Number":
+            gravity = value[2].value
+            self.space.gravity = pymunk.Vec2d(self.space.gravity.x, -gravity)
+
     def handle_event(self, event: Event) -> None:
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_r:
+            if event.key == pygame.K_r and not self.menu.active:
                 self.reset_scene()
             if event.key == pygame.K_SPACE:
                 self.player.jump(self.floor.space)
@@ -124,3 +148,7 @@ class VoxelWorld(AbstractPymunkScene):
         if self.menu.active:
             self.menu.render(self.display)
         self.player.inv.render(self.display)
+
+    def pop_buffer(self) -> Optional[str]:
+        return None if len(self._commands_buffer) == 0 else self._commands_buffer.pop(0)
+

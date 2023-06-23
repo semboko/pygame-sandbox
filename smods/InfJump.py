@@ -7,7 +7,7 @@ from scenes import VoxelWorld
 class InfJump(BaseMod):
     name = "InfJump"
     author = "Kolya142"
-    locked = False
+    locked = True
 
     def start(self, *args, **kwargs):
         super(InfJump, self).start(*args, **kwargs)
@@ -22,3 +22,7 @@ class InfJump(BaseMod):
             )
             if keys[pygame.K_SPACE] and not rc:
                 self.scene.player.body.apply_impulse_at_local_point((0, 400000), (0, 0))
+
+    def handle_command(self, command: str):
+        if command.lower() == "infj":
+            self.locked = not self.locked

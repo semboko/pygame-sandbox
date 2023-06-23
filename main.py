@@ -65,6 +65,10 @@ class Game:
             self.scene.update()
             for mod in self.mods:
                 mod.update()
+            command = self.scene.pop_buffer()
+            if command:
+                for mod in self.mods:
+                    mod.handle_command(command)
             self.scene.render()
             for mod in self.mods:
                 mod.onrender()

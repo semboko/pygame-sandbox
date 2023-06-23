@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Tuple, Dict
 
 from pygame import Rect
 from pygame.event import Event
@@ -19,7 +19,7 @@ class AbstractMenuElement:
 
 class AbstractMenu:
     active: bool = False
-    elements: List[AbstractMenuElement] = []
+    elements: Dict[str, AbstractMenuElement] = {}
 
     def __init__(self):
         self.active = False
@@ -29,9 +29,9 @@ class AbstractMenu:
     def handle_mouse(self, event: Event):
         pass
 
-    def add_element(self, el: AbstractMenuElement):
-        self.elements.append(el)
+    def add_element(self, el: AbstractMenuElement, name: str):
+        self.elements[name] = el
 
     def render(self, display: Surface):
-        for element in self.elements:
-          element.render(display)
+        for element in self.elements.values():
+            element.render(display)

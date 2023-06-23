@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 import pygame.font
 
@@ -16,8 +16,8 @@ pygame.font.init()
 class MainMenu(AbstractMenu):
     def __init__(self):
         super().__init__()
-        self.fps = {}
         self._active_input: Optional[TextInput] = None
+        self._commands_buffer: List[str] = []
 
     def handle_keyboard(self, event: Event):
         if not self._active_input:
@@ -42,7 +42,7 @@ class MainMenu(AbstractMenu):
     def handle_mouse(self, event: Event):
         if not self.active:
             return
-        for element in self.elements:
+        for element in self.elements.values():
             # .......................................................................................
             if event.type == pygame.MOUSEBUTTONDOWN:
 
@@ -76,13 +76,20 @@ class MainMenu(AbstractMenu):
         display.blit(s, (0, 0))
         super().render(display)
 
+    def enter_command(self):
+        command_input = self.elements["Command line"]
+        if command_input.text is not None:
+            self._commands_buffer.append(command_input.text)
+        command_input.text = ""
 
-def create_menu() -> MainMenu:
+    def pop_buffer(self) -> Optional[str]:
+        return None if len(self._commands_buffer) == 0 else self._commands_buffer.pop(0)
+
+
+def create_menu(display: Surface) -> MainMenu:
     menu = MainMenu()
-    menu.add_element(Button(Vector2(0, 0), Vector2(90, 45), "Exit", (150, 150, 150), (50, 50, 50), quit, 100))
-    menu.add_element(Label(Vector2(110, 10), Vector2(210, 45), "Fps: 60.51", (150, 150, 150), 100))
-    menu.fps = {v / 10: Label(Vector2(110, 10), Vector2(210, 45), f"Fps: {v / 10}", (150, 150, 150), 100) for v in
-                range(1, 1000)}
-    menu.add_element(TextInput(Vector2(510, 10), Vector2(510, 45), (150, 150, 150), 50))
-    menu.add_element(TextInput(Vector2(510, 55), Vector2(510, 45), (150, 150, 150), 50))
+    menu.add_element(Button(Vector2(0, 0), Vector2(90, 45), "Exit", (150, 150, 150), (50, 50, 50), quit, 100), "Exit")
+    menu.add_element(TextInput(Vector2(20, display.get_height()-70),
+                               Vector2(600, 50), (150, 150, 150), 50), "Command line")
+    menu.add_element(Button(Vector2(630, display.get_height()-70), Vector2(90, 45), "Enter", (150, 150, 150), (50, 50, 50), menu.enter_command, 100), "Enter")
     return menu

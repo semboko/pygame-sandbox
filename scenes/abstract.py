@@ -1,6 +1,6 @@
 from abc import ABC
 from logging import getLogger
-from typing import Any, List
+from typing import Any, List, Optional
 
 import pymunk
 from pygame.event import Event
@@ -10,6 +10,8 @@ log = getLogger()
 
 
 class AbstractScene(ABC):
+    _commands_buffer: List[str]
+
     def __init__(self, display: Surface, fps: int, game) -> None:
         self.display: Surface = display
         self.size_sc: tuple = display.get_size()
@@ -23,6 +25,9 @@ class AbstractScene(ABC):
         raise NotImplementedError()
 
     def render(self):
+        raise NotImplementedError()
+
+    def pop_buffer(self) -> Optional[str]:
         raise NotImplementedError()
 
 

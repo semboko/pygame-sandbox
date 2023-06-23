@@ -47,7 +47,7 @@ class CMSmod(BaseMod):
             self.locked = True
         self.gm = self.get_maps()
         y = 30
-        self.buttons = [pygame.rect.Rect((20, y + i * 30, 80, 20)) for i in range(len(self.gm))]
+        self.buttons = [pygame.rect.Rect((self.scene.display.get_width() - 100, y + i * 30, 80, 20)) for i in range(len(self.gm))]
         self.scene: VoxelWorld
         # self.buttons[0].on_click(self.buttons[0].text)
         # self.get_map(self.mapr)
@@ -197,7 +197,7 @@ class CMSmod(BaseMod):
                             json.dump(dt, mf)
                 exit()
 
-            if event.key == pygame.K_r:
+            if event.key == pygame.K_r and not self.scene.menu.active:
                 self.inits()
 
     def onrender(self):

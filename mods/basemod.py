@@ -22,6 +22,9 @@ class BaseMod:
             if i.name == name:
                 return i
 
+    def handle_command(self, command: str):
+        pass
+
     def start(self):
         pass
 
