@@ -15,12 +15,16 @@ class AbstractScene(ABC):
         self.size_sc: tuple = display.get_size()
         self.fps: int = fps
         self.game = game
+        self.commands_buffer: List[str] = []
 
     def handle_event(self, event: Event) -> None:
         raise NotImplementedError()
 
     def update(self):
         raise NotImplementedError()
+
+    def next_command(self):
+        return None if len(self.commands_buffer) == 0 else self.commands_buffer.pop(0)
 
     def render(self):
         raise NotImplementedError()

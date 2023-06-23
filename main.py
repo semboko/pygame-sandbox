@@ -65,6 +65,12 @@ class Game:
             self.scene.update()
             for mod in self.mods:
                 mod.update()
+
+            command_to_handle = self.scene.next_command()
+            if command_to_handle is not None:
+                for mod in self.mods:
+                    mod.handle_command(command_to_handle)
+
             self.scene.render()
             for mod in self.mods:
                 mod.onrender()

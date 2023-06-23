@@ -1,5 +1,5 @@
 from pygame.surface import Surface
-from typing import List, Tuple
+from typing import List, Tuple, Optional, Dict
 from pygame.event import Event
 from pygame.rect import Rect
 from pygame.font import Font
@@ -26,6 +26,7 @@ class AbstractMenu:
     def __init__(self):
         self.active = False
         self.elements = []
+        self.elements_dict: Dict[str, AbstractMenuElement] = {}
 
     def handle_mouse(self, event: Event):
         pass
@@ -33,8 +34,10 @@ class AbstractMenu:
     def handle_keyboard(self, event: Event):
         pass
 
-    def add_element(self, el: AbstractMenuElement) -> None:
+    def add_element(self, el: AbstractMenuElement, label: Optional[str] = None) -> None:
         self.elements.append(el)
+        if label is not None:
+            self.elements_dict[label] = el
 
     def render(self, display: Surface):
         for element in self.elements:

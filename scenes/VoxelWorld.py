@@ -1,17 +1,13 @@
 import pickle
-import random
 
 import pygame
 import pymunk
 from pygame.event import Event
-
-from scenes.components.resources import BaseResource
+from typing import List
 from scenes.abstract import AbstractPymunkScene
 from scenes.components.player import Player
 from scenes.components.resources import *
-from scenes.components.terrain import Terrain, TerrainBlock
-from scenes.components.biomes import BaseBiome, Flatland, Mountain, Swamp
-from scenes.components.sprite import Sprite
+from scenes.components.terrain import Terrain
 from scenes.components.tile import Background
 from scenes.components.menu.main_menu import create_menu
 from scenes.utils import convert
@@ -29,6 +25,7 @@ class VoxelWorld(AbstractPymunkScene):
         self.objects.extend((self.player, self.floor))
         self.menu_state = 0
         self.menu = create_menu(self.display)
+        self.commands_buffer: List[str] = []
         self.bg = Background(self.display.get_width())
 
     def update(self):
@@ -60,6 +57,14 @@ class VoxelWorld(AbstractPymunkScene):
                 self.player.consume_resource(obj)
                 self.objects.remove(obj)
                 self.space.remove(obj.rect.body, obj.rect.shape)
+
+        command = self.menu.next_command()
+        if command:
+            self.commands_buffer.append(command)
+            if command.startswith("sg"):
+                _, x, y = command.split(" ")
+                self.space.gravity = float(x), float(y)
+            print("Print from scene:" + command)
 
     def save(self):
         logger.info("Saved into file")

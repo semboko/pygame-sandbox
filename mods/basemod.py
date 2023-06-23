@@ -37,5 +37,8 @@ class BaseMod:
     def handle_pressed_keys(self, keys: Sequence[bool]):
         pass
 
+    def handle_command(self, command: str):
+        pass
+
     def quit(self, error: str = None):
         pass

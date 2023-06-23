@@ -14,6 +14,7 @@ class MainMenu(AbstractMenu):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self._active_input: Optional[TextInput] = None
+        self._commands_buffer: List[str] = []
 
     def handle_mouse(self, event: Event):
         self._active_input = None
@@ -39,14 +40,29 @@ class MainMenu(AbstractMenu):
         if event.key == pygame.K_RIGHT:
             self._active_input.move_cursor(1)
             return
+        if event.key == pygame.K_RETURN and self._active_input == self.elements_dict["command_line"]:
+            self.enter_command()
+            return
         if event.unicode in printable:
             self._active_input.add_text(event.unicode)
             self._active_input.move_cursor(1)
+
+    def next_command(self):
+        return None if len(self._commands_buffer) == 0 else self._commands_buffer.pop(0)
+
+    def enter_command(self):
+        command_input = self.elements_dict["command_line"]
+        command = getattr(command_input, "text", None)
+        command_input.text = ""
+        command_input.cursor = 0
+        if command is not None:
+            print("Print from main: " + command)
+            self._commands_buffer.append(command)
 
 
 def create_menu(display: Surface) -> MainMenu:
     menu = MainMenu()
     menu.add_element(Button(V2(0, 0), V2(100, 50), "Exit game", (150, 150, 150), (10, 10, 10), exit))
-    menu.add_element(TextInput(V2(0, 60), V2(200, 50), (150, 150, 150), (10, 10, 10)))
-    menu.add_element(TextInput(V2(0, 110), V2(200, 50), (150, 150, 150), (10, 10, 10)))
+    menu.add_element(TextInput(V2(20, display.get_height() - 70), V2(600, 50), (150, 150, 150), (10, 10, 10)), label="command_line")
+    menu.add_element(Button(V2(630, display.get_height() - 70), V2(100, 50), "Enter", (150, 150, 150), (10, 10, 10), menu.enter_command))
     return menu
