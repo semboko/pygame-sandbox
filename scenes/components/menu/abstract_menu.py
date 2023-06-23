@@ -1,8 +1,9 @@
-from pygame.surface import Surface
-from typing import List, Tuple, Optional, Dict
+from typing import Dict, List, Optional, Tuple
+
 from pygame.event import Event
-from pygame.rect import Rect
 from pygame.font import Font
+from pygame.rect import Rect
+from pygame.surface import Surface
 
 RGB = Tuple[int, int, int]
 

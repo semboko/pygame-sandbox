@@ -3,4 +3,5 @@ def ddd(cms_mod):
     cms_mod.get_mod("InfJump").locked = False
     cms_mod.updates = []
 
+
 self.updates = [ddd]

@@ -1,10 +1,10 @@
 import pygame
-
-from scenes.components.menu.abstract_menu import AbstractMenuElement, RGB
-from pygame.surface import Surface
-from pygame.rect import Rect
-from pygame.math import Vector2
 from pygame.font import SysFont
+from pygame.math import Vector2
+from pygame.rect import Rect
+from pygame.surface import Surface
+
+from scenes.components.menu.abstract_menu import RGB, AbstractMenuElement
 
 
 class TextInput(AbstractMenuElement):
@@ -33,7 +33,7 @@ class TextInput(AbstractMenuElement):
         self.cursor += dx
 
     def add_text(self, txt: str):
-        self.text = self.text[:self.cursor] + txt + self.text[self.cursor:]
+        self.text = self.text[: self.cursor] + txt + self.text[self.cursor :]
 
     def render(self, display: Surface) -> None:
         # text_rect = self.text_surface.get_rect(center=self.size / 2)
@@ -43,7 +43,7 @@ class TextInput(AbstractMenuElement):
             pygame.draw.rect(self.surface, self.outline, Rect((0, 0), self.rect.size), 1)
 
         text_img = self.font.render(self.text, True, (0, 0, 0))
-        self.surface.blit(text_img, (0, self.rect.height/2 - text_img.get_height()/2))
+        self.surface.blit(text_img, (0, self.rect.height / 2 - text_img.get_height() / 2))
 
         self.frames += 1
         self.frames %= 30

@@ -5,12 +5,14 @@ from typing import Sequence
 
 import pygame
 import pymunk
-# from noise.perlin import SimplexNoise
 
 from mods.basemod import *
 from scenes.abstract import AbstractPymunkScene
 from scenes.components import Ball, Segment, rect
 from scenes.utils import *
+
+# from noise.perlin import SimplexNoise
+
 
 
 def HUEtoRGB(n: float):

@@ -1,13 +1,14 @@
-import pygame
-
 from string import printable
-from scenes.components.menu.abstract_menu import AbstractMenu
+from typing import List, Optional
+
+import pygame
+from pygame import Vector2 as V2
 from pygame.event import Event
+from pygame.surface import Surface
+
+from scenes.components.menu.abstract_menu import AbstractMenu
 from scenes.components.menu.button import Button
 from scenes.components.menu.text_input import TextInput
-from pygame import Vector2 as V2
-from typing import Optional, List
-from pygame.surface import Surface
 
 
 class MainMenu(AbstractMenu):
@@ -63,6 +64,12 @@ class MainMenu(AbstractMenu):
 def create_menu(display: Surface) -> MainMenu:
     menu = MainMenu()
     menu.add_element(Button(V2(0, 0), V2(100, 50), "Exit game", (150, 150, 150), (10, 10, 10), exit))
-    menu.add_element(TextInput(V2(20, display.get_height() - 70), V2(600, 50), (150, 150, 150), (10, 10, 10)), label="command_line")
-    menu.add_element(Button(V2(630, display.get_height() - 70), V2(100, 50), "Enter", (150, 150, 150), (10, 10, 10), menu.enter_command))
+    menu.add_element(
+        TextInput(V2(20, display.get_height() - 70), V2(600, 50), (150, 150, 150), (10, 10, 10)), label="command_line"
+    )
+    menu.add_element(
+        Button(
+            V2(630, display.get_height() - 70), V2(100, 50), "Enter", (150, 150, 150), (10, 10, 10), menu.enter_command
+        )
+    )
     return menu

@@ -1,4 +1,5 @@
-from smods import Animate, AudioLib, CMSmod, DebugMod, GravitySceneGrabFix, InfJump, SaveVideo, UserData, Tas
+from smods import Animate, AudioLib, CMSmod, DebugMod, GravitySceneGrabFix, InfJump, SaveVideo, Tas, UserData
+
 mods = [
     # Animate.Animate,
     # AudioLib.AudioLib,

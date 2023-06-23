@@ -1,17 +1,18 @@
 import pickle
+from typing import List
 
 import pygame
 import pymunk
 from pygame.event import Event
-from typing import List
+
+from log import logger
 from scenes.abstract import AbstractPymunkScene
+from scenes.components.menu.main_menu import create_menu
 from scenes.components.player import Player
 from scenes.components.resources import *
 from scenes.components.terrain import Terrain
 from scenes.components.tile import Background
-from scenes.components.menu.main_menu import create_menu
 from scenes.utils import convert
-from log import logger
 
 pygame.init()
 pygame.font.init()
@@ -68,22 +69,15 @@ class VoxelWorld(AbstractPymunkScene):
 
     def save(self):
         logger.info("Saved into file")
-        resources = [
-            o
-            for o in self.objects
-            if type(o).__base__ == BaseResource
-        ]
+        resources = [o for o in self.objects if type(o).__base__ == BaseResource]
         data = {
             "player": {
                 "position": self.player.body.position,
                 "inventory": self.player.inv.icons,
                 "resources": resources,
-                "seed": self.floor.seed
+                "seed": self.floor.seed,
             },
-            "terrain": [
-                o.save()
-                for o in self.floor.bricks
-            ]
+            "terrain": [o.save() for o in self.floor.bricks],
         }
         with open("save.g2", "wb") as file:
             pickle.dump(data, file)

@@ -1,19 +1,19 @@
 import os
-from typing import Optional, Tuple, List
+from typing import List, Optional, Tuple
 
 import pygame
 import pymunk
-from vnoise import Noise
 import vnoise
 from pygame.surface import Surface
 from pymunk import Body, Space
+from vnoise import Noise
 
+from log import logger
 from scenes.components.biomes import BaseBiome, Flatland, Mountain, Swamp
 from scenes.components.rect import Rect
 from scenes.components.resources import BaseResource
 from scenes.components.sprite import Sprite
 from scenes.utils import convert
-from log import logger
 
 tree_imgs: List[Surface] = []
 tree_folder = os.getcwd() + "/assets/tree/"
@@ -132,7 +132,7 @@ class Terrain:
 
     def get_noise(self, x: float, noise=700) -> float:
         # return self.noise.noise2(x / noise, 0)
-        return self.noise.noise1(x/noise) * 2
+        return self.noise.noise1(x / noise) * 2
 
     def get_block(self, x: int, y: int = None) -> TerrainBlock:
         if not y:
@@ -181,9 +181,9 @@ class Terrain:
         return y - y % TerrainBlock.height
 
     def get_biome(self, noise_value: float) -> BaseBiome:
-        if noise_value > .8:
+        if noise_value > 0.8:
             return Mountain()
-        elif noise_value < -.9:
+        elif noise_value < -0.9:
             return Swamp()
         else:
             return Flatland()
@@ -255,4 +255,3 @@ class Terrain:
         # for i in range(self.x_min, self.x_max):
         #     col = max(min(int(self.get_noise(i) * 255), 255), 0)
         #     pygame.draw.rect(display, (col, col, col), (i-camera_shift.x, 500-self.get_noise(i)*(self.y_max-self.y_min)+camera_shift.y, 1, 1))
-

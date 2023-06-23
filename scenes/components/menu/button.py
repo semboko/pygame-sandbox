@@ -1,12 +1,16 @@
+from typing import Callable, Tuple
+
 import pygame
-from pygame.surface import Surface
 from pygame.font import Font, SysFont
-from scenes.components.menu.abstract_menu import AbstractMenuElement, RGB
-from typing import Tuple, Callable
+from pygame.surface import Surface
+
+from scenes.components.menu.abstract_menu import RGB, AbstractMenuElement
 
 
 class Button(AbstractMenuElement):
-    def __init__(self, pos: pygame.Vector2, size: pygame.Vector2, text: str, fill: RGB, outline: RGB, callback: Callable):
+    def __init__(
+        self, pos: pygame.Vector2, size: pygame.Vector2, text: str, fill: RGB, outline: RGB, callback: Callable
+    ):
         self.outline = outline
         self.size = size
 
@@ -18,6 +22,6 @@ class Button(AbstractMenuElement):
         self.callback = callback
 
     def render(self, display: Surface) -> None:
-        text_rect = self.text_surface.get_rect(center=self.size/2)
+        text_rect = self.text_surface.get_rect(center=self.size / 2)
         self.surface.blit(self.text_surface, text_rect)
         display.blit(self.surface, self.rect)

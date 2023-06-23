@@ -6,13 +6,13 @@ import pygame
 
 from mods.basemod import BaseMod
 from scenes.abstract import AbstractScene
-from scenes.water import WaterScene
 from scenes.carscene import CarScene
 
 # from scenes.CMS import CMS
 from scenes.constraints import ConstraintScene
 from scenes.gravity import GravityScene
 from scenes.VoxelWorld import VoxelWorld
+from scenes.water import WaterScene
 
 
 class Game:
@@ -80,6 +80,7 @@ class Game:
 
 def read_mods(local_dir: str) -> List[Type[BaseMod]]:
     from smods import mods
+
     return mods
 
 

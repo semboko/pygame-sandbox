@@ -1,8 +1,8 @@
 import pygame
-from scenes.components.ball import Ball
-from scenes.utils import *
 
 from mods.basemod import *
+from scenes.components.ball import Ball
+from scenes.utils import *
 
 
 class Balldeb(BaseMod):
@@ -19,4 +19,6 @@ class Balldeb(BaseMod):
             if event.dict["button"] == 3 and not self.locked:
                 pos = convert(event.pos, self.scene.size_sc[1])
                 print((pos[0] - self.scene.camera_shift.x, pos[1] - self.scene.camera_shift.x))
-                self.scene.objects.append(Ball(pos[0] + self.scene.camera_shift.x, pos[1] + self.scene.camera_shift.y, 15, self.scene.space))
+                self.scene.objects.append(
+                    Ball(pos[0] + self.scene.camera_shift.x, pos[1] + self.scene.camera_shift.y, 15, self.scene.space)
+                )

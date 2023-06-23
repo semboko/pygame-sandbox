@@ -1,8 +1,8 @@
 import pygame
 import pymunk
 
-from scenes.utils import convert
 from mods.basemod import *
+from scenes.utils import convert
 
 
 class Tas(BaseMod):
@@ -16,18 +16,18 @@ class Tas(BaseMod):
         super(Tas, self).start(*args, **kwargs)
 
     def update(self):
-        self.get_mod("SaveVideo").active_sprite = (self.scene.menu_state!=2)
+        self.get_mod("SaveVideo").active_sprite = self.scene.menu_state != 2
         if self.on:
             if not pygame.key.get_pressed()[pygame.K_KP4] and self.scene.menu_state != 2:
                 self.names.append(self.get_mod("SaveVideo").nam)
                 self.Poses.append(convert(self.scene.player.body.position, self.scene.size_sc[1]))
-            if pygame.key.get_pressed()[pygame.K_KP6] :
+            if pygame.key.get_pressed()[pygame.K_KP6]:
                 self.on = False
                 self.names = []
                 self.Poses = []
-            if pygame.key.get_pressed()[pygame.K_KP5] :
+            if pygame.key.get_pressed()[pygame.K_KP5]:
                 self.clock.tick(25)
-            if pygame.key.get_pressed()[pygame.K_KP4] :
+            if pygame.key.get_pressed()[pygame.K_KP4]:
                 self.clock.tick(46)
                 if self.get_mod("SaveVideo").nam != 0 and len(self.names) != 0:
                     pr = self.names.pop()
@@ -35,12 +35,11 @@ class Tas(BaseMod):
                     self.get_mod("SaveVideo").remover(pr)
                 if len(self.Poses) != 0:
                     self.scene.player.body.position = convert(self.Poses.pop(), self.scene.size_sc[1])
-        if pygame.key.get_pressed()[pygame.K_KP3] :
+        if pygame.key.get_pressed()[pygame.K_KP3]:
             self.on = True
 
     def onrender(self):
-
         camera_shift = self.scene.camera_shift
         camera_shift = pymunk.Vec2d(-camera_shift.x, camera_shift.y)
         for i in self.Poses:
-            pygame.draw.circle(self.disp, (0, 255, 0), (i[0], i[1])+camera_shift, 3)
+            pygame.draw.circle(self.disp, (0, 255, 0), (i[0], i[1]) + camera_shift, 3)
