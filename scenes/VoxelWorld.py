@@ -13,6 +13,7 @@ from scenes.components.resources import *
 from scenes.components.terrain import Terrain
 from scenes.components.tile import Background
 from scenes.utils import convert
+from connection.manager import ConnectionManager
 
 pygame.init()
 pygame.font.init()
@@ -28,11 +29,15 @@ class VoxelWorld(AbstractPymunkScene):
         self.menu = create_menu(self.display)
         self.commands_buffer: List[str] = []
         self.bg = Background(self.display.get_width())
+        self.connection_manager = ConnectionManager("165.232.46.161", 3010)
 
     def execute_command(self, command: str):
         if command.startswith("sg"):
             _, x, y = command.split(" ")
             self.space.gravity = float(x), float(y)
+        if command.startswith("msg"):
+            _, message = command.split(" ")
+            self.connection_manager.send_chat_message(message)
         print("Print from scene:" + command)
 
     def update(self):
@@ -69,6 +74,9 @@ class VoxelWorld(AbstractPymunkScene):
         if command:
             self.execute_command(command)
             self.commands_buffer.append(command)
+
+        if received_message := self.connection_manager.receive_chat_message():
+            self.menu.commands_history.append("Received: " + received_message)
 
     def save(self):
         logger.info("Saved into file")

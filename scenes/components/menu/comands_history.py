@@ -18,7 +18,8 @@ class CommandsHistory(AbstractMenuElement):
         self.font = pygame.font.SysFont("Arial", 16)
 
     def render(self, display: Surface) -> None:
-        y = self.surface.get_height()
+        y = self.surface.get_height() - 20
+        self.surface.fill((100, 100, 100, 108))
         for entry in reversed(self.history):
             command_img = self.font.render(entry, True, (0, 0, 0))
             self.surface.blit(command_img, (20, y - command_img.get_height()))
