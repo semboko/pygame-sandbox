@@ -19,6 +19,8 @@ from scenes.utils import convert
 from log import logger
 from scenes.components.menu.main_menu import create_menu
 from clparser import Parser, Token
+from servconnction.menage import ConnectionManager
+
 
 pygame.init()
 pygame.font.init()
@@ -34,6 +36,7 @@ class VoxelWorld(AbstractPymunkScene):
         self.menu = create_menu(self.display)
         self._commands_buffer: List[str] = []
         self._pars = Parser()
+        self.connection_menager = ConnectionManager("localhost", 6379)
 
     def update(self):
         if not self.menu.active:
@@ -114,6 +117,13 @@ class VoxelWorld(AbstractPymunkScene):
         print(f"VoxelWorld, handle_command, token is ({token.__str__()})")
 
         value: List[Token] = token.value
+
+        if token.type == "call1" and value[0] == "msg":
+            self.connection_menager.send_chat_message(value[1].value)
+            return
+
+        if value[2] is None:
+            return
 
         if token.type == "call" and value[0] == "set" and value[1] == "gravity" and value[2].type == "Number":
             gravity = value[2].value

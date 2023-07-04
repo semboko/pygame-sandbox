@@ -7,6 +7,7 @@ from pygame.event import Event
 from scenes.components.menu.button import Button
 from scenes.components.menu.label import Label
 from scenes.components.menu.text_input import TextInput
+from scenes.components.menu.commands_history import CommandsHistory
 from pygame import Vector2, Surface
 from log import logger
 
@@ -18,6 +19,9 @@ class MainMenu(AbstractMenu):
         super().__init__()
         self._active_input: Optional[TextInput] = None
         self._commands_buffer: List[str] = []
+        self.commands_history: List[str] = []
+        self._commands_history_cursor = 0
+        self._element_count = 0
 
     def handle_keyboard(self, event: Event):
         if not self._active_input:
@@ -28,10 +32,21 @@ class MainMenu(AbstractMenu):
             if element.cursor >= 0:
                 element.text = element.text[:element.cursor] + element.text[element.cursor+1:]
                 element.cursor -= 1
+        elif event.key == pygame.K_UP:
+            if len(self._commands_history) > 0 and self._commands_history_cursor - 1 >= 0:
+                self._commands_history_cursor -= 1
+                self.elements["Command line"].text = self._commands_history[self._commands_history_cursor]
+        elif event.key == pygame.K_DOWN:
+            if len(self._commands_history) > 0 and self._commands_history_cursor + 1 < len(self._commands_history):
+                self._commands_history_cursor += 1
+                self.elements["Command line"].text = self._commands_history[self._commands_history_cursor]
+
         # elif event.key in (pygame.K_ESCAPE, pygame.K_LCTRL, pygame.K_RCTRL, pygame.K_KP_ENTER, pygame.K_RETURN):
         #     pass
         elif event.key in (pygame.K_RIGHT, pygame.K_LEFT):
             element.move_cursor(-1 if event.key == pygame.K_LEFT else 1)
+        elif event.key == pygame.K_RETURN:
+            self.enter_command()
         else:
             logger.info(f'main menu: UNIC({event.unicode})')
             element.cursor += len(event.unicode)
@@ -80,6 +95,10 @@ class MainMenu(AbstractMenu):
         command_input = self.elements["Command line"]
         if command_input.text is not None:
             self._commands_buffer.append(command_input.text)
+            self.commands_history.append(command_input.text)
+            self._commands_history_cursor = len(self.commands_history)
+            self._element_count += 1
+
         command_input.text = ""
 
     def pop_buffer(self) -> Optional[str]:
@@ -91,5 +110,6 @@ def create_menu(display: Surface) -> MainMenu:
     menu.add_element(Button(Vector2(0, 0), Vector2(90, 45), "Exit", (150, 150, 150), (50, 50, 50), quit, 100), "Exit")
     menu.add_element(TextInput(Vector2(20, display.get_height()-70),
                                Vector2(600, 50), (150, 150, 150), 50), "Command line")
+    menu.add_element(CommandsHistory(menu.elements["Command line"], 300, menu.commands_history), "cmdhis")
     menu.add_element(Button(Vector2(630, display.get_height()-70), Vector2(90, 45), "Enter", (150, 150, 150), (50, 50, 50), menu.enter_command, 100), "Enter")
     return menu

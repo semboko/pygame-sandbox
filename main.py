@@ -8,6 +8,7 @@ from mods.basemod import BaseMod
 from scenes.abstract import AbstractScene
 from scenes.water import WaterScene
 from scenes.carscene import CarScene
+from log import logger
 
 # from scenes.CMS import CMS
 from scenes.constraints import ConstraintScene
@@ -52,26 +53,29 @@ class Game:
         for mod in self.mods:
             mod.start()
         while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+            try:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        for mod in self.mods:
+                            mod.quit()
+                        return
+                    self.scene.handle_event(event)
                     for mod in self.mods:
-                        mod.quit()
-                    return
-                self.scene.handle_event(event)
+                        mod.handle_pressed_keys(pygame.key.get_pressed())
+                    for mod in self.mods:
+                        mod.handle_events(event)
+                self.scene.update()
                 for mod in self.mods:
-                    mod.handle_pressed_keys(pygame.key.get_pressed())
+                    mod.update()
+                command = self.scene.pop_buffer()
+                if command:
+                    for mod in self.mods:
+                        mod.handle_command(command)
+                self.scene.render()
                 for mod in self.mods:
-                    mod.handle_events(event)
-            self.scene.update()
-            for mod in self.mods:
-                mod.update()
-            command = self.scene.pop_buffer()
-            if command:
-                for mod in self.mods:
-                    mod.handle_command(command)
-            self.scene.render()
-            for mod in self.mods:
-                mod.onrender()
+                    mod.onrender()
+            except Exception as e:
+                logger.error(f"Encountered a problem {e}")
             pygame.display.update()
             self.clock.tick(self.fps)
 

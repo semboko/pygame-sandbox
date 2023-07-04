@@ -15,9 +15,10 @@ class Label(AbstractMenuElement):
         self.text = text
         self.size = size
         self.pos = pos
-        text_ = SysFont(get_default_font(), detail).render(self.text, True, self.fill)
-        text_ = pygame.transform.scale(text_, self.size//2)
-        self.surface = text_
+        text_ = SysFont(get_default_font(), detail).render(self.text, True, (50, 50, 50))
+        self.surface = pygame.Surface(size)
+        self.surface.fill(fill)
+        self.surface.blit(text_, (3, 3))
 
     def render(self, display: Surface):
         display.blit(self.surface, self.pos)

@@ -23,6 +23,7 @@ class Parser:
     string = re.compile(r'"(\w*)"')
     null = re.compile(r'\s')
     func = re.compile(r'(\w+) (\w+),\s*(.+)')
+    func_one = re.compile(r'(\w+) (.+)')
 
     def __init__(self, line: str = None):
         self._code = line
@@ -52,9 +53,14 @@ class Parser:
             if n:
                 line = line[len(n.group(0)):]
             func = self.func.match(line)
+            func_one = self.func_one.match(line)
             if func:
                 # print(func.groups(), "g")
                 tokens.append(Token("call", (func.group(1), func.group(2), self.get_token(func.group(3)))))
+                line = line[len(func.group(0)):]
+            elif func_one:
+                func = func_one
+                tokens.append(Token("call1", (func.group(1), self.get_token(func.group(2)))))
                 line = line[len(func.group(0)):]
             else:
                 logger.warning(f'have problems in token parser, not detect function, info: '
