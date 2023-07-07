@@ -1,4 +1,5 @@
 import time
+import uuid
 from enum import Enum
 from typing import Tuple
 
@@ -11,6 +12,8 @@ from scenes.components.rect import Rect
 from scenes.components.resources import *
 from scenes.components.sprite import Sprite
 from scenes.components.terrain import Terrain
+from dataclasses import dataclass
+from uuid import UUID
 
 
 class PlayerState(Enum):
@@ -18,6 +21,14 @@ class PlayerState(Enum):
     RUN = "run"
     FALL = "fall"
     MINE = "mine"
+
+
+@dataclass
+class PlayerMessage:
+    player_id: UUID
+    player_pos: pymunk.Vec2d
+    player_direction: int
+    player_state: PlayerState
 
 
 class Player(Rect):
@@ -41,6 +52,7 @@ class Player(Rect):
         self.state = PlayerState.IDLE
         self.animation_time = 0
         self.moves = 1
+        self.id = kwargs.get("id_") or uuid.uuid4()
 
     def move(self, direction: int):
         if direction != self.moves:
@@ -100,3 +112,22 @@ class Player(Rect):
 
     def consume_resource(self, res: BaseResource) -> None:
         self.inv.pickup(res)
+
+    def get_message(self) -> PlayerMessage:
+        return PlayerMessage(
+            player_id=self.id,
+            player_pos=self.body.position,
+            player_direction=self.direction,
+            player_state=self.state,
+        )
+
+    @classmethod
+    def build_from_message(cls, message: PlayerMessage, space: Space) -> 'Player':
+        return Player(
+            id_=message.player_id,
+            x=message.player_pos.x,
+            y=message.player_pos.y,
+            width=50,
+            height=50,
+            space=space,
+        )

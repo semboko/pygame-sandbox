@@ -17,6 +17,7 @@ class Rect:
         space: pymunk.Space,
         color: Tuple[int, int, int] = (255, 0, 0),
         debug: bool = False,
+        **kwargs,
     ) -> None:
         self.color = color
         self.debug = debug

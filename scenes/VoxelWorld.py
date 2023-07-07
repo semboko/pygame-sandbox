@@ -14,6 +14,7 @@ from scenes.components.terrain import Terrain
 from scenes.components.tile import Background
 from scenes.utils import convert
 from connection.manager import ConnectionManager
+from scenes.components.player_pool import PlayerPool
 
 pygame.init()
 pygame.font.init()
@@ -29,7 +30,8 @@ class VoxelWorld(AbstractPymunkScene):
         self.menu = create_menu(self.display)
         self.commands_buffer: List[str] = []
         self.bg = Background(self.display.get_width())
-        self.connection_manager = ConnectionManager("165.232.46.161", 3010)
+        self.connection_manager = ConnectionManager("0.0.0.0", 5020)
+        self.remote_players = PlayerPool(self.connection_manager, self.space)
 
     def execute_command(self, command: str):
         if command.startswith("sg"):
@@ -75,8 +77,17 @@ class VoxelWorld(AbstractPymunkScene):
             self.execute_command(command)
             self.commands_buffer.append(command)
 
-        if received_message := self.connection_manager.receive_chat_message():
-            self.menu.commands_history.append("Received: " + received_message)
+        # if received_message := self.connection_manager.receive_chat_message():
+        #     self.menu.commands_history.append("Received: " + received_message)
+
+        self.connection_manager.send_player_message(self.player)
+        message = self.connection_manager.receive_player_message()
+        if message is not None and message.player_id != self.player.id:
+            if message.player_id not in self.remote_players.pool:
+                self.remote_players.add_player(message)
+            else:
+                self.remote_players.update_player(message)
+        self.remote_players.update()
 
     def save(self):
         logger.info("Saved into file")
@@ -147,3 +158,4 @@ class VoxelWorld(AbstractPymunkScene):
         self.player.inv.render(self.display)
         if self.menu.active:
             self.menu.render(self.display)
+        self.remote_players.render(self.display, self.camera_shift)
