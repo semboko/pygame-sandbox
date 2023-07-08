@@ -19,25 +19,23 @@ class PlayerPool:
         self.last_update: Dict[UUID, float] = {}
         self.space = space
 
-    def update(self):
-        message = self.connection_manager.receive_player_message
-
     def add_player(self, message: PlayerMessage):
         player = Player.build_from_message(message, self.space)
-        print(f'added player {message}')
+        print(f'added player: {message}')
         self.pool[message.player_id] = player
         self.last_update[message.player_id] = time.time()
 
     def cleanup(self):
         t = time.time()
-        for player in list(self.pool.values()):
-            if t - self.last_update[player.id] > 10:
-                del self.pool[player.id]
-                del self.last_update[player.id]
+        for id_ in self.pool:
+            if self.last_update[id_] + 10 < t:
+                print(f'deleted player: uuid.UUID({id_})')
+                del self.pool[id_]
+                del self.last_update[id_]
 
     def render(self, display: pygame.Surface, camera_shift: pymunk.Vec2d):
         for player in self.pool:
-            self.pool[player].render(display, camera_shift)
+            # self.pool[player].render(display, camera_shift)
             pos = convert(self.pool[player].body.position - camera_shift,
                           display.get_height())
             pygame.draw.rect(display, (0, 0, 251), (*pos - pymunk.Vec2d(25, 25), *(50, 50)))

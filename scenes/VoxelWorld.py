@@ -1,5 +1,6 @@
 import pickle
 import random
+import time
 from typing import List
 
 import pygame
@@ -68,6 +69,8 @@ class VoxelWorld(AbstractPymunkScene):
         self.camera_shift = pymunk.Vec2d(self.player.body.position.x - 250, self.player.body.position.y - 250)
         self.floor.update(self.camera_shift.x)
         self.connection_menager.send_player_message(self.player)
+        self.remote_players.cleanup()
+        # print(self.remote_players.last_update, time.time())
         # print(self.remote_players.pool)
         message = self.connection_menager.receive_player_message()
         while message:
@@ -162,8 +165,6 @@ class VoxelWorld(AbstractPymunkScene):
 
     def render(self):
         self.bg.render(self.display, self.camera_shift)
-        for i in self.remote_players.pool:
-            print(i, self.remote_players.pool[i].body.position)
         self.remote_players.render(self.display, self.camera_shift)
         for obj in self.objects:
             obj.render(self.display, self.camera_shift)

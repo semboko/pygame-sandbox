@@ -129,6 +129,7 @@ class Player(Rect):
             debug=True,
         )
         p.id = message.player_id
+        p.body.body_type = pymunk.Body.KINEMATIC
         print(f'Player.build_from_message({message}, {space}) -> Player(x={p.body.position.x}, y={p.body.position.y}, '
               f'width=50,'
               f'height=50, color=(25, 25, 25), debug=True, space={space}, id={p.id})')
