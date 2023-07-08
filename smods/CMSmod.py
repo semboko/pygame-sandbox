@@ -212,7 +212,7 @@ class CMSmod(BaseMod):
         if finish != (20, 520):
             # print(finish)
             pygame.draw.rect(self.disp, (100, 255, 0), (
-            finish[0] - self.scene.camera_shift.x, (500 - finish[1]) + self.scene.camera_shift.y, 60, 60))
+                finish[0] - self.scene.camera_shift.x, (500 - finish[1]) + self.scene.camera_shift.y, 60, 60))
         if self.mapr == "main.json":
             for but in range(len(self.gm)):
                 # print(but.text)
