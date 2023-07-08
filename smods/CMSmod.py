@@ -139,7 +139,6 @@ class CMSmod(BaseMod):
             exec(codes)
             if pj:
                 for i in pj:
-                    print(i)
                     if not self.scene.space.point_query(i[0], 1,
                                                         pymunk.ShapeFilter()) or not self.scene.space.point_query(i[1],
                                                                                                                   1,
@@ -211,7 +210,7 @@ class CMSmod(BaseMod):
 
     def onrender(self):
         if finish != (20, 520):
-            print(finish)
+            # print(finish)
             pygame.draw.rect(self.disp, (100, 255, 0), (
             finish[0] - self.scene.camera_shift.x, (500 - finish[1]) + self.scene.camera_shift.y, 60, 60))
         if self.mapr == "main.json":
