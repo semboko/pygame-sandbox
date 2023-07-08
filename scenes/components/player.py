@@ -1,4 +1,6 @@
 import time
+import uuid
+from dataclasses import dataclass
 from enum import Enum
 from typing import Tuple
 
@@ -18,6 +20,14 @@ class PlayerState(Enum):
     RUN = "run"
     FALL = "fall"
     MINE = "mine"
+
+
+@dataclass
+class PlayerMessage:
+    player_id: uuid.UUID
+    player_pos: pymunk.Vec2d
+    player_direction: int
+    player_state: PlayerState
 
 
 class Player(Rect):
@@ -41,6 +51,9 @@ class Player(Rect):
         self.state = PlayerState.IDLE
         self.animation_time = 0
         self.moves = 1
+        self.id = uuid.uuid4()
+        if 'id' in kwargs:
+            self.id = kwargs['id']
 
     def move(self, direction: int):
         if direction != self.moves:
@@ -63,6 +76,9 @@ class Player(Rect):
             self.state = PlayerState.FALL
 
         self.sprite.active_sprite = self.state.value
+
+    def create_message(self) -> PlayerMessage:
+        return PlayerMessage(self.id, self.body.position, self.direction, self.state)
 
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         # super(Player, self).render(display, camera_shift)
@@ -100,3 +116,20 @@ class Player(Rect):
 
     def consume_resource(self, res: BaseResource) -> None:
         self.inv.pickup(res)
+
+    @classmethod
+    def build_from_message(cls, message: PlayerMessage, space: pymunk.Space) -> 'Player':
+        p = Player(
+            x=message.player_pos.x,
+            y=message.player_pos.y,
+            width=50,
+            height=50,
+            space=space,
+            color=(25, 25, 25),
+            debug=True,
+        )
+        p.id = message.player_id
+        print(f'Player.build_from_message({message}, {space}) -> Player(x={p.body.position.x}, y={p.body.position.y}, '
+              f'width=50,'
+              f'height=50, color=(25, 25, 25), debug=True, space={space}, id={p.id})')
+        return p

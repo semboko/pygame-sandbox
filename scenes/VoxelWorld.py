@@ -20,7 +20,7 @@ from log import logger
 from scenes.components.menu.main_menu import create_menu
 from clparser import Parser, Token
 from servconnction.menage import ConnectionManager
-
+from scenes.components.player_pool import PlayerPool
 
 pygame.init()
 pygame.font.init()
@@ -37,6 +37,7 @@ class VoxelWorld(AbstractPymunkScene):
         self._commands_buffer: List[str] = []
         self._pars = Parser()
         self.connection_menager = ConnectionManager("localhost", 6379)
+        self.remote_players = PlayerPool(self.connection_menager, self.space)
 
     def update(self):
         if not self.menu.active:
@@ -66,6 +67,17 @@ class VoxelWorld(AbstractPymunkScene):
 
         self.camera_shift = pymunk.Vec2d(self.player.body.position.x - 250, self.player.body.position.y - 250)
         self.floor.update(self.camera_shift.x)
+        self.connection_menager.send_player_message(self.player)
+        # print(self.remote_players.pool)
+        message = self.connection_menager.receive_player_message()
+        while message:
+            if message and message.player_id != self.player.id:
+                # print(f'update: {message}')
+                if message.player_id not in self.remote_players.pool:
+                    self.remote_players.add_player(message)
+                else:
+                    self.remote_players.update_player(message)
+            message = self.connection_menager.receive_player_message()
 
         for obj in self.objects:
             if issubclass(type(obj), BaseResource) and self.player.shape.shapes_collide(obj.rect.shape).points:
@@ -150,6 +162,9 @@ class VoxelWorld(AbstractPymunkScene):
 
     def render(self):
         self.bg.render(self.display, self.camera_shift)
+        for i in self.remote_players.pool:
+            print(i, self.remote_players.pool[i].body.position)
+        self.remote_players.render(self.display, self.camera_shift)
         for obj in self.objects:
             obj.render(self.display, self.camera_shift)
         for p in self.player.dp:
