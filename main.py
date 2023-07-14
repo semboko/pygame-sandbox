@@ -58,11 +58,11 @@ class Game:
         while True:
             try:
                 for event in pygame.event.get():
+                    self.scene.handle_event(event)
                     if event.type == pygame.QUIT:
                         for mod in self.mods:
                             mod.quit()
                         return
-                    self.scene.handle_event(event)
                     for mod in self.mods:
                         mod.handle_pressed_keys(pygame.key.get_pressed())
                     for mod in self.mods:

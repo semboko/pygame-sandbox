@@ -1,3 +1,5 @@
+import logging
+
 from scenes.components.menu.abstract_menu import AbstractMenuElement
 from pygame.surface import Surface
 from pygame.rect import Rect

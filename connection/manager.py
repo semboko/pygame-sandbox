@@ -1,7 +1,10 @@
+import time
 from typing import Optional
 import pickle
 import pymunk
 from redis import Redis
+from typing import Dict
+from redis.client import PubSub
 from scenes.components.player import PlayerMessage, Player
 
 
@@ -11,6 +14,16 @@ class ConnectionManager:
         self.receiver = self.db.pubsub()
 
         self.receiver.subscribe("chat", "player")
+
+        self.send_delay_sec = 0.1
+        self.next_update = time.time() + self.send_delay_sec
+
+        self.receivers: Dict[str, PubSub] = {}
+
+    def add_receiver(self, channel_name: str) -> None:
+        new_receiver = self.db.pubsub()
+        new_receiver.subscribe(channel_name)
+        self.receivers[channel_name] = new_receiver
 
     def send_chat_message(self, message: str) -> None:
         self.db.publish("chat", message)
@@ -30,13 +43,20 @@ class ConnectionManager:
         return None
 
     def send_player_message(self, player: Player) -> None:
+        if time.time() < self.next_update:
+            return
+
+        pos = player.body.position
+        rounded_pos = pymunk.Vec2d(round(pos.x), round(pos.y))
         message = PlayerMessage(
             player_id=player.id,
-            player_pos=player.body.position,
+            player_pos=rounded_pos,
             player_state=player.state,
             player_direction=player.direction,
+            player_username=player.username,
         )
 
         dumped_message = pickle.dumps(message)
         self.db.publish("player", dumped_message)
+        self.next_update = time.time() + self.send_delay_sec
 

@@ -1,4 +1,5 @@
 import pickle
+import time
 from typing import List
 
 import pygame
@@ -15,9 +16,11 @@ from scenes.components.tile import Background
 from scenes.utils import convert
 from connection.manager import ConnectionManager
 from scenes.components.player_pool import PlayerPool
+from threading import Thread
 
 pygame.init()
 pygame.font.init()
+
 
 
 class VoxelWorld(AbstractPymunkScene):
@@ -30,8 +33,11 @@ class VoxelWorld(AbstractPymunkScene):
         self.menu = create_menu(self.display)
         self.commands_buffer: List[str] = []
         self.bg = Background(self.display.get_width())
-        self.connection_manager = ConnectionManager("0.0.0.0", 5020)
+        self.connection_manager = ConnectionManager("178.62.216.119", 4567)
         self.remote_players = PlayerPool(self.connection_manager, self.space)
+
+        self.connection_thread = Thread(target=self.connection_loop, daemon=True)
+        self.connection_thread.start()
 
     def execute_command(self, command: str):
         if command.startswith("sg"):
@@ -41,6 +47,18 @@ class VoxelWorld(AbstractPymunkScene):
             _, message = command.split(" ")
             self.connection_manager.send_chat_message(message)
         print("Print from scene:" + command)
+
+    def connection_loop(self):
+        while True:
+            self.connection_manager.send_player_message(self.player)
+            while message := self.connection_manager.receive_player_message():
+                if message.player_id != self.player.id:
+                    if message.player_id not in self.remote_players.pool:
+                        self.remote_players.add_player(message)
+                    else:
+                        self.remote_players.update_player(message)
+                self.remote_players.update()
+            time.sleep(0.1)
 
     def update(self):
         if 0 <= self.menu_state <= 1:
@@ -80,15 +98,6 @@ class VoxelWorld(AbstractPymunkScene):
         # if received_message := self.connection_manager.receive_chat_message():
         #     self.menu.commands_history.append("Received: " + received_message)
 
-        self.connection_manager.send_player_message(self.player)
-        message = self.connection_manager.receive_player_message()
-        if message is not None and message.player_id != self.player.id:
-            if message.player_id not in self.remote_players.pool:
-                self.remote_players.add_player(message)
-            else:
-                self.remote_players.update_player(message)
-        self.remote_players.update()
-
     def save(self):
         logger.info("Saved into file")
         resources = [o for o in self.objects if type(o).__base__ == BaseResource]
@@ -117,6 +126,8 @@ class VoxelWorld(AbstractPymunkScene):
             resource.materialize(resource.rect.body.position, self.space)
 
     def handle_event(self, event: Event) -> None:
+        if event.type == pygame.QUIT:
+            self.connection_thread.join(timeout=0.5)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
                 self.reset_scene()

@@ -29,6 +29,7 @@ class PlayerMessage:
     player_pos: pymunk.Vec2d
     player_direction: int
     player_state: PlayerState
+    player_username: str
 
 
 class Player(Rect):
@@ -53,6 +54,9 @@ class Player(Rect):
         self.animation_time = 0
         self.moves = 1
         self.id = kwargs.get("id_") or uuid.uuid4()
+        self.username: str = kwargs.get("username", "Anonimus")
+
+        self.font = pygame.font.SysFont("Arial", 14)
 
     def move(self, direction: int):
         if direction != self.moves:
@@ -79,6 +83,9 @@ class Player(Rect):
     def render(self, display: Surface, camera_shift: pymunk.Vec2d) -> None:
         # super(Player, self).render(display, camera_shift)
         self.sprite.render_sprite(self.body.position - (25, 25) - camera_shift, display)
+        username_img = self.font.render(self.username, True, (0, 0, 0))
+        dest_point = convert(self.body.position + (-30, 50) - camera_shift, display.get_height())
+        display.blit(username_img, dest_point)
 
     def jump(self, space: pymunk.Space):
         if space.segment_query(self.body.position, (self.body.position.x, self.body.position.y - 100), 0, self.sf):
@@ -119,6 +126,7 @@ class Player(Rect):
             player_pos=self.body.position,
             player_direction=self.direction,
             player_state=self.state,
+            player_username=self.username
         )
 
     @classmethod
@@ -130,4 +138,5 @@ class Player(Rect):
             width=50,
             height=50,
             space=space,
+            username=message.player_username
         )
